@@ -1,6 +1,6 @@
 <?php
 /**
- * @link http://github.com/yii2-vn/payment
+ * @link https://github.com/yii2-vn/payment
  * @copyright Copyright (c) 2017 Yii2VN
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
@@ -10,9 +10,14 @@ namespace yii2vn\payment;
 
 /**
  * Interface PaymentGatewayInterface
+ *
+ * @package yii2vn\payment
+ *
  * @property array|MerchantInterface[] $merchants
  * @property MerchantInterface $merchant
- * @package yii2vn\payment
+ *
+ * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @since 1.0
  */
 interface PaymentGatewayInterface
 {

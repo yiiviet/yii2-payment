@@ -1,6 +1,6 @@
 <?php
 /**
- * @link http://github.com/yii2vn/payment
+ * @link https://github.com/yii2-vn/payment
  * @copyright Copyright (c) 2017 Yii2VN
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
@@ -9,6 +9,7 @@
 namespace yii2vn\payment;
 
 use Yii;
+
 use yii\base\Component;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
@@ -17,11 +18,12 @@ use yii\httpclient\Client as HttpClient;
 
 /**
  * @package yii2vn\payment
- * @author: Vuong Minh <vuongxuongminh@gmail.com>
- * @since 1.0
  *
  * @property MerchantInterface $defaultMerchant
  * @property MerchantInterface $merchant
+ *
+ * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @since 1.0
  */
 abstract class BasePaymentGateway extends Component implements PaymentGatewayInterface
 {
@@ -37,9 +39,11 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      */
     public function init()
     {
-        if (is_string($this->httpClient)) {
+        $httpClient = $this->httpClient;
+
+        if (is_string($httpClient)) {
             $httpClient = ['class' => $this->httpClient, 'baseUrl' => static::baseUrl()];
-        } elseif (is_array($this->httpClient)) {
+        } elseif (is_array($httpClient)) {
             $httpClient['baseUrl'] = static::baseUrl();
         }
 
@@ -150,11 +154,14 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
             $merchant = $this->getDefaultMerchant();
         }
 
-        $this->trigger(self::EVENT_BEFORE_CHECKOUT, $event = new CheckoutEvent([
+        $event = Yii::createObject([
+            'class' => CheckoutEvent::class,
             'merchant' => $merchant,
             'method' => $method,
             'paymentInfo' => $info
-        ]));
+        ]);
+
+        $this->trigger(self::EVENT_BEFORE_CHECKOUT, $event);
 
         if ($event->isValid) {
             $responseData = $this->checkoutInternal($info, $merchant, $method);
