@@ -13,12 +13,12 @@ use Yii;
 use yii\base\Component;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
-use yii\di\Instance;
 use yii\httpclient\Client as HttpClient;
 
 /**
  * @package yii2vn\payment
  *
+ * @property HttpClient $httpClient
  * @property MerchantInterface $defaultMerchant
  * @property MerchantInterface $merchant
  *
@@ -28,28 +28,9 @@ use yii\httpclient\Client as HttpClient;
 abstract class BasePaymentGateway extends Component implements PaymentGatewayInterface
 {
 
-    /**
-     * @var array|string|HttpClient
-     */
-    public $httpClient = ['class' => HttpClient::class];
+    public $checkoutBankInstanceClass;
 
-    /**
-     * @inheritdoc
-     * @throws InvalidConfigException
-     */
-    public function init()
-    {
-        $httpClient = $this->httpClient;
-
-        if (is_string($httpClient)) {
-            $httpClient = ['class' => $this->httpClient, 'baseUrl' => static::baseUrl()];
-        } elseif (is_array($httpClient)) {
-            $httpClient['baseUrl'] = static::baseUrl();
-        }
-
-        $this->httpClient = Instance::ensure($httpClient, HttpClient::class);
-        parent::init();
-    }
+    public $checkoutTelCardInstanceClass;
 
     private $_merchants = [];
 
@@ -58,7 +39,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @return array|MerchantInterface[]
      * @throws InvalidConfigException
      */
-    public function getMerchants($load = true)
+    public function getMerchants($load = true): array
     {
         if ($load) {
             $merchants = [];
@@ -72,12 +53,15 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 
     /**
      * @param array|MerchantInterface[] $merchants
+     * @return bool
      */
-    public function setMerchants(array $merchants)
+    public function setMerchants(array $merchants): bool
     {
         foreach ($merchants as $id => $merchant) {
             $this->setMerchant($id, $merchant);
         }
+
+        return true;
     }
 
     /**
@@ -108,13 +92,20 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
         }
     }
 
-    public function setMerchant($id, $merchant = null)
+    /**
+     * @param $id
+     * @param null $merchant
+     * @return bool
+     */
+    public function setMerchant($id, $merchant = null): bool
     {
         if ($merchant === null) {
             $this->_merchants[] = $id;
         } else {
             $this->_merchants[$id] = $merchant;
         }
+
+        return true;
     }
 
 
@@ -142,29 +133,25 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @param PaymentInfoInterface $info
-     * @param MerchantInterface|null $merchant
+     * @param array|string|CheckoutInstanceInterface $instance
      * @param string $method
      * @return CheckoutResponseDataInterface|bool
      * @throws InvalidConfigException
      */
-    public function checkout(PaymentInfoInterface $info, MerchantInterface $merchant = null, $method = self::CHECKOUT_METHOD_IB)
+    public function checkout($instance, string $method = self::CHECKOUT_METHOD_INTERNET_BANKING)
     {
-        if ($merchant === null) {
-            $merchant = $this->getDefaultMerchant();
-        }
+        $instance = $this->prepareCheckoutInstance($instance, $method);
 
         $event = Yii::createObject([
             'class' => CheckoutEvent::class,
-            'merchant' => $merchant,
+            'instance' => $instance,
             'method' => $method,
-            'paymentInfo' => $info
         ]);
 
         $this->trigger(self::EVENT_BEFORE_CHECKOUT, $event);
 
         if ($event->isValid) {
-            $responseData = $this->checkoutInternal($info, $merchant, $method);
+            $responseData = $this->checkoutInternal($info, $method);
             $event->responseData = $responseData;
             $this->trigger(self::EVENT_AFTER_CHECKOUT, $event);
             return $responseData;
@@ -173,5 +160,71 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
         }
     }
 
-    abstract protected function checkoutInternal(PaymentInfoInterface $info, MerchantInterface $merchant, $method): CheckoutResponseDataInterface;
+    /**
+     * @param CheckoutInstanceInterface $instance
+     * @param string $method
+     * @return CheckoutResponseDataInterface
+     */
+    abstract protected function checkoutInternal(CheckoutInstanceInterface $instance, string $method): CheckoutResponseDataInterface;
+
+    /**
+     * @param array|string|CheckoutInstanceInterface $instance
+     * @param string $method
+     * @return object|CheckoutInstanceInterface
+     * @throws InvalidConfigException
+     */
+    protected function prepareCheckoutInstance($instance, string $method): CheckoutInstanceInterface
+    {
+        if ($instance instanceof CheckoutInstanceInterface) {
+            return $instance;
+        } elseif (is_array($instance) && !isset($instance['class'])) {
+            if ($method === self::CHECKOUT_METHOD_TEL_CARD) {
+                $class = $this->checkoutTelCardInstanceClass;
+            } else {
+                $class = $this->checkoutBankInstanceClass;
+            }
+            $instance['class'] = $class;
+        }
+
+        return Yii::createObject($instance);
+    }
+
+    /**
+     * @var HttpClient|null
+     */
+    private $_httpClient;
+
+    /**
+     * @return HttpClient
+     * @throws InvalidConfigException
+     */
+    public function getHttpClient()
+    {
+        if (!$this->_httpClient) {
+            $this->setHttpClient([]);
+        }
+
+        return $this->_httpClient;
+    }
+
+    /**
+     * @param $client
+     * @throws InvalidConfigException
+     */
+    public function setHttpClient($client)
+    {
+        if (is_string($client)) {
+            $client = ['class' => $client];
+        } elseif (is_array($client) && !isset($client['class'])) {
+            $client['class'] = HttpClient::class;
+        }
+
+        if (!$client instanceof HttpClient) {
+            /** @var HttpClient $client */
+            $client = Yii::createObject($client);
+        }
+
+        $client->baseUrl = $this->getBaseUrl();
+        $this->_httpClient = $client;
+    }
 }
