@@ -9,11 +9,10 @@
 namespace yii2vn\payment;
 
 use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\di\Instance;
 
 /**
- * @package yii2vn\payment
- *
  * @property PaymentGatewayInterface $paymentGateway
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
@@ -21,48 +20,44 @@ use yii\di\Instance;
  */
 abstract class BaseMerchant extends Component implements MerchantInterface
 {
-
+    /**
+     * @var string
+     */
     public $name;
 
+    /**
+     * @var string
+     */
     public $email;
 
-    public $phone;
-
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @var string
      */
-    public function init()
-    {
-        $this->_paymentGateway = Instance::ensure($this->_paymentGateway, PaymentGatewayInterface::class);
-    }
+    public $phone;
 
     /**
      * @var array|string|PaymentGatewayInterface
      */
     private $_paymentGateway;
 
+    /**
+     * @return PaymentGatewayInterface
+     */
     public function getPaymentGateway(): PaymentGatewayInterface
     {
         return $this->_paymentGateway;
     }
 
-    public function setPaymentGateway(PaymentGatewayInterface $paymentGateway): bool
+    /**
+     * @param array|string|PaymentGatewayInterface $paymentGateway
+     * @return bool
+     * @throws InvalidConfigException
+     */
+    public function setPaymentGateway($paymentGateway): bool
     {
-        $this->_paymentGateway = $paymentGateway;
+        $this->_paymentGateway = Instance::ensure($paymentGateway, PaymentGatewayInterface::class);
 
         return true;
-    }
-
-    /**
-     * @param BaseCheckoutBankInstance|CheckoutDataInterface $info
-     * @param string $method
-     * @return bool|CheckoutResponseDataInterface
-     */
-    public function checkout(CheckoutDataInterface $info, $method = PaymentGatewayInterface::CHECKOUT_METHOD_INTERNET_BANKING)
-    {
-        $info->merchant = $this;
-
-        return $this->_paymentGateway->checkout($info, $method);
     }
 
 }
