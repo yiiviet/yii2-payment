@@ -16,7 +16,6 @@ use yii\base\InvalidConfigException;
 use yii\httpclient\Client as HttpClient;
 
 /**
- * @package yii2vn\payment
  *
  * @property HttpClient $httpClient
  * @property MerchantInterface $defaultMerchant
@@ -27,6 +26,8 @@ use yii\httpclient\Client as HttpClient;
  */
 abstract class BasePaymentGateway extends Component implements PaymentGatewayInterface
 {
+
+    public $merchantClass;
 
     public $checkoutBankInstanceClass;
 
@@ -47,8 +48,10 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
                 $merchants[$id] = $this->getMerchant($id);
             }
         } else {
-            return $this->_merchants;
+            $merchants = $this->_merchants;
         }
+
+        return $merchants;
     }
 
     /**
@@ -73,19 +76,27 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     {
         if ($id === null) {
             return $this->getDefaultMerchant();
-        } elseif ((is_string($id) || is_int($id)) && isset($this->_merchants[$id])) {
-            $merchant = $this->_merchants[$id];
+        } elseif ((is_string($id) || is_int($id))) {
+            if (isset($this->_merchants[$id])) {
+                $merchant = $this->_merchants[$id];
 
-            if (is_string($merchant)) {
-                $merchant = ['class' => $merchant, 'paymentGateway' => $this];
-            } elseif (is_array($merchant)) {
-                $merchant['paymentGateway'] = $this;
-            }
+                if (is_string($merchant)) {
+                    $merchant = ['class' => $merchant, 'paymentGateway' => $this];
+                } elseif (is_array($merchant)) {
+                    $merchant['paymentGateway'] = $this;
+                    if (!isset($merchant['class'])) {
+                        $merchant['class'] = $this->merchantClass;
+                    }
+                }
 
-            if (!$merchant instanceof MerchantInterface) {
-                return $this->_merchants[$id] = Yii::createObject($merchant);
+                if (!$merchant instanceof MerchantInterface) {
+                    return $this->_merchants[$id] = Yii::createObject($merchant);
+                } else {
+                    return $merchant;
+                }
+
             } else {
-                return $merchant;
+                throw new InvalidConfigException(__METHOD__ . ": merchant id: `$id` not found!");
             }
         } else {
             throw new InvalidArgumentException('Only accept get merchant via string or int key type!');
@@ -125,7 +136,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
             if ($merchantId = reset($merchantIds)) {
                 return $this->_defaultMerchant = $this->getMerchant($merchantId);
             } else {
-                throw new InvalidConfigException('Can not get default merchant on an empty array merchants list!');
+                throw new InvalidConfigException('Can not get default merchant on an empty array merchants!');
             }
         } else {
             return $this->_defaultMerchant;
@@ -151,7 +162,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
         $this->trigger(self::EVENT_BEFORE_CHECKOUT, $event);
 
         if ($event->isValid) {
-            $responseData = $this->checkoutInternal($info, $method);
+            $responseData = $this->checkoutInternal($instance, $method);
             $event->responseData = $responseData;
             $this->trigger(self::EVENT_AFTER_CHECKOUT, $event);
             return $responseData;
@@ -177,13 +188,23 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     {
         if ($instance instanceof CheckoutInstanceInterface) {
             return $instance;
-        } elseif (is_array($instance) && !isset($instance['class'])) {
-            if ($method === self::CHECKOUT_METHOD_TEL_CARD) {
-                $class = $this->checkoutTelCardInstanceClass;
-            } else {
-                $class = $this->checkoutBankInstanceClass;
+        } elseif (is_array($instance) || is_string($instance)) {
+            if (is_string($instance)) {
+                $instance = ['class' => $instance];
             }
-            $instance['class'] = $class;
+
+            if (!isset($instance['class'])) {
+                if ($method === self::CHECKOUT_METHOD_TEL_CARD) {
+                    $class = $this->checkoutTelCardInstanceClass;
+                } else {
+                    $class = $this->checkoutBankInstanceClass;
+                }
+                $instance['class'] = $class;
+            }
+
+            if (!isset($instance['merchant'])) {
+                $instance['merchant'] = $this->getDefaultMerchant();
+            }
         }
 
         return Yii::createObject($instance);
@@ -198,7 +219,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @return HttpClient
      * @throws InvalidConfigException
      */
-    public function getHttpClient()
+    public function getHttpClient(): HttpClient
     {
         if (!$this->_httpClient) {
             $this->setHttpClient([]);
@@ -209,9 +230,10 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 
     /**
      * @param $client
+     * @return bool
      * @throws InvalidConfigException
      */
-    public function setHttpClient($client)
+    public function setHttpClient($client): bool
     {
         if (is_string($client)) {
             $client = ['class' => $client];
@@ -226,5 +248,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 
         $client->baseUrl = $this->getBaseUrl();
         $this->_httpClient = $client;
+
+        return true;
     }
 }
