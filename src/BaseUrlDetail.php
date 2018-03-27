@@ -12,7 +12,6 @@ use yii\helpers\Url;
 
 /**
  * Class BaseUrlDetail
- * @package yii2vn\payment
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -20,30 +19,38 @@ use yii\helpers\Url;
 abstract class BaseUrlDetail extends BaseObject implements CheckoutDataInterface
 {
 
+    public $schema = "http";
+
     public $urlSuccess;
 
     public $urlCancel;
 
     public $urlDetail;
 
+    public $urlSuccessSchema;
+
+    public $urlCancelSchema;
+
+    public $urlDetailSchema;
+
     public function init()
     {
         if ($this->urlSuccess) {
-            $this->urlSuccess = $this->ensureUrl($this->urlSuccess);
+            $this->urlSuccess = $this->ensureUrl($this->urlSuccess, $this->urlSuccessSchema ?? $this->schema);
         }
 
         if ($this->urlCancel) {
-            $this->urlCancel = $this->ensureUrl($this->urlCancel);
+            $this->urlCancel = $this->ensureUrl($this->urlCancel, $this->urlCancelSchema ?? $this->schema);
         }
 
         if ($this->urlDetail) {
-            $this->urlDetail = $this->ensureUrl($this->urlDetail);
+            $this->urlDetail = $this->ensureUrl($this->urlDetail, $this->urlDetailSchema ?? $this->schema);
         }
 
         parent::init();
     }
 
-    private function ensureUrl($urlSuccess, $schema = "http")
+    protected function ensureUrl($urlSuccess, $schema)
     {
         return Url::to($urlSuccess, $schema);
     }
