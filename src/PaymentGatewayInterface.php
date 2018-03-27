@@ -22,35 +22,44 @@ namespace yii2vn\payment;
 interface PaymentGatewayInterface
 {
 
-    const CHECKOUT_METHOD_IB = "INTERNET BANKING";
+    const CHECKOUT_METHOD_TEL_CARD = 'TEL CARD';
 
-    const CHECKOUT_METHOD_DEBIT_CARD = "DEBIT CARD";
+    const CHECKOUT_METHOD_INTERNET_BANKING = 'INTERNET BANKING';
 
-    const CHECKOUT_METHOD_CREDIT_CARD = "CREDIT CARD";
+    const CHECKOUT_METHOD_DEBIT_CARD = 'DEBIT CARD';
 
-    const CHECKOUT_METHOD_OFFLINE_ATM = "OFFLINE ATM";
+    const CHECKOUT_METHOD_CREDIT_CARD = 'CREDIT CARD';
 
-    const CHECKOUT_METHOD_BANK_OFFICE = "BANK OFFICE";
+    const CHECKOUT_METHOD_OFFLINE_ATM = 'OFFLINE ATM';
 
-    const CHECKOUT_METHOD_QR_CODE = "QR CODE";
+    const CHECKOUT_METHOD_BANK_OFFICE = 'BANK OFFICE';
 
-    const EVENT_BEFORE_CHECKOUT = "beforeCheckout";
+    const CHECKOUT_METHOD_QR_CODE = 'QR CODE';
 
-    const EVENT_AFTER_CHECKOUT = "afterCheckout";
+    const EVENT_BEFORE_CHECKOUT = 'beforeCheckout';
 
-    public static function baseUrl();
+    const EVENT_AFTER_CHECKOUT = 'afterCheckout';
 
-    public static function getVersion();
+    /**
+     * @return string
+     */
+    public static function getVersion(): string;
+
+    /**
+     * @return string
+     */
+    public function getBaseUrl(): string;
 
     /**
      * @return array|MerchantInterface[]
      */
-    public function getMerchants();
+    public function getMerchants(): array;
 
     /**
      * @param array|MerchantInterface[] $merchants
+     * @return bool
      */
-    public function setMerchants(array $merchants);
+    public function setMerchants(array $merchants): bool;
 
 
     /**
@@ -62,16 +71,15 @@ interface PaymentGatewayInterface
     /**
      * @param $id
      * @param array|string|MerchantInterface $merchant
-     * @return mixed
+     * @return bool
      */
-    public function setMerchant($id, $merchant);
+    public function setMerchant($id, $merchant): bool;
 
     /**
-     * @param PaymentInfoInterface $info
-     * @param MerchantInterface $merchant
+     * @param array|string|CheckoutInstanceInterface $instance
      * @param string $method
      * @return CheckoutResponseDataInterface|bool
      */
-    public function checkout(PaymentInfoInterface $info, MerchantInterface $merchant, $method = self::CHECKOUT_METHOD_IB);
+    public function checkout($instance, string $method = self::CHECKOUT_METHOD_INTERNET_BANKING);
 
 }

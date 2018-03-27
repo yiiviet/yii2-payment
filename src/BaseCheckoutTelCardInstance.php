@@ -5,25 +5,21 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-
 namespace yii2vn\payment;
 
-
 /**
+ * Class BaseCheckoutTelCardInstance
  * @package yii2vn\payment
- *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-interface MerchantInterface extends CheckoutDataInterface
+abstract class BaseCheckoutTelCardInstance extends BaseCheckoutInstance implements CheckoutDataInterface
 {
 
-    public function getPaymentGateway(): PaymentGatewayInterface;
+    public $provider;
 
-    public function setPaymentGateway(PaymentGatewayInterface $paymentGateway): bool;
+    public $serial;
 
-    public function signature(): string;
-
-    public function validateSignature(): bool;
+    public $pinCode;
 
 }
