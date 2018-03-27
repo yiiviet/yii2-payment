@@ -22,6 +22,12 @@ use yii\di\Instance;
 abstract class BaseMerchant extends Component implements MerchantInterface
 {
 
+    public $name;
+
+    public $email;
+
+    public $phone;
+
     /**
      * @throws \yii\base\InvalidConfigException
      */
@@ -35,19 +41,28 @@ abstract class BaseMerchant extends Component implements MerchantInterface
      */
     private $_paymentGateway;
 
-    public function getPaymentGateway()
+    public function getPaymentGateway(): PaymentGatewayInterface
     {
         return $this->_paymentGateway;
     }
 
-    public function setPaymentGateway(PaymentGatewayInterface $paymentGateway)
+    public function setPaymentGateway(PaymentGatewayInterface $paymentGateway): bool
     {
         $this->_paymentGateway = $paymentGateway;
+
+        return true;
     }
 
-    public function checkout(PaymentInfoInterface $info, $method = PaymentGatewayInterface::CHECKOUT_METHOD_IB)
+    /**
+     * @param BaseCheckoutBankInstance|CheckoutDataInterface $info
+     * @param string $method
+     * @return bool|CheckoutResponseDataInterface
+     */
+    public function checkout(CheckoutDataInterface $info, $method = PaymentGatewayInterface::CHECKOUT_METHOD_INTERNET_BANKING)
     {
-        return $this->_paymentGateway->checkout($info, $this, $method);
+        $info->merchant = $this;
+
+        return $this->_paymentGateway->checkout($info, $method);
     }
 
 }

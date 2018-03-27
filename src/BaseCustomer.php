@@ -14,7 +14,13 @@ use yii\base\BaseObject;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseCustomer extends BaseObject implements PaymentInfoInterface
+abstract class BaseCustomer extends BaseObject implements CheckoutDataInterface
 {
+
+    public $name;
+
+    public $email;
+
+    public $phone;
 
 }

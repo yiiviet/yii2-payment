@@ -15,7 +15,9 @@ use yii\base\BaseObject;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseBank extends BaseObject implements PaymentInfoInterface
+abstract class BaseBank extends BaseObject implements CheckoutDataInterface
 {
+
+    public $id;
 
 }

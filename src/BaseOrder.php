@@ -15,7 +15,21 @@ use yii\base\BaseObject;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseOrder extends BaseObject implements PaymentInfoInterface
+abstract class BaseOrder extends BaseObject implements CheckoutDataInterface
 {
+
+    public $id;
+
+    public $amount;
+
+    public $shippingFee;
+
+    public $taxFee;
+
+    public $currency;
+
+    public $description;
+
+    public $shippingAddress;
 
 }
