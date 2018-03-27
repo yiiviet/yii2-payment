@@ -13,6 +13,7 @@ use yii\di\Instance;
 
 /**
  * Class BaseCheckoutInstance
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */

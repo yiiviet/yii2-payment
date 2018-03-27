@@ -11,7 +11,6 @@ namespace yii2vn\payment;
 /**
  * Interface CheckoutResponseDataInterface
  *
- *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */

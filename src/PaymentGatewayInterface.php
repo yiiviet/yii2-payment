@@ -11,7 +11,6 @@ namespace yii2vn\payment;
 /**
  * Interface PaymentGatewayInterface
  *
- * @package yii2vn\payment
  *
  * @property array|MerchantInterface[] $merchants
  * @property MerchantInterface $merchant

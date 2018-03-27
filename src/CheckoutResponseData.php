@@ -15,7 +15,6 @@ use yii\di\Instance;
 
 
 /**
- * @package yii2vn\payment
  *
  * @property int $responseCode
  * @property string $redirectUrl

@@ -23,7 +23,6 @@ use yii2vn\payment\MerchantInterface;
 /**
  * Class PaymentGateway
  *
- * @package yii2vn\src\baokim
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */

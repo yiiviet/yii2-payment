@@ -11,7 +11,7 @@ namespace yii2vn\payment;
 use yii\base\BaseObject;
 
 /**
- * @package yii2vn\payment
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */

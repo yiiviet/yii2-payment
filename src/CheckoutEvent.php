@@ -11,7 +11,6 @@ namespace yii2vn\payment;
 use yii\base\Event;
 
 /**
- * @package yii2vn\payment
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -25,12 +24,12 @@ class CheckoutEvent extends Event
     public $method;
 
     /**
-     * @var CheckoutInstanceInterface|CheckoutInstanceInterface
+     * @var CheckoutInstanceInterface
      */
     public $instance;
 
     /**
-     * @var CheckoutResponseData
+     * @var CheckoutResponseDataInterface
      */
     public $responseData;
 
