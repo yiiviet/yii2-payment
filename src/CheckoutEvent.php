@@ -20,19 +20,14 @@ class CheckoutEvent extends Event
 {
 
     /**
-     * @var MerchantInterface
-     */
-    public $merchant;
-
-    /**
      * @var string
      */
     public $method;
 
     /**
-     * @var PaymentInfoInterface
+     * @var CheckoutInstanceInterface|CheckoutInstanceInterface
      */
-    public $paymentInfo;
+    public $instance;
 
     /**
      * @var CheckoutResponseData
