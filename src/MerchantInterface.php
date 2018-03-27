@@ -10,7 +10,6 @@ namespace yii2vn\payment;
 
 
 /**
- * @package yii2vn\payment
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -18,12 +17,29 @@ namespace yii2vn\payment;
 interface MerchantInterface extends CheckoutDataInterface
 {
 
+    const SIGNATURE_RSA = 'RSA';
+
+    const SIGNATURE_CHECKSUM = 'CHECKSUM';
+
+    /**
+     * @return PaymentGatewayInterface
+     */
     public function getPaymentGateway(): PaymentGatewayInterface;
 
-    public function setPaymentGateway(PaymentGatewayInterface $paymentGateway): bool;
+    /**
+     * @param array|string|PaymentGatewayInterface $paymentGateway
+     * @return bool
+     */
+    public function setPaymentGateway($paymentGateway): bool;
 
+    /**
+     * @return string
+     */
     public function signature(): string;
 
+    /**
+     * @return bool
+     */
     public function validateSignature(): bool;
 
 }

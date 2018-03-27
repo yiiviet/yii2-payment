@@ -15,16 +15,12 @@ use yii2vn\payment\BaseMerchant;
 
 /**
  * Class Merchant
- * @package yii2vn\payment\baokim
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
 class Merchant extends BaseMerchant
 {
-
-    const SIGNATURE_RSA = "RSA";
-
-    const SIGNATURE_CHECKSUM = "CHECKSUM";
 
     public $id;
 
