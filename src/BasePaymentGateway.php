@@ -14,6 +14,7 @@ use yii\base\Component;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\httpclient\Client as HttpClient;
+use yii\httpclient\Request as HttpClientRequest;
 
 /**
  *
@@ -70,7 +71,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @param null|string|int $id
      * @return mixed|MerchantInterface
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|InvalidArgumentException
      */
     public function getMerchant($id = null): MerchantInterface
     {
@@ -104,7 +105,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @param $id
+     * @param int|string $id
      * @param null $merchant
      * @return bool
      */
@@ -213,7 +214,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @var HttpClient|null
      */
-    private $_httpClient;
+    private $_httpClient = ['class' => HttpClient::class, 'transport' => 'yii\httpclient\CurlTransport'];
 
     /**
      * @return HttpClient
@@ -221,34 +222,36 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      */
     public function getHttpClient(): HttpClient
     {
-        if (!$this->_httpClient) {
-            $this->setHttpClient([]);
-        }
+        if (!$this->_httpClient instanceof HttpClient) {
+            $client = $this->_httpClient = Yii::createObject($this->_httpClient);
+            $client->baseUrl = $this->getBaseUrl();
 
-        return $this->_httpClient;
+            return $client;
+        } else {
+            return $this->_httpClient;
+        }
     }
 
     /**
-     * @param $client
+     * @param array|string|callable|HttpClient $client
      * @return bool
-     * @throws InvalidConfigException
      */
     public function setHttpClient($client): bool
     {
-        if (is_string($client)) {
-            $client = ['class' => $client];
-        } elseif (is_array($client) && !isset($client['class'])) {
-            $client['class'] = HttpClient::class;
+        if ($client instanceof HttpClient) {
+            $client->baseUrl = $this->getBaseUrl();
         }
 
-        if (!$client instanceof HttpClient) {
-            /** @var HttpClient $client */
-            $client = Yii::createObject($client);
-        }
-
-        $client->baseUrl = $this->getBaseUrl();
         $this->_httpClient = $client;
 
         return true;
     }
+
+    /**
+     * @param MerchantInterface $merchant
+     * @param string $httpMethod
+     * @return HttpClientRequest
+     */
+    abstract protected function createHttpRequest(MerchantInterface $merchant, string $httpMethod): HttpClientRequest;
+
 }
