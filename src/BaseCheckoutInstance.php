@@ -24,19 +24,28 @@ abstract class BaseCheckoutInstance extends BaseObject implements CheckoutInstan
      */
     private $_merchant;
 
+    /**
+     * @return object|MerchantInterface
+     * @throws InvalidConfigException
+     */
     public function getMerchant(): MerchantInterface
     {
-        return $this->_merchant;
+        if (!$this->_merchant instanceof MerchantInterface) {
+            return $this->_merchant = Instance::ensure($this->_merchant, MerchantInterface::class);
+        } else {
+            return $this->_merchant;
+        }
     }
 
     /**
      * @param array|string|MerchantInterface $merchant
      * @return bool
-     * @throws InvalidConfigException
      */
     public function setMerchant($merchant): bool
     {
-        $this->_merchant = Instance::ensure($merchant, MerchantInterface::class);
+        $this->_merchant = $merchant;
+
+        return true;
     }
 
 }

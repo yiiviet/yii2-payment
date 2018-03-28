@@ -16,7 +16,7 @@ use yii\base\InvalidConfigException;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class BaseCheckoutBankInstance extends BaseCheckoutInstance implements CheckoutDataInterface
+abstract class BaseCheckoutBankInstance extends BaseCheckoutInstance
 {
 
     /**
@@ -130,6 +130,7 @@ class BaseCheckoutBankInstance extends BaseCheckoutInstance implements CheckoutD
     /**
      * @param string $method
      * @return array
+     * @throws InvalidConfigException
      */
     public function getData(string $method): array
     {
