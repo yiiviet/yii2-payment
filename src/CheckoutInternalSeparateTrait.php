@@ -10,26 +10,26 @@ namespace yii2vn\payment;
 use yii\base\NotSupportedException;
 
 /**
- * Trait CheckoutSeparateInternalTrait
+ * Trait CheckoutInternalSeparateTrait
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-trait CheckoutSeparateInternalTrait
+trait CheckoutInternalSeparateTrait
 {
 
     /**
-     * @param CheckoutDataInterface $info
+     * @param CheckoutInstanceInterface $instance
      * @param string $method
      * @return CheckoutResponseDataInterface
      * @throws NotSupportedException
      */
-    protected function checkoutInternal(CheckoutDataInterface $info, string $method): CheckoutResponseDataInterface
+    protected function checkoutInternal(CheckoutInstanceInterface $instance, string $method): CheckoutResponseDataInterface
     {
         $method = "checkoutWith" . $method;
 
         if (method_exists($this, $method)) {
-            return $this->$method($info);
+            return $this->$method($instance);
         } else {
             throw new NotSupportedException('Checkout method: ' . $method . ' is not support on: ' . __CLASS__);
         }
