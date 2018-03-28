@@ -19,7 +19,7 @@ interface MerchantInterface extends CheckoutDataInterface
 
     const SIGNATURE_RSA = 'RSA';
 
-    const SIGNATURE_CHECKSUM = 'CHECKSUM';
+    const SIGNATURE_HMAC = 'HMAC';
 
     /**
      * @return PaymentGatewayInterface
@@ -33,13 +33,18 @@ interface MerchantInterface extends CheckoutDataInterface
     public function setPaymentGateway($paymentGateway): bool;
 
     /**
+     * @param string|array|DataSignatureInterface $dataSignature
+     * @param null|string $type
      * @return string
      */
-    public function signature(): string;
+    public function signature($dataSignature, string $type = null): string;
 
     /**
+     * @param string|array|DataSignatureInterface $dataSignature
+     * @param string $expectSignature
+     * @param null|string $type
      * @return bool
      */
-    public function validateSignature(): bool;
+    public function validateSignature($dataSignature, string $expectSignature, string $type = null): bool;
 
 }
