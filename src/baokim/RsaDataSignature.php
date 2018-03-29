@@ -32,6 +32,11 @@ class RsaDataSignature extends BaseRsaDataSignature
      */
     public $httpMethod;
 
+    public static function getOpenSSLAlgo(): int
+    {
+        return OPENSSL_ALGO_SHA1;
+    }
+
     /**
      * @return string
      */
@@ -40,8 +45,9 @@ class RsaDataSignature extends BaseRsaDataSignature
         $data = $this->getData();
         ksort($data);
         $httpMethod = strtoupper($this->httpMethod);
+        $httpQuery = http_build_query($data);
         $str = $httpMethod . '&' . urlencode($this->urlPath);
-        $str .= '&' . urlencode(http_build_query(self::HTTP_METHOD_GET === $httpMethod ? $data : [])) . '&' . urlencode(http_build_query(self::HTTP_METHOD_POST === $httpMethod ? $data : []));
+        $str .= '&' . urlencode(self::HTTP_METHOD_GET === $httpMethod ? $httpQuery : '') . '&' . urlencode(self::HTTP_METHOD_POST === $httpMethod ? $httpQuery : '');
 
         return $str;
     }

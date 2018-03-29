@@ -12,7 +12,7 @@ use Yii;
 use yii\base\NotSupportedException;
 use yii\base\InvalidConfigException;
 use yii\httpclient\Client as HttpClient;
-use yii\httpclient\Request as HttpClientRequest;
+use yii\httpclient\Response as HttpClientResponse;
 use yii\httpclient\RequestEvent as HttpClientRequestEvent;
 
 use yii2vn\payment\BasePaymentGateway;
@@ -30,6 +30,10 @@ use yii2vn\payment\MerchantInterface;
  */
 class PaymentGateway extends BasePaymentGateway
 {
+
+    const CHECKOUT_METHOD_PRO = 'pro';
+
+    const CHECKOUT_METHOD_BAO_KIM = 'baoKim';
 
     const SELLER_INFO_URL = '/payment/rest/payment_pro_api/get_seller_info';
 
@@ -56,32 +60,89 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @param CheckoutInstanceInterface $instance
      * @return CheckoutResponseDataInterface
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
+     * @throws InvalidConfigException|NotSupportedException
+     * @see [[checkoutWithPro]]
      */
     public function checkoutWithInternetBanking(CheckoutInstanceInterface $instance): CheckoutResponseDataInterface
     {
+        return $this->checkoutWithPro($instance);
+    }
+
+    /**
+     * @param CheckoutInstanceInterface $instance
+     * @return CheckoutResponseDataInterface
+     * @throws InvalidConfigException|NotSupportedException
+     * @see [[checkoutWithPro]]
+     */
+    public function checkoutWithCreditCard(CheckoutInstanceInterface $instance): CheckoutResponseDataInterface
+    {
+        return $this->checkoutWithPro($instance);
+    }
+
+    /**
+     * @param CheckoutInstanceInterface $instance
+     * @return CheckoutResponseDataInterface
+     * @throws InvalidConfigException|NotSupportedException
+     */
+    public function checkoutWithPro(CheckoutInstanceInterface $instance): CheckoutResponseDataInterface
+    {
         /** @var Merchant $merchant */
         $merchant = $instance->getMerchant();
-        $data = $instance->getData(self::CHECKOUT_METHOD_INTERNET_BANKING);
+        $data = $instance->getData(self::CHECKOUT_METHOD_PRO);
 
         $data['signature'] = $merchant->signature([
             'data' => $data,
-            'urlPath' => self::CHECKOUT_METHOD_INTERNET_BANKING,
+            'urlPath' => self::PAY_BY_CARD_URL,
             'httpMethod' => RsaDataSignature::HTTP_METHOD_POST,
             'publicCertificate' => $merchant->publicCertificate,
             'privateCertificate' => $merchant->privateCertificate
         ], Merchant::SIGNATURE_RSA);
 
-        $httpResponse = $this->createHttpRequest($merchant, 'POST')->setData($data)->send();
+        $httpResponse = $this->sendHttpRequest($merchant, 'POST', $data);
+        $httpResponseData = $this->sendHttpRequest($merchant, 'POST', $data)->getData();
 
+        return Yii::createObject([
+            'class' => CheckoutResponseData::class,
+            'message' => $httpResponseData['error'] ?? null,
+            'redirectUrl' => $httpResponseData['redirect_url'] ?? null,
+            'responseCode' => (int)$httpResponse->statusCode,
+            'nextAction' => $httpResponseData['next_action'] ?? null,
+            'errorCode' => $httpResponseData['error_code'] ?? null
+        ]);
     }
 
+    /**
+     * @param CheckoutInstanceInterface $instance
+     */
+    public function checkoutWithBaoKim(CheckoutInstanceInterface $instance)
+    {
+        $merchant = $instance->getMerchant();
+        $data = $instance->getData(self::CHECKOUT_METHOD_BAO_KIM);
+
+        $data['checksum'] = $merchant->signature([
+            'data' => $data,
+            'urlPath' => self::PAY_BY_CARD_URL,
+            'httpMethod' => RsaDataSignature::HTTP_METHOD_POST,
+            'publicCertificate' => $merchant->publicCertificate,
+            'privateCertificate' => $merchant->privateCertificate
+        ], Merchant::SIGNATURE_RSA);
+    }
+
+    /**
+     * @param string $method
+     * @return null|string
+     */
+    protected function getDefaultCheckoutInstanceClass(string $method): ?string
+    {
+        switch ($method) {
+            case self::CHECKOUT_METHOD_BAO_KIM:
+        }
+    }
 
     /**
      * @inheritdoc
      */
-    protected function createHttpRequest(MerchantInterface $merchant, string $httpMethod): HttpClientRequest
+    protected function sendHttpRequest(MerchantInterface $merchant, string $httpMethod, array $queryData, string $format = HttpClient::FORMAT_JSON): HttpClientResponse
     {
         /** @var Merchant $merchant */
 
@@ -96,7 +157,7 @@ class PaymentGateway extends BasePaymentGateway
 
         $request->setMethod($httpMethod);
 
-        return $request;
+        return $request->send();
     }
 
 
