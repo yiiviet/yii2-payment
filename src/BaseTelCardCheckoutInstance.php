@@ -8,12 +8,12 @@
 namespace yii2vn\payment;
 
 /**
- * Class BaseCheckoutTelCardInstance
+ * Class BaseTelCardCheckoutInstance
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseCheckoutTelCardInstance extends BaseCheckoutInstance
+abstract class BaseTelCardCheckoutInstance extends BaseCheckoutInstance
 {
 
     public $provider;

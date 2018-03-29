@@ -21,12 +21,13 @@ interface CheckoutResponseDataInterface
 
     public function setResponseCode(int $code): bool;
 
-    public function getMessage(): string;
+    public function getMessage(): ?string;
 
-    public function setMessage(string $message): bool;
+    public function setMessage(?string $message): bool;
 
-    public function getRedirectUrl(): string;
+    public function getRedirectUrl(): ?string;
 
-    public function setRedirectUrl(string $redirectUrl): bool;
+    public function setRedirectUrl(?string $redirectUrl): bool;
+
 
 }

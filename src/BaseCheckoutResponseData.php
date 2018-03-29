@@ -11,10 +11,12 @@ namespace yii2vn\payment;
 use Yii;
 
 use yii\base\BaseObject;
+use yii\base\InvalidConfigException;
 use yii\di\Instance;
 
 
 /**
+ * Class BaseCheckoutResponseData
  *
  * @property int $responseCode
  * @property string $redirectUrl
@@ -23,13 +25,29 @@ use yii\di\Instance;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class CheckoutResponseData extends BaseObject implements CheckoutResponseDataInterface
+class BaseCheckoutResponseData extends BaseObject implements CheckoutResponseDataInterface
 {
 
-    public $translateCategory = 'app';
+    /**
+     * @var string|array|\yii\i18n\I18N
+     */
+    public $i18n;
 
+    public $translateCategory;
+
+    public $translateLanguage;
 
     private $_code;
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function init()
+    {
+        $this->i18n = Instance::ensure($this->i18n, 'yii\i18n\I18N');
+
+        parent::init();
+    }
 
     public function getResponseCode(): int
     {
@@ -45,26 +63,26 @@ class CheckoutResponseData extends BaseObject implements CheckoutResponseDataInt
 
     private $_message;
 
-    public function getMessage(): string
+    public function getMessage(): ?string
     {
         return $this->_message;
     }
 
-    public function setMessage(string $message): bool
+    public function setMessage(?string $message): bool
     {
-        $this->_message = Yii::t($this->translateCategory, $message);
+        $this->_message = $this->i18n->translate($this->translateCategory ?? 'app', $message, [], $this->translateLanguage ?? Yii::$app->language);
 
         return true;
     }
 
     private $_redirectUrl;
 
-    public function getRedirectUrl(): string
+    public function getRedirectUrl(): ?string
     {
         return $this->_redirectUrl;
     }
 
-    public function setRedirectUrl(string $redirectUrl): bool
+    public function setRedirectUrl(?string $redirectUrl): bool
     {
         $this->_redirectUrl = $redirectUrl;
 

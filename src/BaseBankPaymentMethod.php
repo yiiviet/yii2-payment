@@ -15,9 +15,13 @@ use yii\base\BaseObject;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseBank extends BaseObject implements CheckoutDataInterface
+abstract class BaseBankPaymentMethod extends BaseObject implements CheckoutDataInterface
 {
 
-    public $id;
+    public $bankId;
+
+    public $mode;
+
+    public $escrowTimeout;
 
 }

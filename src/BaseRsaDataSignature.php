@@ -20,6 +20,8 @@ use yii\base\InvalidConfigException;
 abstract class BaseRsaDataSignature extends BaseDataSignature
 {
 
+    abstract public static function getOpenSSLAlgo(): int;
+
     /**
      * @var null|string
      */
@@ -83,8 +85,9 @@ abstract class BaseRsaDataSignature extends BaseDataSignature
      */
     public function generate(): string
     {
-        if (($privateKey = openssl_pkey_get_private($this->getPrivateCertificate())) && openssl_sign($this->getDataString(), $signature, $privateKey, OPENSSL_ALGO_SHA1)) {
+        if (($privateKey = openssl_pkey_get_private($this->getPrivateCertificate())) && openssl_sign($this->getDataString(), $signature, $privateKey, static::getOpenSSLAlgo())) {
             openssl_free_key($privateKey);
+
             return urlencode(base64_encode($signature));
         } else {
             throw new InvalidConfigException('Can not signature data via current private certificate!');
@@ -96,7 +99,8 @@ abstract class BaseRsaDataSignature extends BaseDataSignature
      */
     public function validate(string $expect): bool
     {
-        $isValid = ($publicKey = openssl_pkey_get_public($this->getPublicCertificate())) && openssl_verify($this->getDataString(), $expect, $publicKey);
+        $expect = urldecode(base64_decode($expect));
+        $isValid = ($publicKey = openssl_pkey_get_public($this->getPublicCertificate())) && openssl_verify($this->getDataString(), $expect, $publicKey, static::getOpenSSLAlgo());
         openssl_free_key($publicKey);
 
         return $isValid;

@@ -16,7 +16,7 @@ use yii\base\InvalidConfigException;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseCheckoutBankInstance extends BaseCheckoutInstance
+abstract class BaseBankCheckoutInstance extends BaseCheckoutInstance
 {
 
     /**
@@ -25,7 +25,7 @@ abstract class BaseCheckoutBankInstance extends BaseCheckoutInstance
     public $customerClass;
 
     /**
-     * @var BaseBank|CheckoutDataInterface
+     * @var BaseBankPaymentMethod|CheckoutDataInterface
      */
     public $bankClass;
 
@@ -35,12 +35,12 @@ abstract class BaseCheckoutBankInstance extends BaseCheckoutInstance
     public $orderClass;
 
     /**
-     * @var null|object|BaseBank|CheckoutDataInterface
+     * @var null|object|BaseBankPaymentMethod|CheckoutDataInterface
      */
     private $_bank;
 
     /**
-     * @return BaseBank|CheckoutDataInterface
+     * @return BaseBankPaymentMethod|CheckoutDataInterface
      */
     public function getBank(): CheckoutDataInterface
     {
@@ -48,7 +48,7 @@ abstract class BaseCheckoutBankInstance extends BaseCheckoutInstance
     }
 
     /**
-     * @param array|string|callable|BaseBank|CheckoutDataInterface $bank
+     * @param array|string|callable|BaseBankPaymentMethod|CheckoutDataInterface $bank
      * @return bool
      * @throws InvalidConfigException
      */

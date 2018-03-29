@@ -21,19 +21,19 @@ namespace yii2vn\payment;
 interface PaymentGatewayInterface
 {
 
-    const CHECKOUT_METHOD_TEL_CARD = 'TEL CARD';
+    const CHECKOUT_METHOD_TEL_CARD = 'telCard';
 
-    const CHECKOUT_METHOD_INTERNET_BANKING = 'INTERNET BANKING';
+    const CHECKOUT_METHOD_INTERNET_BANKING = 'internetBanking';
 
-    const CHECKOUT_METHOD_DEBIT_CARD = 'DEBIT CARD';
+    const CHECKOUT_METHOD_DEBIT_CARD = 'debitCard';
 
-    const CHECKOUT_METHOD_CREDIT_CARD = 'CREDIT CARD';
+    const CHECKOUT_METHOD_CREDIT_CARD = 'creditCard';
 
-    const CHECKOUT_METHOD_OFFLINE_ATM = 'OFFLINE ATM';
+    const CHECKOUT_METHOD_OFFLINE_ATM = 'offlineATM';
 
-    const CHECKOUT_METHOD_BANK_OFFICE = 'BANK OFFICE';
+    const CHECKOUT_METHOD_BANK_OFFICE = 'bankOffice';
 
-    const CHECKOUT_METHOD_QR_CODE = 'QR CODE';
+    const CHECKOUT_METHOD_QR_CODE = 'qrCode';
 
     const EVENT_BEFORE_CHECKOUT = 'beforeCheckout';
 

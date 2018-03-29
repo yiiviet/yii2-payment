@@ -14,7 +14,7 @@ use yii\base\Component;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\httpclient\Client as HttpClient;
-use yii\httpclient\Request as HttpClientRequest;
+use yii\httpclient\Response as HttpClientResponse;
 
 /**
  *
@@ -29,10 +29,6 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 {
 
     public $merchantClass;
-
-    public $checkoutBankInstanceClass;
-
-    public $checkoutTelCardInstanceClass;
 
     private $_merchants = [];
 
@@ -194,12 +190,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
                 $instance = ['class' => $instance];
             }
 
-            if (!isset($instance['class'])) {
-                if ($method === self::CHECKOUT_METHOD_TEL_CARD) {
-                    $class = $this->checkoutTelCardInstanceClass;
-                } else {
-                    $class = $this->checkoutBankInstanceClass;
-                }
+            if (!isset($instance['class']) && $class = $this->getDefaultCheckoutInstanceClass($method)) {
                 $instance['class'] = $class;
             }
 
@@ -210,6 +201,13 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 
         return Yii::createObject($instance);
     }
+
+    /**
+     * @param string $method
+     * @return null|string
+     */
+    abstract protected function getDefaultCheckoutInstanceClass(string $method): ?string;
+
 
     /**
      * @var HttpClient|null
@@ -250,8 +248,10 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @param MerchantInterface $merchant
      * @param string $httpMethod
-     * @return HttpClientRequest
+     * @param array $queryData
+     * @param string $format
+     * @return HttpClientResponse
      */
-    abstract protected function createHttpRequest(MerchantInterface $merchant, string $httpMethod): HttpClientRequest;
+    abstract protected function sendHttpRequest(MerchantInterface $merchant, string $httpMethod, array $queryData, string $format = HttpClient::FORMAT_JSON): HttpClientResponse;
 
 }
