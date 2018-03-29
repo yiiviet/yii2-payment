@@ -15,7 +15,6 @@ namespace yii2vn\payment;
  */
 interface CheckoutInstanceInterface extends CheckoutDataInterface
 {
-
     /**
      * @return MerchantInterface
      */

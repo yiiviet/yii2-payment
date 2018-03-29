@@ -32,6 +32,9 @@ class RsaDataSignature extends BaseRsaDataSignature
      */
     public $httpMethod;
 
+    /**
+     * @return int
+     */
     public static function getOpenSSLAlgo(): int
     {
         return OPENSSL_ALGO_SHA1;

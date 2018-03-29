@@ -8,14 +8,12 @@
 
 namespace yii2vn\payment;
 
-use yii\base\BaseObject;
-
 /**
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseBankPaymentMethod extends BaseObject implements CheckoutDataInterface
+abstract class BaseBankPaymentMethod extends BaseCheckoutData
 {
 
     public $bankId;

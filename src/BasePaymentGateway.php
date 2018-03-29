@@ -14,7 +14,7 @@ use yii\base\Component;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\httpclient\Client as HttpClient;
-use yii\httpclient\Response as HttpClientResponse;
+use yii\httpclient\Request as HttpClientRequest;
 
 /**
  *
@@ -222,7 +222,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     {
         if (!$this->_httpClient instanceof HttpClient) {
             $client = $this->_httpClient = Yii::createObject($this->_httpClient);
-            $client->baseUrl = $this->getBaseUrl();
+            $client->baseUrl = static::baseUrl();
 
             return $client;
         } else {
@@ -237,7 +237,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     public function setHttpClient($client): bool
     {
         if ($client instanceof HttpClient) {
-            $client->baseUrl = $this->getBaseUrl();
+            $client->baseUrl = static::baseUrl();
         }
 
         $this->_httpClient = $client;
@@ -246,12 +246,11 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @param MerchantInterface $merchant
-     * @param string $httpMethod
+     * @param string $url
+     * @param string $method
      * @param array $queryData
-     * @param string $format
-     * @return HttpClientResponse
+     * @param MerchantInterface $merchant
+     * @return HttpClientRequest
      */
-    abstract protected function sendHttpRequest(MerchantInterface $merchant, string $httpMethod, array $queryData, string $format = HttpClient::FORMAT_JSON): HttpClientResponse;
-
+    abstract protected function createHttpRequest(string $url, string $method, array $queryData, MerchantInterface $merchant = null): HttpClientRequest;
 }

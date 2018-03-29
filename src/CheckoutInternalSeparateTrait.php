@@ -7,6 +7,7 @@
 
 namespace yii2vn\payment;
 
+use Yii;
 use yii\base\NotSupportedException;
 
 /**
@@ -29,7 +30,11 @@ trait CheckoutInternalSeparateTrait
         $method = "checkoutWith" . $method;
 
         if (method_exists($this, $method)) {
-            return $this->$method($instance);
+            $checkoutResponseData = $this->$method($instance);
+
+            Yii::debug("Checkout internal requested sent with method: $method");
+
+            return $checkoutResponseData;
         } else {
             throw new NotSupportedException('Checkout method: ' . $method . ' is not support on: ' . __CLASS__);
         }

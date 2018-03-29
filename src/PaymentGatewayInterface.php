@@ -21,19 +21,9 @@ namespace yii2vn\payment;
 interface PaymentGatewayInterface
 {
 
-    const CHECKOUT_METHOD_TEL_CARD = 'telCard';
-
     const CHECKOUT_METHOD_INTERNET_BANKING = 'internetBanking';
 
-    const CHECKOUT_METHOD_DEBIT_CARD = 'debitCard';
-
     const CHECKOUT_METHOD_CREDIT_CARD = 'creditCard';
-
-    const CHECKOUT_METHOD_OFFLINE_ATM = 'offlineATM';
-
-    const CHECKOUT_METHOD_BANK_OFFICE = 'bankOffice';
-
-    const CHECKOUT_METHOD_QR_CODE = 'qrCode';
 
     const EVENT_BEFORE_CHECKOUT = 'beforeCheckout';
 
@@ -42,12 +32,12 @@ interface PaymentGatewayInterface
     /**
      * @return string
      */
-    public static function getVersion(): string;
+    public static function version(): string;
 
     /**
      * @return string
      */
-    public function getBaseUrl(): string;
+    public static function baseUrl(): string;
 
     /**
      * @return array|MerchantInterface[]

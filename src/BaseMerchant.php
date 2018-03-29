@@ -77,7 +77,7 @@ abstract class BaseMerchant extends Component implements MerchantInterface
      * @param array|string|DataSignatureInterface $dataSignature
      * @param string $type
      * @return string
-     * @throws InvalidConfigException|NotSupportedException
+     * @throws InvalidConfigException
      */
     public function signature($dataSignature, string $type = null): string
     {
@@ -91,7 +91,7 @@ abstract class BaseMerchant extends Component implements MerchantInterface
      * @param string $expectSignature
      * @param string $type
      * @return bool
-     * @throws InvalidConfigException|NotSupportedException
+     * @throws InvalidConfigException
      */
     public function validateSignature($dataSignature, string $expectSignature, string $type = null): bool
     {
@@ -101,29 +101,28 @@ abstract class BaseMerchant extends Component implements MerchantInterface
     }
 
     /**
-     * @param $dataSignature
-     * @param $type
+     * @param array|string|DataSignatureInterface $dataSignature
+     * @param string $type
      * @return object|DataSignatureInterface
-     * @throws InvalidConfigException|NotSupportedException
+     * @throws InvalidConfigException
      */
-    protected function prepareDataSignature($dataSignature, $type): DataSignatureInterface
+    protected function prepareDataSignature($dataSignature, string $type): DataSignatureInterface
     {
         if ($dataSignature instanceof DataSignatureInterface) {
             return $dataSignature;
-        } else {
-            if (is_string($dataSignature)) {
-                $dataSignature = ['class' => $dataSignature];
-            } elseif (is_array($dataSignature) && !isset($dataSignature['class'])) {
-                if ($type === self::SIGNATURE_HMAC) {
-                    $dataSignature['class'] = $this->hmacDataSignatureClass;
-                } elseif ($type === self::SIGNATURE_RSA) {
-                    $dataSignature['class'] = $this->rsaDataSignatureClass;
-                } else {
-                    throw new NotSupportedException("Data signature type: '$type' is not supported!");
-                }
+        } elseif (is_array($dataSignature) && !isset($dataSignature['class'])) {
+            if ($class = $this->getDefaultDataSignatureClass($type)) {
+                $dataSignature['class'] = $class;
             }
-
-            return Yii::createObject($dataSignature);
         }
+
+        return Yii::createObject($dataSignature);
     }
+
+    /**
+     * @param string $type
+     * @return null|string
+     */
+    abstract protected function getDefaultDataSignatureClass($type): ?string;
+
 }

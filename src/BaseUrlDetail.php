@@ -7,7 +7,6 @@
 
 namespace yii2vn\payment;
 
-use yii\base\BaseObject;
 use yii\helpers\Url;
 
 /**
@@ -16,10 +15,10 @@ use yii\helpers\Url;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseUrlDetail extends BaseObject implements CheckoutDataInterface
+abstract class BaseUrlDetail extends BaseCheckoutData
 {
 
-    public $schema = "http";
+    public $defaultSchema = "http";
 
     public $urlSuccess;
 
@@ -36,15 +35,15 @@ abstract class BaseUrlDetail extends BaseObject implements CheckoutDataInterface
     public function init()
     {
         if ($this->urlSuccess) {
-            $this->urlSuccess = $this->ensureUrl($this->urlSuccess, $this->urlSuccessSchema ?? $this->schema);
+            $this->urlSuccess = $this->ensureUrl($this->urlSuccess, $this->urlSuccessSchema ?? $this->defaultSchema);
         }
 
         if ($this->urlCancel) {
-            $this->urlCancel = $this->ensureUrl($this->urlCancel, $this->urlCancelSchema ?? $this->schema);
+            $this->urlCancel = $this->ensureUrl($this->urlCancel, $this->urlCancelSchema ?? $this->defaultSchema);
         }
 
         if ($this->urlDetail) {
-            $this->urlDetail = $this->ensureUrl($this->urlDetail, $this->urlDetailSchema ?? $this->schema);
+            $this->urlDetail = $this->ensureUrl($this->urlDetail, $this->urlDetailSchema ?? $this->defaultSchema);
         }
 
         parent::init();
