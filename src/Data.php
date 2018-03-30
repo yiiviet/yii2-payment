@@ -36,17 +36,7 @@ class Data extends DynamicModel
     public function getData(bool $validate = false): array
     {
         if (!$validate || $this->validate()) {
-            $data = [];
-
-            foreach ($this->attributes() as $attribute) {
-                $value = $this->$attribute;
-
-                if ($value !== null) {
-                    $data[$attribute] = $value;
-                }
-            }
-
-            return $data;
+            return $this->toArray();
         } else {
             $errors = $this->getFirstErrors();
             throw new InvalidConfigException(reset($errors));
