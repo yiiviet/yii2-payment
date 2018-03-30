@@ -18,33 +18,32 @@ use yii\base\InvalidConfigException;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseDataSignature extends BaseObject implements DataSignatureInterface
+abstract class BaseDataSignature extends BaseObject
 {
 
-    /**
-     * @var array
-     */
-    private $_data = [];
+    private $_data;
 
     /**
-     * @return array
+     * @inheritdoc
      */
-    public function getData(): array
+    public function getData(): string
     {
         return $this->_data;
     }
 
-    /**
-     * @param array $data
-     * @return bool
-     */
-    public function setData(array $data): bool
+    public function setData(string $data): bool
     {
         $this->_data = $data;
-
-        return true;
     }
 
-    abstract protected function getDataString(): string;
+    /**
+     * @inheritdoc
+     */
+    abstract public function generate(): string;
+
+    /**
+     * @inheritdoc
+     */
+    abstract public function validate(string $expect): bool;
 
 }

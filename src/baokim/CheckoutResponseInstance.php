@@ -5,21 +5,18 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
+namespace yii2vn\payment\baokim;
 
-namespace yii2vn\payment;
+use yii2vn\payment\ResponseInstance as BaseResponseInstance;
 
 /**
+ * Class CheckoutResponseInstance
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseBankPaymentMethod extends BaseCheckoutData
+class CheckoutResponseInstance extends BaseResponseInstance
 {
 
-    public $bankId;
-
-    public $mode;
-
-    public $escrowTimeout;
 
 }

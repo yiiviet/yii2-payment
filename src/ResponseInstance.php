@@ -8,18 +8,21 @@
 
 namespace yii2vn\payment;
 
+use yii\base\DynamicModel;
+
+
 /**
+ * Class CheckoutResponseInstance
+ *
+ * @property int $responseCode
+ * @property string $redirectUrl
+ * @property string $message
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseCustomer extends BaseCheckoutData
+class ResponseInstance extends DynamicModel
 {
 
-    public $name;
-
-    public $email;
-
-    public $phone;
 
 }

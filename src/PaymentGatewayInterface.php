@@ -65,9 +65,9 @@ interface PaymentGatewayInterface
     public function setMerchant($id, $merchant): bool;
 
     /**
-     * @param array|string|CheckoutInstanceInterface $instance
+     * @param array|string|RequestInstance $instance
      * @param string $method
-     * @return CheckoutResponseDataInterface|bool
+     * @return ResponseInstance|bool
      */
     public function checkout($instance, string $method = self::CHECKOUT_METHOD_INTERNET_BANKING);
 

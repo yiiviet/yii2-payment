@@ -8,11 +8,8 @@
 
 namespace yii2vn\payment;
 
-use Yii;
-
 use yii\base\Component;
 use yii\base\NotSupportedException;
-use yii\base\InvalidConfigException;
 use yii\di\Instance;
 
 /**
@@ -23,30 +20,6 @@ use yii\di\Instance;
  */
 abstract class BaseMerchant extends Component implements MerchantInterface
 {
-    /**
-     * @var string
-     */
-    public $name;
-
-    /**
-     * @var string
-     */
-    public $email;
-
-    /**
-     * @var string
-     */
-    public $phone;
-
-    /**
-     * @var string
-     */
-    public $rsaDataSignatureClass;
-
-    /**
-     * @var string
-     */
-    public $hmacDataSignatureClass;
 
     /**
      * @var array|string|PaymentGatewayInterface
@@ -64,7 +37,7 @@ abstract class BaseMerchant extends Component implements MerchantInterface
     /**
      * @param array|string|PaymentGatewayInterface $paymentGateway
      * @return bool
-     * @throws InvalidConfigException
+     * @throws \yii\base\InvalidConfigException
      */
     public function setPaymentGateway($paymentGateway): bool
     {
@@ -74,55 +47,37 @@ abstract class BaseMerchant extends Component implements MerchantInterface
     }
 
     /**
-     * @param array|string|DataSignatureInterface $dataSignature
-     * @param string $type
-     * @return string
-     * @throws InvalidConfigException
+     * @inheritdoc
+     * @throws NotSupportedException
      */
-    public function signature($dataSignature, string $type = null): string
+    public function signature(string $data, string $type = null): string
     {
-        $dataSignature = $this->prepareDataSignature($dataSignature, $type);
-
-        return $dataSignature->generate();
-    }
-
-    /**
-     * @param array|string|DataSignatureInterface $dataSignature
-     * @param string $expectSignature
-     * @param string $type
-     * @return bool
-     * @throws InvalidConfigException
-     */
-    public function validateSignature($dataSignature, string $expectSignature, string $type = null): bool
-    {
-        $dataSignature = $this->prepareDataSignature($dataSignature, $type);
-
-        return $dataSignature->validate($expectSignature);
-    }
-
-    /**
-     * @param array|string|DataSignatureInterface $dataSignature
-     * @param string $type
-     * @return object|DataSignatureInterface
-     * @throws InvalidConfigException
-     */
-    protected function prepareDataSignature($dataSignature, string $type): DataSignatureInterface
-    {
-        if ($dataSignature instanceof DataSignatureInterface) {
-            return $dataSignature;
-        } elseif (is_array($dataSignature) && !isset($dataSignature['class'])) {
-            if ($class = $this->getDefaultDataSignatureClass($type)) {
-                $dataSignature['class'] = $class;
-            }
+        if ($dataSignature = $this->createDataSignature($data, $type)) {
+            return $dataSignature->generate();
+        } else {
+            throw new NotSupportedException("Signature data with type: '$type' is not supported!");
         }
-
-        return Yii::createObject($dataSignature);
     }
 
     /**
-     * @param string $type
-     * @return null|string
+     * @inheritdoc
+     * @throws NotSupportedException
      */
-    abstract protected function getDefaultDataSignatureClass($type): ?string;
+    public function validateSignature(string $data, string $expectSignature, string $type = null): bool
+    {
+        if ($dataSignature = $this->createDataSignature($data, $type)) {
+            return $dataSignature->validate($expectSignature);
+        } else {
+            throw new NotSupportedException("Validate signature with type: '$type' is not supported!");
+        }
+    }
+
+    /**
+     * @param string $data
+     * @param string $type
+     * @return BaseDataSignature
+     */
+    abstract protected function createDataSignature(string $data, string $type): ?BaseDataSignature;
+
 
 }

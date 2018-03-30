@@ -9,17 +9,14 @@ namespace yii2vn\payment\baokim;
 
 use Yii;
 
-use yii\base\InvalidConfigException;
 use yii\httpclient\Client as HttpClient;
 use yii\httpclient\Request as HttpClientRequest;
-use yii\httpclient\Response as HttpClientResponse;
 
 use yii2vn\payment\BasePaymentGateway;
-use yii2vn\payment\CardChargePaymentGatewayInterface;
-use yii2vn\payment\CheckoutInstanceInterface;
-use yii2vn\payment\CheckoutResponseDataInterface;
 use yii2vn\payment\CheckoutInternalSeparateTrait;
 use yii2vn\payment\MerchantInterface;
+use yii2vn\payment\ResponseInstance;
+use yii2vn\payment\TelCardPaymentGatewayInterface;
 
 
 /**
@@ -28,7 +25,7 @@ use yii2vn\payment\MerchantInterface;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGatewayInterface
+class PaymentGateway extends BasePaymentGateway implements TelCardPaymentGatewayInterface
 {
 
     const CHECKOUT_METHOD_BAO_KIM = 'baoKim';
@@ -49,15 +46,36 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
 
     use CheckoutInternalSeparateTrait;
 
+    public $merchantConfig = ['class' => Merchant::class];
 
+    public $checkoutRequestInstanceConfig = ['class' => CheckoutRequestInstance::class];
+
+    public $checkoutResponseInstanceConfig = ['class' => CheckoutResponseInstance::class];
+
+    /**
+     * @inheritdoc
+     */
     public static function version(): string
     {
         return '1.0';
     }
 
+    /**
+     * @inheritdoc
+     */
     public static function baseUrl(): string
     {
         return 'https://www.baokim.vn';
+    }
+
+    /**
+     * @param array|string|CheckoutRequestInstance $instance
+     * @return bool|CheckoutResponseInstance
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function cardCharge($instance)
+    {
+        return $this->checkout($instance, self::CHECKOUT_METHOD_TEL_CARD);
     }
 
     /**
@@ -87,191 +105,144 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
         return $request;
     }
 
-    /**
-     * @param string $method
-     * @return null|string
-     */
-    protected function getDefaultCheckoutInstanceClass(string $method): ?string
-    {
-        switch ($method) {
-            case self::CHECKOUT_METHOD_BAO_KIM || self::CHECKOUT_METHOD_ATM_TRANSFER || self::CHECKOUT_METHOD_BANK_TRANSFER:
-                return CheckoutInstance::class;
-            case self::CHECKOUT_METHOD_CREDIT_CARD || self::CHECKOUT_METHOD_LOCAL_BANK || self::CHECKOUT_METHOD_INTERNET_BANKING:
-                return ProCheckoutInstance::class;
-            case self::CHECKOUT_METHOD_TEL_CARD:
-                return TelCardCheckoutInstance::class;
-            default:
-                return null;
-        }
-    }
 
     /**
-     * @param CheckoutInstanceInterface $instance
-     * @return CheckoutResponseDataInterface
-     * @throws InvalidConfigException
+     * @param CheckoutRequestInstance $instance
+     * @return CheckoutResponseInstance
+     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
+     * @see [[checkoutBaoKim]]
      */
-    public function checkoutWithAtmTransfer(CheckoutInstanceInterface $instance): CheckoutResponseDataInterface
+    private function checkoutWithAtmTransfer(CheckoutRequestInstance $instance): CheckoutResponseInstance
     {
         return $this->checkoutBaoKim($instance, self::CHECKOUT_METHOD_ATM_TRANSFER);
     }
 
     /**
-     * @param CheckoutInstanceInterface $instance
-     * @return CheckoutResponseDataInterface
-     * @throws InvalidConfigException
+     * @param CheckoutRequestInstance $instance
+     * @return CheckoutResponseInstance
+     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
+     * @see [[checkoutBaoKim]]
      */
-    public function checkoutWithBankTransfer(CheckoutInstanceInterface $instance): CheckoutResponseDataInterface
+    private function checkoutWithBankTransfer(CheckoutRequestInstance $instance): CheckoutResponseInstance
     {
         return $this->checkoutBaoKim($instance, self::CHECKOUT_METHOD_BANK_TRANSFER);
     }
 
     /**
-     * @param CheckoutInstanceInterface $instance
-     * @return CheckoutResponseDataInterface
-     * @throws InvalidConfigException
+     * @param CheckoutRequestInstance $instance
+     * @return CheckoutResponseInstance
+     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
+     * @see [[checkoutBaoKim]]
      */
-    public function checkoutWithBaoKim(CheckoutInstanceInterface $instance): CheckoutResponseDataInterface
+    private function checkoutWithBaoKim(CheckoutRequestInstance $instance): CheckoutResponseInstance
     {
         return $this->checkoutBaoKim($instance, self::CHECKOUT_METHOD_BAO_KIM);
     }
 
 
     /**
-     * @param CheckoutInstanceInterface $instance
-     * @return CheckoutResponseDataInterface
-     * @throws InvalidConfigException
+     * @param CheckoutRequestInstance $instance
+     * @return CheckoutResponseInstance
+     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
+     * @see [[checkoutPro]]
      */
-    public function checkoutWithLocalBank(CheckoutInstanceInterface $instance): CheckoutResponseDataInterface
+    private function checkoutWithLocalBank(CheckoutRequestInstance $instance): CheckoutResponseInstance
     {
         return $this->checkoutPro($instance, self::CHECKOUT_METHOD_LOCAL_BANK);
     }
 
     /**
-     * @param CheckoutInstanceInterface $instance
-     * @return CheckoutResponseDataInterface
-     * @throws InvalidConfigException
-     * @see [[checkoutWithPro]]
+     * @param CheckoutRequestInstance $instance
+     * @return CheckoutResponseInstance
+     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
+     * @see [[checkoutPro]]
      */
-    public function checkoutWithCreditCard(CheckoutInstanceInterface $instance): CheckoutResponseDataInterface
+    private function checkoutWithCreditCard(CheckoutRequestInstance $instance): CheckoutResponseInstance
     {
         return $this->checkoutPro($instance, self::CHECKOUT_METHOD_CREDIT_CARD);
     }
 
     /**
-     * @param CheckoutInstanceInterface $instance
-     * @return CheckoutResponseDataInterface
-     * @throws InvalidConfigException
-     * @see [[checkoutWithPro]]
+     * @param CheckoutRequestInstance $instance
+     * @return CheckoutResponseInstance
+     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
+     * @see [[checkoutPro]]
      */
-    public function checkoutWithInternetBanking(CheckoutInstanceInterface $instance): CheckoutResponseDataInterface
+    private function checkoutWithInternetBanking(CheckoutRequestInstance $instance): CheckoutResponseInstance
     {
         return $this->checkoutPro($instance, self::CHECKOUT_METHOD_INTERNET_BANKING);
     }
 
     /**
-     * @param CheckoutInstanceInterface $instance
-     * @return CheckoutResponseDataInterface
-     * @throws InvalidConfigException
+     * @param CheckoutRequestInstance $instance
+     * @return object|CheckoutResponseInstance
+     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
      */
-    public function checkoutWithTelCard(CheckoutInstanceInterface $instance): CheckoutResponseDataInterface
+    private function checkoutWithTelCard(CheckoutRequestInstance $instance): CheckoutResponseInstance
     {
         /** @var Merchant $merchant */
-        $merchant = $instance->getMerchant();
-        $data = $instance->getData(self::CHECKOUT_METHOD_TEL_CARD);
+        $merchant = $instance->merchant;
 
-        $data['checksum'] = $merchant->signature([
-            'data' => $data,
-            'key' => $merchant->securePassword
-        ], Merchant::SIGNATURE_HMAC);
+        $data = $instance->getData();
+        ksort($data);
+        $dataSign = implode('', $data);
+        $data['checksum'] = $merchant->signature($dataSign, Merchant::SIGNATURE_HMAC);
 
         $httpResponse = $this->createHttpRequest(self::CARD_CHARGE_URL, 'POST', $data, $merchant)->send();
 
         Yii::debug("Checkout tel card requested sent");
 
-        return $this->resolveHttpResponse($httpResponse);
+        return Yii::createObject($this->checkoutResponseInstanceConfig, [$httpResponse->getData()]);
     }
 
     /**
-     * @param array|string|TelCardCheckoutInstance $instance
-     * @return CheckoutResponseDataInterface
-     * @throws InvalidConfigException
-     */
-    public function cardCharge($instance): CheckoutResponseDataInterface
-    {
-        $instance = $this->prepareCheckoutInstance($instance, static::CHECKOUT_METHOD_TEL_CARD);
-
-        return $this->checkoutWithTelCard($instance);
-    }
-
-    /**
-     * @param CheckoutInstanceInterface $instance
+     * @param CheckoutRequestInstance $instance
      * @param string $method
-     * @return CheckoutResponseDataInterface
-     * @throws InvalidConfigException
+     * @return object|CheckoutResponseInstance
+     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
      */
-    private function checkoutPro(CheckoutInstanceInterface $instance, string $method): CheckoutResponseDataInterface
+    private function checkoutPro(CheckoutRequestInstance $instance, string $method): CheckoutResponseInstance
     {
         /** @var Merchant $merchant */
-        $merchant = $instance->getMerchant();
-        $data = $instance->getData($method);
 
-        $data['signature'] = $merchant->signature([
-            'data' => $data,
-            'urlPath' => self::PRO_PAYMENT_URL,
-            'httpMethod' => RsaDataSignature::HTTP_METHOD_POST,
-            'publicCertificate' => $merchant->publicCertificate,
-            'privateCertificate' => $merchant->privateCertificate
-        ], Merchant::SIGNATURE_RSA);
+        $merchant = $instance->merchant;
+        $data = $instance->getData();
 
-        $httpResponse = $this->createHttpRequest(self::PRO_PAYMENT_URL, 'POST', $data, $merchant)->send();
+        ksort($data);
+        $httpMethod = 'POST';
+        $dataSign = $httpMethod . '&' . urlencode(self::PRO_PAYMENT_URL) . '&&' . urlencode(http_build_query($data));
+        $data['signature'] = $merchant->signature($dataSign, Merchant::SIGNATURE_RSA);
+
+        $httpResponse = $this->createHttpRequest(self::PRO_PAYMENT_URL, $httpMethod, $data, $merchant)->send();
 
         Yii::debug("Checkout pro requested sent with method: $method");
 
-        return $this->resolveHttpResponse($httpResponse);
+        return Yii::createObject($this->checkoutResponseInstanceConfig, [$httpResponse->getData()]);
     }
 
     /**
-     * @param CheckoutInstanceInterface $instance
+     * @param CheckoutRequestInstance $instance
      * @param string $method
-     * @return CheckoutResponseDataInterface
-     * @throws InvalidConfigException
+     * @return object|CheckoutResponseInstance
+     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
      */
-    private function checkoutBaoKim(CheckoutInstanceInterface $instance, string $method): CheckoutResponseDataInterface
+    private function checkoutBaoKim(CheckoutRequestInstance $instance, string $method): CheckoutResponseInstance
     {
         /** @var Merchant $merchant */
-        $merchant = $instance->getMerchant();
-        $data = $instance->getData($method);
+        $merchant = $instance->merchant;
+        $data = $instance->getData();
 
-        $data['checksum'] = $merchant->signature([
-            'data' => $data,
-            'key' => $merchant->securePassword
-        ], Merchant::SIGNATURE_HMAC);
+        ksort($data);
+        $dataSign = implode('', $data);
+        $data['checksum'] = $merchant->signature($dataSign, Merchant::SIGNATURE_HMAC);
 
         $httpResponse = $this->createHttpRequest(self::BK_PAYMENT_URL, 'POST', $data, $merchant)->send();
 
         Yii::debug("Checkout bao kim requested sent with method: $method");
 
-        return $this->resolveHttpResponse($httpResponse);
+        return Yii::createObject($this->checkoutResponseInstanceConfig, [$httpResponse->getData()]);
     }
 
-    /**
-     * @param HttpClientResponse $httpResponse
-     * @return CheckoutResponseDataInterface
-     * @throws InvalidConfigException
-     */
-    private function resolveHttpResponse(HttpClientResponse $httpResponse): CheckoutResponseDataInterface
-    {
-        $httpResponseData = $httpResponse->getData();
 
-        return Yii::createObject([
-            'class' => CheckoutResponseData::class,
-            'message' => $httpResponseData['error'] ?? null,
-            'redirectUrl' => $httpResponseData['redirect_url'] ?? null,
-            'responseCode' => (int)$httpResponse->statusCode,
-            'nextAction' => $httpResponseData['next_action'] ?? null,
-            'errorCode' => $httpResponseData['error_code'] ?? null,
-            'rvId' => $httpResponse['rv_id'] ?? null
-        ]);
-    }
 
 }

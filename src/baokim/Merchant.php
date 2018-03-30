@@ -9,10 +9,11 @@ namespace yii2vn\payment\baokim;
 
 use Yii;
 
-use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
+use yii\helpers\ArrayHelper;
 
 use yii2vn\payment\BaseMerchant;
-use yii2vn\payment\DataSignatureInterface;
+use yii2vn\payment\BaseDataSignature;
 
 /**
  * Class Merchant
@@ -29,17 +30,15 @@ class Merchant extends BaseMerchant
 
     public $apiPassword;
 
-    public $emailBusiness;
-
     public $securePassword;
 
     public $privateCertificate;
 
     public $publicCertificate;
 
-    public $hmacDataSignatureClass = 'yii2vn\payment\baokim\HmacDataSignature';
+    public $hmacDataSignatureClass = 'yii2vn\payment\HmacDataSignature';
 
-    public $rsaDataSignatureClass = 'yii2vn\payment\baokim\RsaDataSignature';
+    public $rsaDataSignatureClass = 'yii2vn\payment\RsaDataSignature';
 
     public function setPublicCertificateFile($file): bool
     {
@@ -58,15 +57,29 @@ class Merchant extends BaseMerchant
     }
 
     /**
-     * @param string $method
-     * @return array
+     * @inheritdoc
+     *
+     * @return null|object|BaseDataSignature
      */
-    public function getData(string $method): array
+    protected function createDataSignature(string $data, string $type): ?BaseDataSignature
     {
-        return [
-            'business' => $this->emailBusiness ?? $this->email,
-            'id' => $this->id,
-        ];
+        if ($type === self::SIGNATURE_RSA) {
+            return Yii::createObject([
+                'class' => $this->rsaDataSignatureClass,
+                'data' => $data,
+                'publicCertificate' => $this->publicCertificate,
+                'privateCertificate' => $this->privateCertificate,
+                'openSSLAlgo' => OPENSSL_ALGO_SHA1
+            ]);
+        } elseif ($type === self::SIGNATURE_HMAC) {
+            return Yii::createObject([
+                'class' => $this->hmacDataSignatureClass,
+                'data' => $data,
+                'key' => $this->securePassword,
+                'hmacAlgo' => 'md5'
+            ]);
+        } else {
+            return null;
+        }
     }
-
 }

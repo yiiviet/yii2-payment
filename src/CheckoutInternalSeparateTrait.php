@@ -20,12 +20,12 @@ trait CheckoutInternalSeparateTrait
 {
 
     /**
-     * @param CheckoutInstanceInterface $instance
+     * @param RequestInstance $instance
      * @param string $method
      * @return CheckoutResponseDataInterface
      * @throws NotSupportedException
      */
-    protected function checkoutInternal(CheckoutInstanceInterface $instance, string $method): CheckoutResponseDataInterface
+    protected function checkoutInternal(RequestInstance $instance, string $method): CheckoutResponseDataInterface
     {
         $method = "checkoutWith" . $method;
 

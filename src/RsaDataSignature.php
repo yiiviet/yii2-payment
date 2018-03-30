@@ -7,20 +7,22 @@
 
 namespace yii2vn\payment;
 
-use yii\base\NotSupportedException;
 use yii\base\InvalidConfigException;
 
 
 /**
- * Class BaseRsaDataSignature
+ * Class RsaDataSignature
+ *
+ * @property string $publicCertificate
+ * @property string $privateCertificate
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseRsaDataSignature extends BaseDataSignature
+ class RsaDataSignature extends BaseDataSignature
 {
 
-    abstract public static function getOpenSSLAlgo(): int;
+    public $openSSLAlgo;
 
     /**
      * @var null|string
@@ -85,7 +87,7 @@ abstract class BaseRsaDataSignature extends BaseDataSignature
      */
     public function generate(): string
     {
-        if (($privateKey = openssl_pkey_get_private($this->getPrivateCertificate())) && openssl_sign($this->getDataString(), $signature, $privateKey, static::getOpenSSLAlgo())) {
+        if (($privateKey = openssl_pkey_get_private($this->getPrivateCertificate())) && openssl_sign($this->getData(), $signature, $privateKey, $this->openSSLAlgo)) {
             openssl_free_key($privateKey);
 
             return urlencode(base64_encode($signature));
@@ -100,7 +102,7 @@ abstract class BaseRsaDataSignature extends BaseDataSignature
     public function validate(string $expect): bool
     {
         $expect = urldecode(base64_decode($expect));
-        $isValid = ($publicKey = openssl_pkey_get_public($this->getPublicCertificate())) && openssl_verify($this->getDataString(), $expect, $publicKey, static::getOpenSSLAlgo());
+        $isValid = ($publicKey = openssl_pkey_get_public($this->getPublicCertificate())) && openssl_verify($this->getData(), $expect, $publicKey, $this->openSSLAlgo);
         openssl_free_key($publicKey);
 
         return $isValid;

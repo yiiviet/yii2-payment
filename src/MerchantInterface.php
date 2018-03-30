@@ -14,7 +14,7 @@ namespace yii2vn\payment;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-interface MerchantInterface extends CheckoutDataInterface
+interface MerchantInterface
 {
 
     const SIGNATURE_RSA = 'RSA';
@@ -33,18 +33,18 @@ interface MerchantInterface extends CheckoutDataInterface
     public function setPaymentGateway($paymentGateway): bool;
 
     /**
-     * @param string|array|DataSignatureInterface $dataSignature
+     * @param string $data
      * @param null|string $type
      * @return string
      */
-    public function signature($dataSignature, string $type = null): string;
+    public function signature(string $data, string $type = null): string;
 
     /**
-     * @param string|array|DataSignatureInterface $dataSignature
+     * @param string $data
      * @param string $expectSignature
      * @param null|string $type
      * @return bool
      */
-    public function validateSignature($dataSignature, string $expectSignature, string $type = null): bool;
+    public function validateSignature(string $data, string $expectSignature, string $type = null): bool;
 
 }
