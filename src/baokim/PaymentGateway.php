@@ -116,7 +116,7 @@ class PaymentGateway extends BasePaymentGateway implements TelCardPaymentGateway
             $merchant = $this->getDefaultMerchant();
         }
 
-        $data = ['business' => $merchant->emailBusiness];
+        $data = ['business' => $merchant->businessEmail];
         $httpMethod = 'GET';
         $dataSign = $httpMethod . '&' . urlencode(self::PRO_PAYMENT_URL) . '&' . urlencode(http_build_query($data)) . '&';
         $data['signature'] = $merchant->signature($dataSign, Merchant::SIGNATURE_RSA);
