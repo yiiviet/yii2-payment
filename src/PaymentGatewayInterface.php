@@ -65,7 +65,7 @@ interface PaymentGatewayInterface
     public function setMerchant($id, $merchant): bool;
 
     /**
-     * @param mixed $data
+     * @param array $data
      * @param string $method
      * @return Data|bool
      */
