@@ -65,10 +65,10 @@ interface PaymentGatewayInterface
     public function setMerchant($id, $merchant): bool;
 
     /**
-     * @param array|string|RequestInstance $instance
+     * @param mixed $data
      * @param string $method
-     * @return ResponseInstance|bool
+     * @return Data|bool
      */
-    public function checkout($instance, string $method = self::CHECKOUT_METHOD_INTERNET_BANKING);
+    public function checkout(array $data, string $method = self::CHECKOUT_METHOD_INTERNET_BANKING);
 
 }

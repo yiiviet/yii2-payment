@@ -20,21 +20,21 @@ trait CheckoutInternalSeparateTrait
 {
 
     /**
-     * @param RequestInstance $instance
+     * @param Data $data
      * @param string $method
-     * @return CheckoutResponseDataInterface
+     * @return array
      * @throws NotSupportedException
      */
-    protected function checkoutInternal(RequestInstance $instance, string $method): CheckoutResponseDataInterface
+    protected function checkoutInternal(Data $data, string $method): array
     {
         $method = "checkoutWith" . $method;
 
         if (method_exists($this, $method)) {
-            $checkoutResponseData = $this->$method($instance);
+            $data = $this->$method($data);
 
             Yii::debug("Checkout internal requested sent with method: $method");
 
-            return $checkoutResponseData;
+            return $data;
         } else {
             throw new NotSupportedException('Checkout method: ' . $method . ' is not support on: ' . __CLASS__);
         }

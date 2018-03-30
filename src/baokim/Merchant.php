@@ -9,7 +9,6 @@ namespace yii2vn\payment\baokim;
 
 use Yii;
 
-use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
 
 use yii2vn\payment\BaseMerchant;
@@ -30,15 +29,17 @@ class Merchant extends BaseMerchant
 
     public $apiPassword;
 
+    public $emailBusiness;
+
     public $securePassword;
 
     public $privateCertificate;
 
     public $publicCertificate;
 
-    public $hmacDataSignatureClass = 'yii2vn\payment\HmacDataSignature';
+    public $hmacDataSignatureConfig = ['class' => 'yii2vn\payment\HmacDataSignature'];
 
-    public $rsaDataSignatureClass = 'yii2vn\payment\RsaDataSignature';
+    public $rsaDataSignatureConfig = ['class' => 'yii2vn\payment\RsaDataSignature'];
 
     public function setPublicCertificateFile($file): bool
     {
@@ -64,20 +65,18 @@ class Merchant extends BaseMerchant
     protected function createDataSignature(string $data, string $type): ?BaseDataSignature
     {
         if ($type === self::SIGNATURE_RSA) {
-            return Yii::createObject([
-                'class' => $this->rsaDataSignatureClass,
+            return Yii::createObject(ArrayHelper::merge($this->rsaDataSignatureConfig, [
                 'data' => $data,
                 'publicCertificate' => $this->publicCertificate,
                 'privateCertificate' => $this->privateCertificate,
                 'openSSLAlgo' => OPENSSL_ALGO_SHA1
-            ]);
+            ]));
         } elseif ($type === self::SIGNATURE_HMAC) {
-            return Yii::createObject([
-                'class' => $this->hmacDataSignatureClass,
+            return Yii::createObject(ArrayHelper::merge($this->hmacDataSignatureConfig, [
                 'data' => $data,
                 'key' => $this->securePassword,
                 'hmacAlgo' => 'md5'
-            ]);
+            ]));
         } else {
             return null;
         }

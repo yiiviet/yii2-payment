@@ -7,15 +7,15 @@
 
 namespace yii2vn\payment\baokim;
 
-use yii2vn\payment\ResponseInstance as BaseResponseInstance;
+use yii2vn\payment\Data;
 
 /**
- * Class CheckoutResponseInstance
+ * Class CheckoutResponseData
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class CheckoutResponseInstance extends BaseResponseInstance
+class CheckoutResponseData extends Data
 {
 
 

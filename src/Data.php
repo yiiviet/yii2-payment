@@ -11,13 +11,17 @@ use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
 
 /**
- * Class CheckoutRequestInstance
+ * Class Data
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class RequestInstance extends DynamicModel
+class Data extends DynamicModel
 {
+    /**
+     * @var string
+     */
+    public $method;
 
     /**
      * @var BaseMerchant|MerchantInterface
@@ -25,20 +29,16 @@ class RequestInstance extends DynamicModel
     public $merchant;
 
     /**
-     * @var string
-     */
-    public $method;
-
-    /**
+     * @param bool $validate
      * @return array
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
-    public function getData(): array
+    public function getData(bool $validate = false): array
     {
-        if ($this->validate()) {
+        if (!$validate || $this->validate()) {
             $data = [];
 
-            foreach ($this->activeAttributes() as $attribute) {
+            foreach ($this->attributes() as $attribute) {
                 $value = $this->$attribute;
 
                 if ($value !== null) {
@@ -52,6 +52,4 @@ class RequestInstance extends DynamicModel
             throw new InvalidConfigException(reset($errors));
         }
     }
-
-
 }

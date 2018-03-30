@@ -33,17 +33,17 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @var array
      */
-    public $checkoutRequestInstanceConfig = ['class' => RequestInstance::class];
+    public $checkoutRequestDataConfig = ['class' => Data::class];
 
     /**
      * @var array
      */
-    public $checkoutResponseInstanceConfig = ['class' => ResponseInstance::class];
+    public $checkoutResponseDataConfig = ['class' => Data::class];
 
     /**
      * @var array
      */
-    public $merchantConfig;
+    public $merchantClass;
 
     /**
      * @var array|MerchantInterface[]
@@ -100,9 +100,12 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
                         $merchant = ['class' => $merchant, 'paymentGateway' => $this];
                     } else {
                         $merchant['paymentGateway'] = $this;
+                        if (!isset($merchant['class'])) {
+                            $merchant['class'] = $this->merchantClass;
+                        }
                     }
-                    $merchant = ArrayHelper::merge($this->merchantConfig, $merchant);
                 }
+
                 if (!$merchant instanceof MerchantInterface) {
                     return $this->_merchants[$id] = Yii::createObject($merchant);
                 } else {
@@ -158,30 +161,28 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @param array|string|RequestInstance $instance
-     * @param string $method
-     * @return ResponseInstance|bool
-     * @throws InvalidConfigException
+     * @inheritdoc
      */
-    public function checkout($instance, string $method = self::CHECKOUT_METHOD_INTERNET_BANKING)
+    public function checkout(array $data, string $method = self::CHECKOUT_METHOD_INTERNET_BANKING)
     {
-        if (!$instance instanceof RequestInstance) {
-            $instance = $this->initCheckoutRequestInstance($instance, $method);
-        } else {
-            $instance->merchant = $instance->merchant ?? $this->getDefaultMerchant();
-            $instance->method = $method;
-        }
+        $merchant = ArrayHelper::remove($data, 'merchant', $this->getDefaultMerchant());
+        $requestDataConfig = ArrayHelper::merge($this->checkoutRequestDataConfig, ['merchant' => $merchant, 'method' => $method]);
+        /** @var Data $data */
+
+        $requestData = Yii::createObject($requestDataConfig, [$data]);
 
         $event = Yii::createObject([
             'class' => CheckoutEvent::class,
-            'instance' => $instance,
+            'requestData' => $requestData,
             'method' => $method,
         ]);
 
         $this->trigger(self::EVENT_BEFORE_CHECKOUT, $event);
 
         if ($event->isValid) {
-            $responseData = $this->checkoutInternal($instance, $method);
+            $responseData = $this->checkoutInternal($data, $method);
+            $responseDataConfig = ArrayHelper::merge($this->checkoutResponseDataConfig, ['merchant' => $merchant, 'method' => $method]);
+            $responseData = Yii::createObject($responseDataConfig, [$responseData]);
             $event->responseData = $responseData;
             $this->trigger(self::EVENT_AFTER_CHECKOUT, $event);
 
@@ -192,35 +193,11 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @param array|string $config
+     * @param Data $data
      * @param string $method
-     * @return RequestInstance
-     * @throws InvalidConfigException
+     * @return array
      */
-    protected function initCheckoutRequestInstance($config, string $method): RequestInstance
-    {
-        /** @var RequestInstance $instance */
-
-        if (is_array($config)) {
-            $instance = Yii::createObject($this->checkoutRequestInstanceConfig, [$config]);
-        } else {
-            $instance = Yii::createObject(ArrayHelper::merge($this->checkoutRequestInstanceConfig, $config));
-        }
-
-        $instance = Instance::ensure($instance, RequestInstance::class);
-
-        $instance->merchant = $instance->merchant ?? $this->getDefaultMerchant();
-        $instance->method = $method;
-
-        return $instance;
-    }
-
-    /**
-     * @param RequestInstance $instance
-     * @param string $method
-     * @return ResponseInstance
-     */
-    abstract protected function checkoutInternal(RequestInstance $instance, string $method): ResponseInstance;
+    abstract protected function checkoutInternal(Data $data, string $method): array;
 
 
     /**
@@ -263,9 +240,9 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @param string $url
      * @param string $method
      * @param array $queryData
-     * @param MerchantInterface $merchant
+     * @param null|MerchantInterface $merchant
      * @return HttpClientRequest
      */
-    abstract protected function createHttpRequest(string $url, string $method, array $queryData, MerchantInterface $merchant = null): HttpClientRequest;
+    abstract public function createHttpRequest(string $url, string $method, array $queryData, MerchantInterface $merchant = null): HttpClientRequest;
 
 }
