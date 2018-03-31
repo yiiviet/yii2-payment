@@ -24,12 +24,12 @@ class CheckoutEvent extends Event
     public $method;
 
     /**
-     * @var Data
+     * @var CheckoutData
      */
     public $requestData;
 
     /**
-     * @var Data
+     * @var CheckoutData
      */
     public $responseData;
 
