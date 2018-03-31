@@ -7,20 +7,18 @@
 
 namespace yii2vn\payment\baokim;
 
-use yii2vn\payment\Data;
+use yii2vn\payment\CheckoutData;
 
 /**
  * Class BaoKimCheckoutInstance
  *
+ * @property Merchant $merchant
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class CheckoutRequestData extends Data
+class CheckoutRequestData extends CheckoutData
 {
-    /**
-     * @var Merchant
-     */
-    public $merchant;
 
     /**
      * @inheritdoc
