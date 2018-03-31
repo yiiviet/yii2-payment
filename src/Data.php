@@ -19,16 +19,6 @@ use yii\base\InvalidConfigException;
 class Data extends DynamicModel
 {
     /**
-     * @var string
-     */
-    public $method;
-
-    /**
-     * @var BaseMerchant|MerchantInterface
-     */
-    public $merchant;
-
-    /**
      * @param bool $validate
      * @return array
      * @throws InvalidConfigException
@@ -42,4 +32,5 @@ class Data extends DynamicModel
             throw new InvalidConfigException(reset($errors));
         }
     }
+
 }
