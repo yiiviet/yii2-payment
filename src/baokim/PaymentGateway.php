@@ -14,6 +14,7 @@ use yii\httpclient\Client as HttpClient;
 use yii\httpclient\Request as HttpClientRequest;
 
 use yii2vn\payment\BasePaymentGateway;
+use yii2vn\payment\CheckoutData;
 use yii2vn\payment\Data;
 use yii2vn\payment\MerchantInterface;
 use yii2vn\payment\TelCardPaymentGatewayInterface;
@@ -44,13 +45,14 @@ class PaymentGateway extends BasePaymentGateway implements TelCardPaymentGateway
 
     const PRO_PAYMENT_URL = '/payment/rest/payment_pro_api/pay_by_card';
 
-    public $merchantConfig = ['class' => Merchant::class];
+    public $merchantClass = Merchant::class;
+
+    public $merchantInfoDataConfig = ['class' => Data::class];
 
     public $checkoutRequestDataConfig = ['class' => CheckoutRequestData::class];
 
     public $checkoutResponseDataConfig = ['class' => CheckoutResponseData::class];
 
-    public $merchantDataConfig = ['class' => Data::class];
 
     /**
      * @inheritdoc
@@ -80,49 +82,41 @@ class PaymentGateway extends BasePaymentGateway implements TelCardPaymentGateway
     /**
      * @inheritdoc
      */
-    public function createHttpRequest(string $url, string $method, array $queryData, MerchantInterface $merchant = null): HttpClientRequest
+    protected function getHttpClientConfig(): array
     {
-        /** @var Merchant $merchant */
-
-        if ($merchant === null) {
-            $merchant = $this->getDefaultMerchant();
-        }
-
-        $request = $this->getHttpClient()->createRequest();
-
-        $request->setUrl($url)
-            ->setMethod($method)
-            ->setData($queryData)
-            ->setFormat(HttpClient::FORMAT_JSON)
-            ->setOptions([
-                CURLOPT_HTTPAUTH => CURLAUTH_DIGEST | CURLAUTH_BASIC,
-                CURLOPT_USERPWD => "{$merchant->apiUser}:{$merchant->apiPassword}",
-                CURLOPT_SSL_VERIFYHOST => false,
-                CURLOPT_SSL_VERIFYPEER => false
-            ]);
-
-        return $request;
+        return [
+            'class' => HttpClient::class,
+            'transport' => 'yii\httpclient\CurlTransport',
+            'requestConfig' => [
+                'format' => HttpClient::FORMAT_JSON,
+                'options' => [
+                    CURLOPT_HTTPAUTH => CURLAUTH_DIGEST | CURLAUTH_BASIC,
+                    CURLOPT_SSL_VERIFYHOST => false,
+                    CURLOPT_SSL_VERIFYPEER => false
+                ]
+            ]
+        ];
     }
 
 
     /**
-     * @param Merchant|null $merchant
+     * @param string|int $merchantId
      * @throws \yii\base\InvalidConfigException
      * @return object|Data
      */
-    public function getMerchantInfo(Merchant $merchant = null): Data
+    public function getMerchantInfo($merchantId = null): Data
     {
-        if ($merchant === null) {
-            $merchant = $this->getDefaultMerchant();
-        }
+        $merchant = $this->getMerchant($merchantId);
 
         $data = ['business' => $merchant->businessEmail];
         $httpMethod = 'GET';
-        $dataSign = $httpMethod . '&' . urlencode(self::PRO_PAYMENT_URL) . '&' . urlencode(http_build_query($data)) . '&';
+        $dataSign = $httpMethod . '&' . urlencode(self::PRO_SELLER_INFO_URL) . '&' . urlencode(http_build_query($data)) . '&';
         $data['signature'] = $merchant->signature($dataSign, Merchant::SIGNATURE_RSA);
-        $httpResponse = $this->createHttpRequest(self::PRO_PAYMENT_URL, $httpMethod, $data, $merchant)->send();
+        $httpResponse = $this->getHttpClient()->get(self::PRO_SELLER_INFO_URL, $data, [], [
+            CURLOPT_USERPWD => $merchant->apiUser . ':' . $merchant->apiPassword
+        ])->send();
 
-        return Yii::createObject($this->merchantConfig, [$httpResponse->getData()]);
+        return Yii::createObject($this->merchantInfoDataConfig, [$httpResponse->getData()]);
     }
 
     /**
@@ -190,12 +184,12 @@ class PaymentGateway extends BasePaymentGateway implements TelCardPaymentGateway
     }
 
     /**
-     * @param Data $data
+     * @param CheckoutData $data
      * @param string $method
      * @return array
      * @throws \yii\base\InvalidConfigException|NotSupportedException
      */
-    protected function checkoutInternal(Data $data, string $method): array
+    protected function checkoutInternal(CheckoutData $data, string $method): array
     {
         /** @var Merchant $merchant */
 
@@ -203,21 +197,22 @@ class PaymentGateway extends BasePaymentGateway implements TelCardPaymentGateway
         $data = $data->getData();
         ksort($data);
         $dataSign = implode('', $data);
-
+        $httpRequestOptions = [
+            CURLOPT_USERPWD => $merchant->apiUser . ':' . $merchant->apiPassword
+        ];
         switch ($method) {
             case self::CHECKOUT_METHOD_TEL_CARD:
                 $data['data_sign'] = $merchant->signature($dataSign, Merchant::SIGNATURE_HMAC);
-                $httpResponse = $this->createHttpRequest(self::CARD_CHARGE_URL, 'POST', $data, $merchant)->send();
+                $httpResponse = $this->getHttpClient()->post(self::CARD_CHARGE_URL, $data, [], $httpRequestOptions)->send();
                 break;
             case self::CHECKOUT_METHOD_ATM_TRANSFER || self::CHECKOUT_METHOD_BANK_TRANSFER || self::CHECKOUT_METHOD_BAO_KIM:
                 $data['checksum'] = $merchant->signature($dataSign, Merchant::SIGNATURE_HMAC);
-                $httpResponse = $this->createHttpRequest(self::BK_PAYMENT_URL, 'POST', $data, $merchant)->send();
+                $httpResponse = $this->getHttpClient()->post(self::BK_PAYMENT_URL, $data, [], $httpRequestOptions)->send();
                 break;
             case self::CHECKOUT_METHOD_LOCAL_BANK || self::CHECKOUT_METHOD_INTERNET_BANKING || self::CHECKOUT_METHOD_CREDIT_CARD:
-                $httpMethod = 'POST';
-                $dataSign = $httpMethod . '&' . urlencode(self::PRO_PAYMENT_URL) . '&&' . urlencode(http_build_query($data));
+                $dataSign = 'POST' . '&' . urlencode(self::PRO_PAYMENT_URL) . '&&' . urlencode(http_build_query($data));
                 $data['signature'] = $merchant->signature($dataSign, Merchant::SIGNATURE_RSA);
-                $httpResponse = $this->createHttpRequest(self::PRO_PAYMENT_URL, $httpMethod, $data, $merchant)->send();
+                $httpResponse = $this->getHttpClient()->post(self::PRO_PAYMENT_URL, $data, [], $httpRequestOptions)->send();
                 break;
             default:
                 throw new NotSupportedException("Checkout method '$method' not supported in " . __CLASS__);
