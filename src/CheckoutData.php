@@ -19,37 +19,43 @@ namespace yii2vn\payment;
 class CheckoutData extends Data
 {
     /**
+     * @var MerchantInterface
+     */
+    private $_merchant;
+    /**
      * @var string
      */
     private $_method;
 
+    /**
+     * CheckoutData constructor.
+     * @param string $method
+     * @param MerchantInterface $merchant
+     * @param array $attributes
+     * @param array $config
+     */
+    public function __construct(string $method, MerchantInterface $merchant, array $attributes = [], array $config = [])
+    {
+        $this->_method = $method;
+        $this->_merchant = $merchant;
+
+        parent::__construct($attributes, $config);
+    }
+
+    /**
+     * @return string
+     */
     public function getMethod(): string
     {
         return $this->_method;
     }
 
-    public function setMethod(string $method): bool
-    {
-        $this->_method = $method;
-
-        return true;
-    }
-
     /**
-     * @var MerchantInterface
+     * @return MerchantInterface
      */
-    private $_merchant;
-
     public function getMerchant(): MerchantInterface
     {
         return $this->_merchant;
-    }
-
-    public function setMerchant(MerchantInterface $merchant): bool
-    {
-        $this->_merchant = $merchant;
-
-        return true;
     }
 
 

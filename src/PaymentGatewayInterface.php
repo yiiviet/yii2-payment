@@ -21,10 +21,6 @@ namespace yii2vn\payment;
 interface PaymentGatewayInterface
 {
 
-    const CHECKOUT_METHOD_INTERNET_BANKING = 'internetBanking';
-
-    const CHECKOUT_METHOD_CREDIT_CARD = 'creditCard';
-
     const EVENT_BEFORE_CHECKOUT = 'beforeCheckout';
 
     const EVENT_AFTER_CHECKOUT = 'afterCheckout';
@@ -66,9 +62,9 @@ interface PaymentGatewayInterface
 
     /**
      * @param array $data
-     * @param string $method
-     * @return Data|bool
+     * @return CheckoutData|bool
      */
-    public function checkout(array $data, string $method = self::CHECKOUT_METHOD_INTERNET_BANKING);
+    public function checkout(array $data);
+
 
 }

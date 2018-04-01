@@ -40,7 +40,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @var array
      */
-    public $merchantClass;
+    public $merchantConfig;
 
     /**
      * @var array|MerchantInterface[]
@@ -94,17 +94,13 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 
                 if (is_array($merchant) || is_string($merchant)) {
                     if (is_string($merchant)) {
-                        $merchant = ['class' => $merchant, 'paymentGateway' => $this];
-                    } else {
-                        $merchant['paymentGateway'] = $this;
-                        if (!isset($merchant['class'])) {
-                            $merchant['class'] = $this->merchantClass;
-                        }
+                        $merchant = ['class' => $merchant];
                     }
+                    $merchant = ArrayHelper::merge($this->merchantConfig, $merchant);
                 }
 
                 if (!$merchant instanceof MerchantInterface) {
-                    return $this->_merchants[$id] = Yii::createObject($merchant);
+                    return $this->_merchants[$id] = Yii::createObject($merchant, [$this]);
                 } else {
                     return $merchant;
                 }
@@ -143,7 +139,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @return MerchantInterface|BaseMerchant
      * @throws InvalidConfigException
      */
-    public function getDefaultMerchant(): MerchantInterface
+    protected function getDefaultMerchant(): MerchantInterface
     {
         if (!$this->_defaultMerchant) {
             $merchantIds = array_keys($this->_merchants);
@@ -160,15 +156,15 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @inheritdoc
      */
-    public function checkout(array $data, string $method = self::CHECKOUT_METHOD_INTERNET_BANKING)
+    public function checkout(array $data)
     {
+        $method = ArrayHelper::remove($data, 'method', $this->getDefaultCheckoutMethod());
         $merchantId = ArrayHelper::remove($data, 'merchantId');
         $merchant = $this->getMerchant($merchantId);
-        $requestDataConfig = ArrayHelper::merge($this->checkoutRequestDataConfig, ['merchant' => $merchant, 'method' => $method]);
 
         /** @var CheckoutData $requestData */
 
-        $requestData = Yii::createObject($requestDataConfig, [$data]);
+        $requestData = Yii::createObject($this->checkoutRequestDataConfig, [$method, $merchant, $data]);
 
         $event = Yii::createObject([
             'class' => CheckoutEvent::class,
@@ -179,9 +175,8 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
         $this->trigger(self::EVENT_BEFORE_CHECKOUT, $event);
 
         if ($event->isValid) {
-            $responseData = $this->checkoutInternal($requestData, $method);
-            $responseDataConfig = ArrayHelper::merge($this->checkoutResponseDataConfig, ['merchant' => $merchant, 'method' => $method]);
-            $responseData = Yii::createObject($responseDataConfig, [$responseData]);
+            $data = $this->checkoutInternal($requestData);
+            $responseData = Yii::createObject($this->checkoutResponseDataConfig, [$method, $merchant, $data]);
             $event->responseData = $responseData;
             $this->trigger(self::EVENT_AFTER_CHECKOUT, $event);
 
@@ -192,11 +187,15 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
+     * @return string
+     */
+    abstract protected function getDefaultCheckoutMethod(): string;
+
+    /**
      * @param CheckoutData $data
-     * @param string $method
      * @return array
      */
-    abstract protected function checkoutInternal(CheckoutData $data, string $method): array;
+    abstract protected function checkoutInternal(CheckoutData $data): array;
 
 
     /**

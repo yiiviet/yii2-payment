@@ -22,6 +22,17 @@ abstract class BaseMerchant extends Component implements MerchantInterface
 {
 
     /**
+     * BaseMerchant constructor.
+     * @param PaymentGatewayInterface $paymentGateway
+     * @param array $config
+     */
+    public function __construct(PaymentGatewayInterface $paymentGateway, array $config = [])
+    {
+        $this->_paymentGateway = $paymentGateway;
+        parent::__construct($config);
+    }
+
+    /**
      * @var array|string|PaymentGatewayInterface
      */
     private $_paymentGateway;
@@ -32,18 +43,6 @@ abstract class BaseMerchant extends Component implements MerchantInterface
     public function getPaymentGateway(): PaymentGatewayInterface
     {
         return $this->_paymentGateway;
-    }
-
-    /**
-     * @param array|string|PaymentGatewayInterface $paymentGateway
-     * @return bool
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function setPaymentGateway($paymentGateway): bool
-    {
-        $this->_paymentGateway = Instance::ensure($paymentGateway, PaymentGatewayInterface::class);
-
-        return true;
     }
 
     /**

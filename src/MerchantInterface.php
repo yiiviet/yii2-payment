@@ -27,12 +27,6 @@ interface MerchantInterface
     public function getPaymentGateway(): PaymentGatewayInterface;
 
     /**
-     * @param array|string|PaymentGatewayInterface $paymentGateway
-     * @return bool
-     */
-    public function setPaymentGateway($paymentGateway): bool;
-
-    /**
      * @param string $data
      * @param null|string $type
      * @return string
