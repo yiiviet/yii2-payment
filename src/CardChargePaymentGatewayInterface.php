@@ -9,26 +9,17 @@
 namespace yii2vn\payment;
 
 /**
- * Interface TelCardPaymentGatewayInterface
+ * Interface CardChargePaymentGatewayInterface
  *
  * @author: Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-interface TelCardPaymentGatewayInterface extends PaymentGatewayInterface
+interface CardChargePaymentGatewayInterface extends PaymentGatewayInterface
 {
-
-
-    const CHECKOUT_METHOD_TEL_CARD = 'telCard';
-
     /**
      * @param array $data
      * @return Data|bool
      */
     public function cardCharge(array $data);
-
-    /**
-     * @inheritdoc
-     */
-    public function checkout(array $data, string $method = self::CHECKOUT_METHOD_TEL_CARD);
 
 }
