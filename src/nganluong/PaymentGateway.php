@@ -39,7 +39,7 @@ class PaymentGateway extends BasePaymentGateway
 
     const CHECKOUT_API_POST_URL = '/checkout.api.nganluong.post.php';
 
-    public $merchantClass = Merchant::class;
+    public $merchantConfig = ['class' => Merchant::class];
 
     public $checkoutRequestDataConfig = ['class' => CheckoutRequestData::class];
 
