@@ -48,7 +48,7 @@ abstract class BasePaymentNotificationAction extends Action
     public function beforeRun()
     {
         $this->trigger(static::EVENT_BEFORE_VERIFIED, $event = Yii::createObject([
-            'class' => PaymentNoticeEvent::class,
+            'class' => PaymentNotificationEvent::class,
             'request' => $this->request
         ]));
 
@@ -61,7 +61,7 @@ abstract class BasePaymentNotificationAction extends Action
     public function afterRun()
     {
         $this->trigger(static::EVENT_AFTER_VERIFIED, Yii::createObject([
-            'class' => PaymentNoticeEvent::class,
+            'class' => PaymentNotificationEvent::class,
             'request' => $this->request,
             'verifiedData' => $this->getVerifiedData()
         ]));

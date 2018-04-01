@@ -10,12 +10,12 @@ namespace yii2vn\payment;
 use yii\base\Event;
 
 /**
- * Class PaymentNoticeEvent
+ * Class PaymentNotificationEvent
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class PaymentNoticeEvent extends Event
+class PaymentNotificationEvent extends Event
 {
 
     public $isValid = true;
