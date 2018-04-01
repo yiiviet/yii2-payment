@@ -40,14 +40,6 @@ class CheckoutRequestData extends CheckoutData
     /**
      * @inheritdoc
      */
-    public function getScenario(): string
-    {
-        return $this->method;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getData(bool $validate = true): array
     {
         $data = parent::getData($validate);

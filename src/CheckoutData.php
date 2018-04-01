@@ -42,6 +42,11 @@ class CheckoutData extends Data
         parent::__construct($attributes, $config);
     }
 
+    public function getScenario()
+    {
+        return $this->getMethod();
+    }
+
     /**
      * @return string
      */
