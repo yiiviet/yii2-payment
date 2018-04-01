@@ -245,5 +245,8 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
         return $httpResponse->getData();
     }
 
-
+    protected function getDefaultCheckoutMethod(): string
+    {
+        return self::CHECKOUT_METHOD_LOCAL_BANK;
+    }
 }

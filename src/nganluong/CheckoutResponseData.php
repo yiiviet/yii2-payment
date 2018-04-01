@@ -13,6 +13,7 @@ use yii2vn\payment\CheckoutData;
 /**
  * Class CheckoutResponseData
  *
+ * @property Merchant $merchant
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */

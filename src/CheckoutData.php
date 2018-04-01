@@ -7,6 +7,8 @@
 
 namespace yii2vn\payment;
 
+use yii\base\InvalidConfigException;
+
 /**
  * Class CheckoutData
  *
@@ -42,9 +44,21 @@ class CheckoutData extends Data
         parent::__construct($attributes, $config);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getScenario()
     {
         return $this->getMethod();
+    }
+
+    /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     */
+    public function setScenario($value)
+    {
+        throw new InvalidConfigException('Scenario must be checkout method value! It can not be set!');
     }
 
     /**

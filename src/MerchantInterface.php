@@ -16,11 +16,6 @@ namespace yii2vn\payment;
  */
 interface MerchantInterface
 {
-
-    const SIGNATURE_RSA = 'RSA';
-
-    const SIGNATURE_HMAC = 'HMAC';
-
     /**
      * @return PaymentGatewayInterface
      */

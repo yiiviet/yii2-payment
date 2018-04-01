@@ -23,6 +23,10 @@ use yii2vn\payment\BaseDataSignature;
 class Merchant extends BaseMerchant
 {
 
+    const SIGNATURE_RSA = 'RSA';
+
+    const SIGNATURE_HMAC = 'HMAC';
+
     public $id;
 
     public $apiUser;

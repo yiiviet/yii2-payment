@@ -27,6 +27,10 @@ use yii\httpclient\Client as HttpClient;
 abstract class BasePaymentGateway extends Component implements PaymentGatewayInterface
 {
 
+    const EVENT_BEFORE_CHECKOUT = 'beforeCheckout';
+
+    const EVENT_AFTER_CHECKOUT = 'afterCheckout';
+
     /**
      * @var array
      */

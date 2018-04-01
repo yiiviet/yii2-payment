@@ -21,10 +21,6 @@ namespace yii2vn\payment;
 interface PaymentGatewayInterface
 {
 
-    const EVENT_BEFORE_CHECKOUT = 'beforeCheckout';
-
-    const EVENT_AFTER_CHECKOUT = 'afterCheckout';
-
     /**
      * @return string
      */

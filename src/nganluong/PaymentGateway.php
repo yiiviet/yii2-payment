@@ -45,11 +45,17 @@ class PaymentGateway extends BasePaymentGateway
 
     public $checkoutResponseDataConfig = ['class' => CheckoutResponseData::class];
 
+    /**
+     * @inheritdoc
+     */
     public static function baseUrl(): string
     {
         return 'https://www.nganluong.vn';
     }
 
+    /**
+     * @inheritdoc
+     */
     public static function version(): string
     {
         return '3.1';
@@ -143,7 +149,9 @@ class PaymentGateway extends BasePaymentGateway
         return $this->checkout($data);
     }
 
-
+    /**
+     * @inheritdoc
+     */
     protected function getHttpClientConfig(): array
     {
         return [
@@ -166,6 +174,14 @@ class PaymentGateway extends BasePaymentGateway
         Yii::debug(__CLASS__ . " checkout requested sent with method: {$data->getMethod()}");
 
         return $httpResponse->getData();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultCheckoutMethod(): string
+    {
+        return self::CHECKOUT_METHOD_ATM_ONLINE;
     }
 
 }

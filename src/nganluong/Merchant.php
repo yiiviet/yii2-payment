@@ -27,7 +27,6 @@ class Merchant extends BaseMerchant
 
     public $password;
 
-    public $receiverEmail;
     /**
      * @inheritdoc
      * @throws NotSupportedException
