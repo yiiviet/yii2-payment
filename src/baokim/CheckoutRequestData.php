@@ -26,7 +26,7 @@ class CheckoutRequestData extends CheckoutData
     public function rules(): array
     {
         return [
-            [['seri_field', 'pin_field', 'transaction_id', 'card_id'], 'required', 'on' => [PaymentGateway::CHECKOUT_METHOD_TEL_CARD]],
+            [['seri_field', 'pin_field', 'transaction_id', 'card_id'], 'required', 'on' => [PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE]],
             [['order_id', 'total_amount', 'payer_name', 'payer_email', 'payer_phone_no', 'url_success'], 'required', 'on' => [
                 PaymentGateway::CHECKOUT_METHOD_LOCAL_BANK, PaymentGateway::CHECKOUT_METHOD_CREDIT_CARD, PaymentGateway::CHECKOUT_METHOD_INTERNET_BANKING,
                 PaymentGateway::CHECKOUT_METHOD_BAO_KIM, PaymentGateway::CHECKOUT_METHOD_BANK_TRANSFER, PaymentGateway::CHECKOUT_METHOD_ATM_TRANSFER,
@@ -52,13 +52,16 @@ class CheckoutRequestData extends CheckoutData
     {
         $data = parent::getData($validate);
 
+        /** @var Merchant $merchant */
+        $merchant = $this->getMerchant();
+
         switch ($this->method) {
-            case PaymentGateway::CHECKOUT_METHOD_TEL_CARD:
+            case PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE:
                 $data['merchant_id'] = $this->merchant->id;
                 break;
             case PaymentGateway::CHECKOUT_METHOD_BAO_KIM || PaymentGateway::CHECKOUT_METHOD_BANK_TRANSFER || PaymentGateway::CHECKOUT_METHOD_ATM_TRANSFER ||
                 PaymentGateway::CHECKOUT_METHOD_LOCAL_BANK || PaymentGateway::CHECKOUT_METHOD_CREDIT_CARD || PaymentGateway::CHECKOUT_METHOD_INTERNET_BANKING:
-                $data['business'] = $this->merchant->businessEmail;
+                $data['business'] = $data['business'] ?? $merchant->email;
                 break;
         }
 

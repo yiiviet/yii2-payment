@@ -29,7 +29,7 @@ class Merchant extends BaseMerchant
 
     public $apiPassword;
 
-    public $businessEmail;
+    public $email;
 
     public $securePassword;
 
