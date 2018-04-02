@@ -7,6 +7,8 @@
 
 namespace yii2vn\payment\vnpayment;
 
+use yii\base\NotSupportedException;
+
 use yii2vn\payment\BaseDataSignature;
 use yii2vn\payment\BaseMerchant;
 
@@ -19,9 +21,18 @@ use yii2vn\payment\BaseMerchant;
 class Merchant extends BaseMerchant
 {
 
-    public function createDataSignature(string $data, string $type): ?BaseDataSignature
-    {
-        // TODO: Implement createDataSignature() method.
-    }
+    public $hashSecret;
 
+    /**
+     * @var string
+     */
+    public $tmnCode;
+
+    /**
+     * @inheritdoc
+     */
+    protected function createDataSignature(string $data, string $type): ?BaseDataSignature
+    {
+        throw new NotSupportedException('Data signature is not supported in VNPayment Gateway');
+    }
 }

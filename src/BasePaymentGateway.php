@@ -85,7 +85,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 
     /**
      * @param null|string|int $id
-     * @return mixed|MerchantInterface
+     * @return object|MerchantInterface
      * @throws InvalidConfigException|InvalidArgumentException
      */
     public function getMerchant($id = null): MerchantInterface
@@ -140,7 +140,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     private $_defaultMerchant;
 
     /**
-     * @return MerchantInterface|BaseMerchant
+     * @return MerchantInterface
      * @throws InvalidConfigException
      */
     protected function getDefaultMerchant(): MerchantInterface
@@ -191,9 +191,9 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    abstract protected function getDefaultCheckoutMethod(): string;
+    abstract protected function getDefaultCheckoutMethod(): ?string;
 
     /**
      * @param CheckoutData $data

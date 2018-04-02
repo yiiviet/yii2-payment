@@ -22,15 +22,18 @@ use yii2vn\payment\BaseMerchant;
 class Merchant extends BaseMerchant
 {
 
-    const SIGNATURE_HMAC = 'HMAC';
 
     public $id;
+
+    public $user;
+
+    public $password;
 
     public $accessCode;
 
     public $secureSecret;
 
-    public $hmacDataSignatureConfig = ['class' => HmacDataSignature::class, 'hmacAlgo' => HmacDataSignature::HMAC_ALGO_SHA256];
+    public $dataSignatureConfig = ['class' => HmacDataSignature::class, 'hmacAlgo' => HmacDataSignature::HMAC_ALGO_SHA256];
 
     /**
      * @param string $data
@@ -40,15 +43,11 @@ class Merchant extends BaseMerchant
      */
     public function createDataSignature(string $data, string $type): ?BaseDataSignature
     {
-        if ($type === null || $type === self::SIGNATURE_HMAC) {
-            return Yii::createObject($this->hmacDataSignatureConfig, [
-                'key' => pack('H*', $this->secureSecret),
-                'data' => $data,
-                'hmacAlgo' => HmacDataSignature::HMAC_ALGO_SHA256
-            ]);
-        } else {
-            return null;
-        }
+        return Yii::createObject($this->dataSignatureConfig, [
+            'key' => pack('H*', $this->secureSecret),
+            'data' => $data,
+            'hmacAlgo' => HmacDataSignature::HMAC_ALGO_SHA256
+        ]);
     }
 
 }

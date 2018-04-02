@@ -25,10 +25,6 @@ use yii2vn\payment\MerchantInterface;
 class CheckoutRequestData extends CheckoutData
 {
 
-    const AVS_ATTRIBUTE_PREFIX = 'AVS_';
-
-    const VPC_ATTRIBUTE_PREFIX = 'vpc_';
-
     const AVS_ATTRIBUTES = [
         'Street01', 'City', 'StateProv', 'PostCode', 'Country'
     ];
@@ -57,9 +53,9 @@ class CheckoutRequestData extends CheckoutData
 
         foreach ($attributes as $attribute => $value) {
             if (in_array($attribute, self::AVS_ATTRIBUTES, true)) {
-                $attributesPrepared[self::AVS_ATTRIBUTE_PREFIX . $attribute] = $value;
+                $attributesPrepared['AVS_' . $attribute] = $value;
             } elseif (in_array($attribute, self::VPC_ATTRIBUTES, true)) {
-                $attributesPrepared[self::VPC_ATTRIBUTE_PREFIX . $attribute] = $value;
+                $attributesPrepared['vpc_' . $attribute] = $value;
             } else {
                 $attributesPrepared[$attribute] = $value;
             }
@@ -72,7 +68,7 @@ class CheckoutRequestData extends CheckoutData
     {
         return [
             [['vpc_Amount', 'vpc_ReturnUrl', 'vpc_MerchTxnRef', 'vpc_OrderInfo'], 'required'],
-            [['vpc_Currency'], 'required', 'on' => [PaymentGateway::CHECKOUT_METHOD_LOCAL_ATM]]
+            [['vpc_Currency'], 'required', 'on' => [PaymentGateway::CHECKOUT_METHOD_LOCAL_BANK]]
         ];
     }
 

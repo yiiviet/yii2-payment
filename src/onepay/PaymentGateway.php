@@ -7,10 +7,14 @@
 
 namespace yii2vn\payment\onepay;
 
+use Yii;
+
 use yii\httpclient\Client as HttpClient;
 
 use yii2vn\payment\BasePaymentGateway;
 use yii2vn\payment\CheckoutData;
+use yii2vn\payment\Data;
+
 
 /**
  * Class PaymentGateway
@@ -25,13 +29,17 @@ class PaymentGateway extends BasePaymentGateway
 
     const CHECKOUT_METHOD_INTER_BANK = 'interBank';
 
+    const ONECOMM_PAY_URL = '/onecomm-pay/vpc.op';
+
+    const QUERY_DR_URL = '/onecomm-pay/Vpcdps.op';
+
     public $merchantConfig = ['class' => Merchant::class];
 
     public $checkoutRequestDataConfig = ['class' => CheckoutRequestData::class];
 
     public $checkoutResponseDataConfig = ['class' => CheckoutResponseData::class];
 
-    const ONECOMM_PAY_URL = '/onecomm-pay/vpc.op';
+    public $queryDRDataConfig = ['class' => Data::class];
 
     public static function baseUrl(): string
     {
@@ -49,9 +57,38 @@ class PaymentGateway extends BasePaymentGateway
             'class' => HttpClient::class,
             'transport' => 'yii\httpclient\CurlTransport',
             'requestConfig' => [
-                'format' => ''
+                'options' => [
+                    CURLOPT_SSL_VERIFYHOST => false,
+                    CURLOPT_SSL_VERIFYPEER => false
+                ]
             ]
         ];
+    }
+
+    /**
+     * @param int|string $vpcMerchTxnRef
+     * @param null|int|string $merchantId
+     * @return Data
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function queryDR($vpcMerchTxnRef, $merchantId = null): Data
+    {
+        /** @var Merchant $merchant */
+        $merchant = $this->getMerchant($merchantId);
+        $url = [
+            self::QUERY_DR_URL,
+            'merchant' => $merchant->id,
+            'command' => 'queryDR',
+            'vpc_User' => $merchant->user,
+            'vpc_Password' => $merchant->password,
+            'vpc_AccessCode' => $merchant->accessCode,
+            'vpc_Version' => static::version(),
+            'vpc_MerchTxnRef' => (string)$vpcMerchTxnRef
+        ];
+
+        $responseData = $this->getHttpClient()->post($url)->send()->getData();
+
+        return Yii::createObject($this->queryDRDataConfig, [$responseData]);
     }
 
     /**
@@ -87,7 +124,7 @@ class PaymentGateway extends BasePaymentGateway
         ksort($dataQuery);
         $dataSign = [];
         foreach ($dataQuery as $attribute => $value) {
-            if (substr($attribute, 0, strlen(CheckoutRequestData::VPC_ATTRIBUTE_PREFIX)) === CheckoutRequestData::VPC_ATTRIBUTE_PREFIX) {
+            if (substr($attribute, 0, 4) === 'vpc_') {
                 $dataSign[$attribute] = $value;
             }
         }
