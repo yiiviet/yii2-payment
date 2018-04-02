@@ -7,6 +7,8 @@
 
 namespace yii2vn\payment\onepay;
 
+use yii\httpclient\Client as HttpClient;
+
 use yii2vn\payment\BasePaymentGateway;
 use yii2vn\payment\CheckoutData;
 
@@ -19,30 +21,85 @@ use yii2vn\payment\CheckoutData;
 class PaymentGateway extends BasePaymentGateway
 {
 
+    const CHECKOUT_METHOD_LOCAL_BANK = 'localBank';
+
+    const CHECKOUT_METHOD_INTER_BANK = 'interBank';
+
     public $merchantConfig = ['class' => Merchant::class];
 
     public $checkoutRequestDataConfig = ['class' => CheckoutRequestData::class];
 
     public $checkoutResponseDataConfig = ['class' => CheckoutResponseData::class];
 
+    const ONECOMM_PAY_URL = '/onecomm-pay/vpc.op';
+
     public static function baseUrl(): string
     {
-        // TODO: Implement baseUrl() method.
+        return 'https://onepay.vn';
     }
 
     public static function version(): string
     {
-        // TODO: Implement version() method.
+        return '2';
     }
 
+    protected function getHttpClientConfig(): array
+    {
+        return [
+            'class' => HttpClient::class,
+            'transport' => 'yii\httpclient\CurlTransport',
+            'requestConfig' => [
+                'format' => ''
+            ]
+        ];
+    }
+
+    /**
+     * @param array $data
+     * @return CheckoutResponseData
+     */
+    public function checkoutWithLocalBank(array $data): CheckoutResponseData
+    {
+        $data['method'] = self::CHECKOUT_METHOD_LOCAL_BANK;
+
+        return $this->checkout($data);
+    }
+
+    /**
+     * @param array $data
+     * @return CheckoutResponseData
+     */
+    public function checkoutWithInterBank(array $data): CheckoutResponseData
+    {
+        $data['method'] = self::CHECKOUT_METHOD_INTER_BANK;
+
+        return $this->checkout($data);
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function checkoutInternal(CheckoutData $data): array
     {
-        // TODO: Implement checkoutInternal() method.
+        /** @var Merchant $merchant */
+        $merchant = $data->getMerchant();
+        $dataQuery = $data->getData();
+        ksort($dataQuery);
+        $dataSign = [];
+        foreach ($dataQuery as $attribute => $value) {
+            if (substr($attribute, 0, strlen(CheckoutRequestData::VPC_ATTRIBUTE_PREFIX)) === CheckoutRequestData::VPC_ATTRIBUTE_PREFIX) {
+                $dataSign[$attribute] = $value;
+            }
+        }
+        $dataQuery['vpc_SecureHash'] = strtoupper($merchant->signature(http_build_query($dataSign)));
+        $location = rtrim(static::baseUrl()) . self::ONECOMM_PAY_URL . '?' . http_build_query($dataQuery);
+
+        return ['location' => $location];
     }
 
     protected function getDefaultCheckoutMethod(): string
     {
-        // TODO: Implement getDefaultCheckoutMethod() method.
+        return self::CHECKOUT_METHOD_LOCAL_BANK;
     }
 
 }
