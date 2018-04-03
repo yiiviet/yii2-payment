@@ -1,0 +1,23 @@
+{
+    "name": "yii2vn/payment",
+    "description": "Extension support integrated payment gateway in Viet Nam.",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension","vn-payment","one-pay","bao-kim","ngan-luong"],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Vuong Minh",
+            "email": "vuongxuongminh@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "yiisoft/yii2": ">=2.0.14",
+        "yiisoft/httpclient": "~2.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "yii2vn\\payment\\": "src"
+        }
+    }
+}
