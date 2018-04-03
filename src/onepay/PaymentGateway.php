@@ -41,9 +41,9 @@ class PaymentGateway extends BasePaymentGateway
 
     public $queryDRDataConfig = ['class' => Data::class];
 
-    public static function baseUrl(): string
+    public static function getBaseUrl(bool $sandbox): string
     {
-        return 'https://onepay.vn';
+        return $sandbox ? 'https://mtf.onepay.vn' : 'https://onepay.vn';
     }
 
     public static function version(): string

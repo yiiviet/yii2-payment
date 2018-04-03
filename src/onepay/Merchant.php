@@ -9,6 +9,8 @@ namespace yii2vn\payment\onepay;
 
 use Yii;
 
+use yii\helpers\ArrayHelper;
+
 use yii2vn\payment\BaseDataSignature;
 use yii2vn\payment\HmacDataSignature;
 use yii2vn\payment\BaseMerchant;
@@ -33,7 +35,7 @@ class Merchant extends BaseMerchant
 
     public $secureSecret;
 
-    public $dataSignatureConfig = ['class' => HmacDataSignature::class, 'hmacAlgo' => HmacDataSignature::HMAC_ALGO_SHA256];
+    public $dataSignatureConfig = ['class' => HmacDataSignature::class];
 
     /**
      * @param string $data
@@ -41,13 +43,12 @@ class Merchant extends BaseMerchant
      * @return null|object|HmacDataSignature|BaseDataSignature
      * @throws \yii\base\InvalidConfigException
      */
-    public function createDataSignature(string $data, string $type): ?BaseDataSignature
+    public function initDataSignature(string $data, string $type): ?BaseDataSignature
     {
-        return Yii::createObject($this->dataSignatureConfig, [
+        return Yii::createObject(ArrayHelper::merge($this->dataSignatureConfig, [
             'key' => pack('H*', $this->secureSecret),
-            'data' => $data,
             'hmacAlgo' => HmacDataSignature::HMAC_ALGO_SHA256
-        ]);
+        ]), [$data]);
     }
 
 }

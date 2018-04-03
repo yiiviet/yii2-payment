@@ -48,9 +48,9 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public static function baseUrl(): string
+    protected static function getBaseUrl(bool $sandbox): string
     {
-        return 'https://www.nganluong.vn';
+        return $sandbox ? 'https://sandbox.nganluong.vn:8088/nl30' : 'https://www.nganluong.vn';
     }
 
     /**

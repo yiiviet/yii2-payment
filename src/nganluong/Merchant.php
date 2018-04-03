@@ -29,11 +29,10 @@ class Merchant extends BaseMerchant
 
     /**
      * @inheritdoc
-     * @throws NotSupportedException
      */
-    protected function createDataSignature(string $data, string $type): ?BaseDataSignature
+    protected function initDataSignature(string $data, string $type): ?BaseDataSignature
     {
-        throw new NotSupportedException('Data signature is not supported in Ngan Luong Payment Gateway');
+        return null;
     }
 
 }

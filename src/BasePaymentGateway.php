@@ -18,8 +18,8 @@ use yii\httpclient\Client as HttpClient;
 
 /**
  *
- * @property MerchantInterface $defaultMerchant
- * @property MerchantInterface $merchant
+ * @property BaseMerchant $defaultMerchant
+ * @property BaseMerchant $merchant
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -30,6 +30,11 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     const EVENT_BEFORE_CHECKOUT = 'beforeCheckout';
 
     const EVENT_AFTER_CHECKOUT = 'afterCheckout';
+
+    /**
+     * @var bool
+     */
+    public $sandbox = false;
 
     /**
      * @var array
@@ -47,13 +52,30 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     public $merchantConfig;
 
     /**
-     * @var array|MerchantInterface[]
+     * @var array|BaseMerchant[]
      */
     private $_merchants = [];
 
     /**
+     * @param bool $sandbox
+     * @inheritdoc
+     */
+    public static function baseUrl(): string
+    {
+        $sandbox = ArrayHelper::getValue(func_get_args(), 0, false);
+
+        return static::getBaseUrl($sandbox);
+    }
+
+    /**
+     * @param bool $sandbox
+     * @return string
+     */
+    abstract protected static function getBaseUrl(bool $sandbox): string;
+
+    /**
      * @param bool $load
-     * @return array|MerchantInterface[]
+     * @return array|BaseMerchant[]
      * @throws InvalidConfigException
      */
     public function getMerchants($load = true): array
@@ -71,7 +93,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @param array|MerchantInterface[] $merchants
+     * @param array|BaseMerchant[] $merchants
      * @return bool
      */
     public function setMerchants(array $merchants): bool
@@ -85,7 +107,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 
     /**
      * @param null|string|int $id
-     * @return object|MerchantInterface
+     * @return object|BaseMerchant
      * @throws InvalidConfigException|InvalidArgumentException
      */
     public function getMerchant($id = null): MerchantInterface
@@ -103,7 +125,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
                     $merchant = ArrayHelper::merge($this->merchantConfig, $merchant);
                 }
 
-                if (!$merchant instanceof MerchantInterface) {
+                if (!$merchant instanceof BaseMerchant) {
                     return $this->_merchants[$id] = Yii::createObject($merchant, [$this]);
                 } else {
                     return $merchant;
@@ -135,15 +157,15 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 
 
     /**
-     * @var null|MerchantInterface
+     * @var null|BaseMerchant
      */
     private $_defaultMerchant;
 
     /**
-     * @return MerchantInterface
+     * @return BaseMerchant
      * @throws InvalidConfigException
      */
-    protected function getDefaultMerchant(): MerchantInterface
+    protected function getDefaultMerchant(): BaseMerchant
     {
         if (!$this->_defaultMerchant) {
             $merchantIds = array_keys($this->_merchants);
@@ -193,7 +215,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @return null|string
      */
-    abstract protected function getDefaultCheckoutMethod(): ?string;
+    abstract protected function getDefaultCheckoutMethod(): string;
 
     /**
      * @param CheckoutData $data
@@ -215,9 +237,12 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     protected function getHttpClient(bool $force = false): HttpClient
     {
         if (!$this->_httpClient === null || $force) {
+            /** @var HttpClient $client */
+
             $client = $this->_httpClient = Yii::createObject(ArrayHelper::merge([
                 'class' => HttpClient::class
             ], $this->getHttpClientConfig()));
+            $client->baseUrl = static::baseUrl($this->sandbox);
 
             return $client;
         } else {

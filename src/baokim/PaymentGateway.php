@@ -10,7 +10,6 @@ namespace yii2vn\payment\baokim;
 use Yii;
 
 use yii\base\NotSupportedException;
-use yii\httpclient\Client as HttpClient;
 
 use yii2vn\payment\BasePaymentGateway;
 use yii2vn\payment\CheckoutData;
@@ -72,9 +71,9 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
     /**
      * @inheritdoc
      */
-    public static function baseUrl(): string
+    protected static function getBaseUrl(bool $sandbox): string
     {
-        return 'https://www.baokim.vn';
+        return $sandbox ? 'https://sandbox.baokim.vn' : 'https://www.baokim.vn';
     }
 
     /**
@@ -94,10 +93,9 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
     protected function getHttpClientConfig(): array
     {
         return [
-            'class' => HttpClient::class,
             'transport' => 'yii\httpclient\CurlTransport',
             'requestConfig' => [
-                'format' => HttpClient::FORMAT_JSON,
+                'format' => 'json',
                 'options' => [
                     CURLOPT_HTTPAUTH => CURLAUTH_DIGEST | CURLAUTH_BASIC,
                     CURLOPT_SSL_VERIFYHOST => false,

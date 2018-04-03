@@ -20,29 +20,38 @@ use yii\base\InvalidConfigException;
  */
 abstract class BaseDataSignature extends BaseObject
 {
-
+    /**
+     * @var string
+     */
     private $_data;
 
     /**
-     * @inheritdoc
+     * BaseDataSignature constructor.
+     * @param string $data
+     * @param array $config
+     */
+    public function __construct(string $data, array $config = [])
+    {
+        $this->_data = $data;
+        parent::__construct($config);
+    }
+
+    /**
+     * @return string
      */
     public function getData(): string
     {
         return $this->_data;
     }
 
-    public function setData(string $data): bool
-    {
-        $this->_data = $data;
-    }
-
     /**
-     * @inheritdoc
+     * @return string
      */
     abstract public function generate(): string;
 
     /**
-     * @inheritdoc
+     * @param string $expect
+     * @return bool
      */
     abstract public function validate(string $expect): bool;
 

@@ -27,17 +27,22 @@ class PaymentGateway extends BasePaymentGateway
 
     const CHECKOUT_METHOD_VNMART = 'VNMART';
 
+    const PAYMENT_URL = '/paymentv2/vpcpay.html';
+
+    const QUERY_DR_URL = '';
+
     public $merchantConfig = ['class' => Merchant::class];
 
     public $checkoutRequestDataConfig = ['class' => CheckoutRequestData::class];
 
     public $checkoutResponseDataConfig = ['class' => CheckoutResponseData::class];
 
-    const PAYMENT_URL = '/paymentv2/vpcpay.html';
-
-    public static function baseUrl(): string
+    /**
+     * @inheritdoc
+     */
+    protected static function getBaseUrl(bool $sandbox): string
     {
-        return 'http://vnpayment.vn';
+        return $sandbox ? 'http://sandbox.vnpayment.vn' : 'http://vnpayment.vn';
     }
 
     public static function version(): string
@@ -104,6 +109,16 @@ class PaymentGateway extends BasePaymentGateway
         $location = rtrim(static::baseUrl()) . self::PAYMENT_URL . '?' . http_build_query($queryData);
 
         return ['location' => $location, 'code' => '00'];
+    }
+
+    protected function getHttpClientConfig(): array
+    {
+        return [
+            'transport' => 'yii\httpclient\CurlTransport',
+            'requestConfig' => [
+
+            ]
+        ];
     }
 
     protected function getDefaultCheckoutMethod(): string

@@ -13,7 +13,7 @@ use yii\base\NotSupportedException;
 use yii\di\Instance;
 
 /**
- * @property PaymentGatewayInterface $paymentGateway
+ * @property BasePaymentGateway $paymentGateway
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -23,22 +23,37 @@ abstract class BaseMerchant extends Component implements MerchantInterface
 
     /**
      * BaseMerchant constructor.
-     * @param PaymentGatewayInterface $paymentGateway
+     * @param BasePaymentGateway $paymentGateway
      * @param array $config
      */
-    public function __construct(PaymentGatewayInterface $paymentGateway, array $config = [])
+    public function __construct(BasePaymentGateway $paymentGateway, array $config = [])
     {
         $this->_paymentGateway = $paymentGateway;
         parent::__construct($config);
     }
 
+    public function init()
+    {
+        if ($this->getPaymentGateway()->sandbox) {
+            $this->initSandboxEnvironment();
+        }
+
+        parent::init();
+    }
+
+
+    protected function initSandboxEnvironment()
+    {
+
+    }
+
     /**
-     * @var array|string|PaymentGatewayInterface
+     * @var BasePaymentGateway
      */
     private $_paymentGateway;
 
     /**
-     * @return PaymentGatewayInterface
+     * @return BasePaymentGateway
      */
     public function getPaymentGateway(): PaymentGatewayInterface
     {
@@ -51,7 +66,7 @@ abstract class BaseMerchant extends Component implements MerchantInterface
      */
     public function signature(string $data, string $type = null): string
     {
-        if ($dataSignature = $this->createDataSignature($data, $type)) {
+        if ($dataSignature = $this->initDataSignature($data, $type)) {
             return $dataSignature->generate();
         } else {
             throw new NotSupportedException("Signature data with type: '$type' is not supported!");
@@ -64,7 +79,7 @@ abstract class BaseMerchant extends Component implements MerchantInterface
      */
     public function validateSignature(string $data, string $expectSignature, string $type = null): bool
     {
-        if ($dataSignature = $this->createDataSignature($data, $type)) {
+        if ($dataSignature = $this->initDataSignature($data, $type)) {
             return $dataSignature->validate($expectSignature);
         } else {
             throw new NotSupportedException("Validate signature with type: '$type' is not supported!");
@@ -76,7 +91,7 @@ abstract class BaseMerchant extends Component implements MerchantInterface
      * @param string $type
      * @return BaseDataSignature
      */
-    abstract protected function createDataSignature(string $data, string $type): ?BaseDataSignature;
+    abstract protected function initDataSignature(string $data, string $type): ?BaseDataSignature;
 
 
 }

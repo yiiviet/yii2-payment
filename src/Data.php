@@ -28,8 +28,7 @@ class Data extends DynamicModel
         if (!$validate || $this->validate()) {
             return $this->toArray();
         } else {
-            $errors = $this->getFirstErrors();
-            throw new InvalidConfigException(reset($errors));
+            throw new InvalidConfigException(current($this->getFirstErrors()));
         }
     }
 
