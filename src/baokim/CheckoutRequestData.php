@@ -39,24 +39,39 @@ class CheckoutRequestData extends CheckoutData
     /**
      * @inheritdoc
      */
-    public function getData(bool $validate = true): array
+    protected function ensureAttributes(array &$attributes)
     {
-        $data = parent::getData($validate);
-
         /** @var Merchant $merchant */
         $merchant = $this->getMerchant();
 
         switch ($this->method) {
             case PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE:
-                $data['merchant_id'] = $this->merchant->id;
+                $attributes['merchant_id'] = $this->merchant->id;
                 break;
             case PaymentGateway::CHECKOUT_METHOD_BAO_KIM || PaymentGateway::CHECKOUT_METHOD_BANK_TRANSFER || PaymentGateway::CHECKOUT_METHOD_ATM_TRANSFER ||
                 PaymentGateway::CHECKOUT_METHOD_LOCAL_BANK || PaymentGateway::CHECKOUT_METHOD_CREDIT_CARD || PaymentGateway::CHECKOUT_METHOD_INTERNET_BANKING:
-                $data['business'] = $data['business'] ?? $merchant->email;
+                $attributes['business'] = $attributes['business'] ?? $merchant->email;
                 break;
         }
 
-        return $data;
+    }
+
+    protected function signature(array $data): string
+    {
+        ksort($data);
+
+        switch ($this->method) {
+            case PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE || PaymentGateway::CHECKOUT_METHOD_ATM_TRANSFER ||
+                PaymentGateway::CHECKOUT_METHOD_BANK_TRANSFER || PaymentGateway::CHECKOUT_METHOD_BAO_KIM:
+                $dataSign = implode("", $data);
+                $signType = Merchant::SIGNATURE_HMAC;
+                break;
+            default:
+                $dataSign = 'POST' . '&' . urlencode(PaymentGateway::PRO_PAYMENT_URL) . '&&' . urlencode(http_build_query($data));
+                $signType = Merchant::SIGNATURE_RSA;
+        }
+
+        return $this->getMerchant()->signature($dataSign, $signType);
     }
 
 }

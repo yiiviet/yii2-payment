@@ -9,11 +9,11 @@ namespace yii2vn\payment\baokim;
 
 use Yii;
 
+use yii\di\Instance;
 use yii\base\NotSupportedException;
 
 use yii2vn\payment\BasePaymentGateway;
 use yii2vn\payment\CheckoutData;
-use yii2vn\payment\Data;
 use yii2vn\payment\CardChargePaymentGatewayInterface;
 
 
@@ -49,11 +49,20 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
     const PRO_PAYMENT_URL = '/payment/rest/payment_pro_api/pay_by_card';
 
     /**
+     * @var string|array|\yii\caching\Cache
+     */
+    public $merchantDataCache = 'cache';
+
+    public $merchantDataCacheDuration = 86400;
+
+    /**
      * @var array
      */
     public $merchantConfig = ['class' => Merchant::class];
 
-    public $merchantInfoDataConfig = ['class' => Data::class];
+    public $merchantRequestDataConfig = ['class' => MerchantRequestData::class];
+
+    public $merchantResponseDataConfig = ['class' => MerchantResponseData::class];
 
     public $checkoutRequestDataConfig = ['class' => CheckoutRequestData::class];
 
@@ -74,6 +83,17 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
     protected static function getBaseUrl(bool $sandbox): string
     {
         return $sandbox ? 'https://sandbox.baokim.vn' : 'https://www.baokim.vn';
+    }
+
+    /**
+     * @throws \yii\base\InvalidConfigException
+     * @inheritdoc
+     */
+    public function init()
+    {
+        $this->merchantDataCache = Instance::ensure($this->merchantDataCache, 'yii\caching\Cache');
+
+        parent::init();
     }
 
     /**
@@ -110,22 +130,32 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
      * @param string $emailBusiness
      * @param int|string|null $merchantId
      * @throws \yii\base\InvalidConfigException|NotSupportedException
-     * @return object|Data
+     * @return object|MerchantRequestData
      */
-    public function getMerchantInfo(string $emailBusiness = null, $merchantId = null): Data
+    public function getMerchantData(string $emailBusiness = null, $merchantId = null): MerchantRequestData
     {
         /** @var Merchant $merchant */
         $merchant = $this->getMerchant($merchantId);
+        $cacheKey = [
+            __METHOD__,
+            $emailBusiness,
+            $merchant->id
+        ];
 
-        $data = ['business' => $emailBusiness ?? $merchant->email];
-        $httpMethod = 'GET';
-        $dataSign = $httpMethod . '&' . urlencode(self::PRO_SELLER_INFO_URL) . '&' . urlencode(http_build_query($data)) . '&';
-        $data['signature'] = $merchant->signature($dataSign, Merchant::SIGNATURE_RSA);
-        $httpResponse = $this->getHttpClient()->get(self::PRO_SELLER_INFO_URL, $data, [], [
-            CURLOPT_USERPWD => $merchant->apiUser . ':' . $merchant->apiPassword
-        ])->send();
+        if (!$data = $this->merchantDataCache->get($cacheKey)) {
+            $requestData = Yii::createObject($this->merchantRequestDataConfig, [$merchant, [
+                'business' => $emailBusiness
+            ]]);
 
-        return Yii::createObject($this->merchantInfoDataConfig, [$httpResponse->getData()]);
+            $queryData = $requestData->getData(true, 'signature');
+            $httpResponse = $this->getHttpClient()->get(self::PRO_SELLER_INFO_URL, $queryData, [], [
+                CURLOPT_USERPWD => $merchant->apiUser . ':' . $merchant->apiPassword
+            ])->send();
+
+            $this->merchantDataCache->set($cacheKey, $data = $httpResponse->getData(), $this->merchantDataCacheDuration);
+        }
+
+        return Yii::createObject($this->merchantResponseDataConfig, [$merchant, $data]);
     }
 
     /**
@@ -215,28 +245,25 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
 
         $merchant = $data->getMerchant();
         $method = $data->getMethod();
-        $data = $data->getData();
-        ksort($data);
-        $dataSign = implode('', $data);
 
         switch ($method) {
             case self::CHECKOUT_METHOD_CARD_CHARGE:
-                $data['data_sign'] = $merchant->signature($dataSign, Merchant::SIGNATURE_HMAC);
+                $signKey = 'data_sign';
                 $url = self::CARD_CHARGE_URL;
                 break;
             case self::CHECKOUT_METHOD_ATM_TRANSFER || self::CHECKOUT_METHOD_BANK_TRANSFER || self::CHECKOUT_METHOD_BAO_KIM:
-                $data['checksum'] = $merchant->signature($dataSign, Merchant::SIGNATURE_HMAC);
+                $signKey = 'checksum';
                 $url = self::BK_PAYMENT_URL;
                 break;
             case self::CHECKOUT_METHOD_LOCAL_BANK || self::CHECKOUT_METHOD_INTERNET_BANKING || self::CHECKOUT_METHOD_CREDIT_CARD:
-                $dataSign = 'POST' . '&' . urlencode(self::PRO_PAYMENT_URL) . '&&' . urlencode(http_build_query($data));
-                $data['signature'] = $merchant->signature($dataSign, Merchant::SIGNATURE_RSA);
+                $signKey = 'signature';
                 $url = self::PRO_PAYMENT_URL;
                 break;
             default:
                 throw new NotSupportedException("Checkout method '$method' not supported in " . __CLASS__);
         }
 
+        $data = $data->getData(true, $signKey);
         $httpResponse = $this->getHttpClient()->post($url, $data, [], [CURLOPT_USERPWD => $merchant->apiUser . ':' . $merchant->apiPassword])->send();
         Yii::debug(__CLASS__ . " checkout requested sent with method: $method");
 

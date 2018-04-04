@@ -8,10 +8,13 @@
 namespace yii2vn\payment;
 
 use yii\base\DynamicModel;
+use yii\base\NotSupportedException;
 use yii\base\InvalidConfigException;
 
 /**
  * Class Data
+ *
+ * @property MerchantInterface $merchant
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -19,12 +22,8 @@ use yii\base\InvalidConfigException;
 class Data extends DynamicModel
 {
 
-    public $signature = false;
-
-    public $signatureKey = 'signature';
-
     /**
-     * QueryDRRequestData constructor.
+     * Data constructor.
      * @param MerchantInterface $merchant
      * @param array $attributes
      * @param array $config
@@ -44,9 +43,8 @@ class Data extends DynamicModel
 
     }
 
-
     /**
-     * @var BaseMerchant|MerchantInterface
+     * @var MerchantInterface
      */
     private $_merchant;
 
@@ -60,16 +58,17 @@ class Data extends DynamicModel
 
     /**
      * @param bool $validate
+     * @param string $signatureKey
      * @return array
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|NotSupportedException
      */
-    public function getData(bool $validate = false): array
+    public function getData(bool $validate = true, string $signatureKey = null): array
     {
         if (!$validate || $this->validate()) {
             $data = $this->toArray();
 
-            if ($this->signature) {
-                $data[$this->signatureKey] = $this->signature($data);
+            if ($signatureKey) {
+                $data[$signatureKey] = $this->signature($data);
             }
 
             return $data;
@@ -81,11 +80,11 @@ class Data extends DynamicModel
     /**
      * @param $data
      * @return string
-     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     protected function signature(array $data): string
     {
-        throw new InvalidConfigException(__METHOD__ . ' must be override when property `signature` value is true!');
+        throw new NotSupportedException(__CLASS__ . ' do not support data signature by default');
     }
 
 }
