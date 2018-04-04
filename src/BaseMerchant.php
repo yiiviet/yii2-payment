@@ -89,9 +89,9 @@ abstract class BaseMerchant extends Component implements MerchantInterface
     /**
      * @param string $data
      * @param string $type
-     * @return BaseDataSignature
+     * @return DataSignature
      */
-    abstract protected function initDataSignature(string $data, string $type): ?BaseDataSignature;
+    abstract protected function initDataSignature(string $data, string $type): ?DataSignature;
 
 
 }

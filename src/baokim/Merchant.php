@@ -12,7 +12,7 @@ use Yii;
 use yii\helpers\ArrayHelper;
 
 use yii2vn\payment\BaseMerchant;
-use yii2vn\payment\BaseDataSignature;
+use yii2vn\payment\DataSignature;
 
 /**
  * Class Merchant
@@ -72,7 +72,7 @@ class Merchant extends BaseMerchant
     /**
      * @inheritdoc
      */
-    protected function initDataSignature(string $data, string $type): ?BaseDataSignature
+    protected function initDataSignature(string $data, string $type): ?DataSignature
     {
         if ($type === self::SIGNATURE_RSA) {
             return Yii::createObject(ArrayHelper::merge($this->rsaDataSignatureConfig, [

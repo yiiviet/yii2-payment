@@ -9,7 +9,7 @@ namespace yii2vn\payment\nganluong;
 
 use yii\base\NotSupportedException;
 
-use yii2vn\payment\BaseDataSignature;
+use yii2vn\payment\DataSignature;
 use yii2vn\payment\BaseMerchant;
 
 /**
@@ -30,7 +30,7 @@ class Merchant extends BaseMerchant
     /**
      * @inheritdoc
      */
-    protected function initDataSignature(string $data, string $type): ?BaseDataSignature
+    protected function initDataSignature(string $data, string $type): ?DataSignature
     {
         return null;
     }

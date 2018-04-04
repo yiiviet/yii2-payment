@@ -11,14 +11,14 @@ use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
 
 /**
- * Class BaseDataSignature
+ * Class DataSignature
  *
  * @property string $data
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseDataSignature extends BaseObject
+abstract class DataSignature extends BaseObject
 {
     /**
      * @var string
@@ -26,7 +26,7 @@ abstract class BaseDataSignature extends BaseObject
     private $_data;
 
     /**
-     * BaseDataSignature constructor.
+     * DataSignature constructor.
      * @param string $data
      * @param array $config
      */

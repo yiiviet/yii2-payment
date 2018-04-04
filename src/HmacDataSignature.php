@@ -15,7 +15,7 @@ use Yii;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class HmacDataSignature extends BaseDataSignature
+class HmacDataSignature extends DataSignature
 {
 
     const HMAC_ALGO_MD5 = 'md5';

@@ -19,7 +19,7 @@ use yii\base\InvalidConfigException;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
- class RsaDataSignature extends BaseDataSignature
+ class RsaDataSignature extends DataSignature
 {
 
     public $openSSLAlgo;
