@@ -19,6 +19,10 @@ use yii\base\InvalidConfigException;
 class Data extends DynamicModel
 {
 
+    public $signature = false;
+
+    public $signatureKey = 'signature';
+
     /**
      * QueryDRRequestData constructor.
      * @param MerchantInterface $merchant
@@ -62,10 +66,26 @@ class Data extends DynamicModel
     public function getData(bool $validate = false): array
     {
         if (!$validate || $this->validate()) {
-            return $this->toArray();
+            $data = $this->toArray();
+
+            if ($this->signature) {
+                $data[$this->signatureKey] = $this->signature($data);
+            }
+
+            return $data;
         } else {
             throw new InvalidConfigException(current($this->getFirstErrors()));
         }
+    }
+
+    /**
+     * @param $data
+     * @return string
+     * @throws InvalidConfigException
+     */
+    protected function signature(array $data): string
+    {
+        throw new InvalidConfigException(__METHOD__ . ' must be override when property `signature` value is true!');
     }
 
 }
