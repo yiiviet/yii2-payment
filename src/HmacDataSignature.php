@@ -47,7 +47,7 @@ class HmacDataSignature extends BaseDataSignature
      */
     public function validate(string $expect): bool
     {
-        $actual = $this->getData();
+        $actual = $this->generate();
 
         if (Yii::$app) {
             return Yii::$app->getSecurity()->compareString($expect, $actual);
