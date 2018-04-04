@@ -14,12 +14,12 @@ use yii\base\InvalidConfigException;
 use yii\di\Instance;
 
 /**
- * Class BasePaymentNotificationAction
+ * Class PaymentNotificationAction
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BasePaymentNotificationAction extends Action
+abstract class PaymentNotificationAction extends Action
 {
 
     const EVENT_BEFORE_VERIFIED = 'beforeVerified';
