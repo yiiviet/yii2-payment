@@ -20,14 +20,6 @@ use yii\base\InvalidConfigException;
  */
 class CheckoutData extends Data
 {
-    /**
-     * @var MerchantInterface
-     */
-    private $_merchant;
-    /**
-     * @var string
-     */
-    private $_method;
 
     /**
      * CheckoutData constructor.
@@ -39,9 +31,8 @@ class CheckoutData extends Data
     public function __construct(string $method, MerchantInterface $merchant, array $attributes = [], array $config = [])
     {
         $this->_method = $method;
-        $this->_merchant = $merchant;
 
-        parent::__construct($attributes, $config);
+        parent::__construct($merchant, $attributes, $config);
     }
 
     /**
@@ -62,19 +53,16 @@ class CheckoutData extends Data
     }
 
     /**
+     * @var string
+     */
+    private $_method;
+
+    /**
      * @return string
      */
     public function getMethod(): string
     {
         return $this->_method;
-    }
-
-    /**
-     * @return MerchantInterface
-     */
-    public function getMerchant(): MerchantInterface
-    {
-        return $this->_merchant;
     }
 
 

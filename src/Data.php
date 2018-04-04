@@ -18,6 +18,42 @@ use yii\base\InvalidConfigException;
  */
 class Data extends DynamicModel
 {
+
+    /**
+     * QueryDRRequestData constructor.
+     * @param MerchantInterface $merchant
+     * @param array $attributes
+     * @param array $config
+     */
+    public function __construct(MerchantInterface $merchant, array $attributes = [], array $config = [])
+    {
+        $this->_merchant = $merchant;
+
+        parent::__construct($this->ensureAttributes($attributes), $config);
+    }
+
+    /**
+     * @param array $attributes
+     */
+    protected function ensureAttributes(array &$attributes)
+    {
+
+    }
+
+
+    /**
+     * @var BaseMerchant|MerchantInterface
+     */
+    private $_merchant;
+
+    /**
+     * @return MerchantInterface
+     */
+    public function getMerchant(): MerchantInterface
+    {
+        return $this->_merchant;
+    }
+
     /**
      * @param bool $validate
      * @return array
