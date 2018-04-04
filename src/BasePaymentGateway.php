@@ -39,12 +39,12 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @var array
      */
-    public $checkoutRequestDataConfig = ['class' => Data::class];
+    public $checkoutRequestDataConfig = ['class' => CheckoutData::class];
 
     /**
      * @var array
      */
-    public $checkoutResponseDataConfig = ['class' => Data::class];
+    public $checkoutResponseDataConfig = ['class' => CheckoutData::class];
 
     /**
      * @var array
