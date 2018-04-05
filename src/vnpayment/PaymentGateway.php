@@ -21,11 +21,7 @@ class PaymentGateway extends BasePaymentGateway
 
     const CHECKOUT_METHOD_DYNAMIC = 'dynamic';
 
-    const CHECKOUT_METHOD_LOCAL_BANK = 'localBank';
-
-    const CHECKOUT_METHOD_INTER_BANK = 'VISA';
-
-    const CHECKOUT_METHOD_VNMART = 'VNMART';
+    const CHECKOUT_METHOD_DETECT = 'detect';
 
     const PAYMENT_URL = '/paymentv2/vpcpay.html';
 
@@ -48,50 +44,6 @@ class PaymentGateway extends BasePaymentGateway
     public static function version(): string
     {
         return '2.0.0';
-    }
-
-    /**
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithLocalBank(array $data): CheckoutResponseData
-    {
-        $data['method'] = self::CHECKOUT_METHOD_LOCAL_BANK;
-
-        return $this->checkout($data);
-    }
-
-    /**
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithInterBank(array $data): CheckoutResponseData
-    {
-        $data['method'] = self::CHECKOUT_METHOD_INTER_BANK;
-
-        return $this->checkout($data);
-    }
-
-    /**
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithVNMART(array $data): CheckoutResponseData
-    {
-        $data['method'] = self::CHECKOUT_METHOD_VNMART;
-
-        return $this->checkout($data);
-    }
-
-    /**
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithDynamic(array $data): CheckoutResponseData
-    {
-        $data['method'] = self::CHECKOUT_METHOD_DYNAMIC;
-
-        return $this->checkout($data);
     }
 
     /**
@@ -123,7 +75,7 @@ class PaymentGateway extends BasePaymentGateway
 
     protected function getDefaultCheckoutMethod(): string
     {
-        return self::CHECKOUT_METHOD_DYNAMIC;
+        return self::CHECKOUT_METHOD_DETECT;
     }
 
 }

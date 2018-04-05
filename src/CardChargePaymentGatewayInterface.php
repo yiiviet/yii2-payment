@@ -18,8 +18,9 @@ interface CardChargePaymentGatewayInterface extends PaymentGatewayInterface
 {
     /**
      * @param array $data
+     * @param string|int
      * @return Data|bool
      */
-    public function cardCharge(array $data);
+    public function cardCharge(array $data, $merchantId);
 
 }

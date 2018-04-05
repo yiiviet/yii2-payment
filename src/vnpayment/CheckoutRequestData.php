@@ -45,14 +45,14 @@ class CheckoutRequestData extends CheckoutData
     {
         return [
             [['vnp_Amount', 'vnp_OrderInfo', 'vnp_OrderType', 'vnp_ReturnUrl', 'vnp_TxnRef'], 'required'],
-            [['vnp_BankCode'], 'required', 'on' => [PaymentGateway::CHECKOUT_METHOD_LOCAL_BANK]],
+            [['vnp_BankCode'], 'required', 'on' => [PaymentGateway::CHECKOUT_METHOD_DETECT]],
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function getData(bool $validate = true): array
+    protected function ensureAttributes(array &$attributes)
     {
         $data = parent::getData($validate);
 
@@ -66,13 +66,8 @@ class CheckoutRequestData extends CheckoutData
         $data['vnp_IpAddr'] = $data['vnp_IpAddr'] ?? Yii::$app->getRequest()->getUserIP();
         $data['vnp_CreateDate'] = $data['vnp_CreateDate'] ?? date('Ymdhis');
 
-        switch ($method = $this->method) {
-            case PaymentGateway::CHECKOUT_METHOD_DYNAMIC:
-                unset($data['vnp_BankCode']);
-                break;
-            case PaymentGateway::CHECKOUT_METHOD_INTER_BANK || PaymentGateway::CHECKOUT_METHOD_VNMART:
-                $data['vnp_BankCode'] = $method;
-                break;
+        if ($this->method === PaymentGateway::CHECKOUT_METHOD_DYNAMIC) {
+            unset($data['vnp_BankCode']);
         }
 
         return $data;

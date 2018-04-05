@@ -98,13 +98,12 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
 
     /**
      * @param array $data
+     * @param string|int|null $merchantId
      * @return bool|CheckoutResponseData
      */
-    public function cardCharge(array $data)
+    public function cardCharge(array $data, $merchantId = null)
     {
-        $data['method'] = self::CHECKOUT_METHOD_CARD_CHARGE;
-
-        return $this->checkout($data);
+        return $this->checkoutWithCardCharge($data, $merchantId);
     }
 
     /**
@@ -160,80 +159,73 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
 
     /**
      * @param array $data
+     * @param string|int|null $merchantId
      * @return CheckoutResponseData
      */
-    public function checkoutWithAtmTransfer(array $data): CheckoutResponseData
+    public function checkoutWithAtmTransfer(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_ATM_TRANSFER;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_ATM_TRANSFER, $merchantId);
     }
 
     /**
      * @param array $data
+     * @param string|int|null $merchantId
      * @return CheckoutResponseData
      */
-    public function checkoutWithBankTransfer(array $data): CheckoutResponseData
+    public function checkoutWithBankTransfer(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_BANK_TRANSFER;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_BANK_TRANSFER, $merchantId);
     }
 
     /**
      * @param array $data
+     * @param string|int|null $merchantId
      * @return CheckoutResponseData
      */
-    public function checkoutWithBaoKim(array $data): CheckoutResponseData
+    public function checkoutWithBaoKim(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_BAO_KIM;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_BAO_KIM, $merchantId);
     }
 
 
     /**
      * @param array $data
+     * @param string|int|null $merchantId
      * @return CheckoutResponseData
      */
-    public function checkoutWithLocalBank(array $data): CheckoutResponseData
+    public function checkoutWithLocalBank(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_LOCAL_BANK;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_LOCAL_BANK, $merchantId);
     }
 
     /**
      * @param array $data
+     * @param string|int|null $merchantId
      * @return CheckoutResponseData
      */
-    public function checkoutWithCreditCard(array $data): CheckoutResponseData
+    public function checkoutWithCreditCard(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_CREDIT_CARD;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_CREDIT_CARD, $merchantId);
     }
 
     /**
      * @param array $data
+     * @param string|int|null $merchantId
      * @return CheckoutResponseData
      */
-    public function checkoutWithInternetBanking(array $data): CheckoutResponseData
+    public function checkoutWithInternetBanking(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_INTERNET_BANKING;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_INTERNET_BANKING, $merchantId);
     }
 
     /**
      * @param array $data
+     * @param string|int|null $merchantId
      * @return CheckoutResponseData
      */
-    public function checkoutWithCardCharge(array $data): CheckoutResponseData
+    public function checkoutWithCardCharge(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_CARD_CHARGE;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_CARD_CHARGE, $merchantId);
     }
 
     /**

@@ -44,14 +44,10 @@ class CheckoutRequestData extends CheckoutData
         /** @var Merchant $merchant */
         $merchant = $this->getMerchant();
 
-        switch ($this->method) {
-            case PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE:
-                $attributes['merchant_id'] = $this->merchant->id;
-                break;
-            case PaymentGateway::CHECKOUT_METHOD_BAO_KIM || PaymentGateway::CHECKOUT_METHOD_BANK_TRANSFER || PaymentGateway::CHECKOUT_METHOD_ATM_TRANSFER ||
-                PaymentGateway::CHECKOUT_METHOD_LOCAL_BANK || PaymentGateway::CHECKOUT_METHOD_CREDIT_CARD || PaymentGateway::CHECKOUT_METHOD_INTERNET_BANKING:
-                $attributes['business'] = $attributes['business'] ?? $merchant->email;
-                break;
+        if ($this->method === PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE) {
+            $attributes['merchant_id'] = $this->merchant->id;
+        } else {
+            $attributes['business'] = $attributes['business'] ?? $merchant->email;
         }
 
     }
@@ -60,15 +56,15 @@ class CheckoutRequestData extends CheckoutData
     {
         ksort($data);
 
-        switch ($this->method) {
-            case PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE || PaymentGateway::CHECKOUT_METHOD_ATM_TRANSFER ||
-                PaymentGateway::CHECKOUT_METHOD_BANK_TRANSFER || PaymentGateway::CHECKOUT_METHOD_BAO_KIM:
-                $dataSign = implode("", $data);
-                $signType = Merchant::SIGNATURE_HMAC;
-                break;
-            default:
-                $dataSign = 'POST' . '&' . urlencode(PaymentGateway::PRO_PAYMENT_URL) . '&&' . urlencode(http_build_query($data));
-                $signType = Merchant::SIGNATURE_RSA;
+        if (in_array($this->method, [
+            PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE, PaymentGateway::CHECKOUT_METHOD_ATM_TRANSFER,
+            PaymentGateway::CHECKOUT_METHOD_BANK_TRANSFER, PaymentGateway::CHECKOUT_METHOD_BAO_KIM
+        ], true)) {
+            $dataSign = implode("", $data);
+            $signType = Merchant::SIGNATURE_HMAC;
+        } else {
+            $dataSign = 'POST' . '&' . urlencode(PaymentGateway::PRO_PAYMENT_URL) . '&&' . urlencode(http_build_query($data));
+            $signType = Merchant::SIGNATURE_RSA;
         }
 
         return $this->getMerchant()->signature($dataSign, $signType);

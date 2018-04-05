@@ -50,7 +50,7 @@ interface PaymentGatewayInterface
     public function getMerchant($id): MerchantInterface;
 
     /**
-     * @param $id
+     * @param string|int $id
      * @param array|string|MerchantInterface $merchant
      * @return bool
      */
@@ -58,9 +58,19 @@ interface PaymentGatewayInterface
 
     /**
      * @param array $data
-     * @return CheckoutData|bool
+     * @param string $method
+     * @param string|int $merchantId
+     * @return mixed
      */
-    public function checkout(array $data);
+    public function checkout(array $data, string $method, $merchantId);
 
+
+    /**
+     * @param string $method
+     * @param string|int $merchantId
+     * @param \yii\web\Request|null $request
+     * @return bool
+     */
+    public function verifyCheckoutReturnRequest(string $method, $merchantId, \yii\web\Request $request = null): bool;
 
 }

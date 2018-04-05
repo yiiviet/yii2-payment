@@ -62,91 +62,83 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
+     * @param string|int|null $merchantId
      * @param array $data
      * @return CheckoutResponseData
      */
-    public function checkoutWithNganLuong(array $data): CheckoutResponseData
+    public function checkoutWithNganLuong(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_NL;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_NL, $merchantId);
     }
 
     /**
+     * @param string|int|null $merchantId
      * @param array $data
      * @return CheckoutResponseData
      */
-    public function checkoutWithQrCode(array $data): CheckoutResponseData
+    public function checkoutWithQrCode(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_QR_CODE;
-
-        return $this->checkout($data);
+        return $this->checkout($data,self::CHECKOUT_METHOD_QR_CODE, $merchantId);
     }
 
     /**
+     * @param string|int|null $merchantId
      * @param array $data
      * @return CheckoutResponseData
      */
-    public function checkoutWithBankOffline(array $data): CheckoutResponseData
+    public function checkoutWithBankOffline(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_BANK_OFFLINE;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_BANK_OFFLINE, $merchantId);
     }
 
     /**
+     * @param string|int|null $merchantId
      * @param array $data
      * @return CheckoutResponseData
      */
-    public function checkoutWithCreditCardPrepaid(array $data): CheckoutResponseData
+    public function checkoutWithCreditCardPrepaid(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_CREDIT_CARD_PREPAID;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_CREDIT_CARD_PREPAID, $merchantId);
     }
 
     /**
+     * @param string|int|null $merchantId
      * @param array $data
      * @return CheckoutResponseData
      */
-    public function checkoutWithVisa(array $data): CheckoutResponseData
+    public function checkoutWithVisa(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_VISA;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_VISA, $merchantId);
     }
 
     /**
+     * @param string|int|null $merchantId
      * @param array $data
      * @return CheckoutResponseData
      */
-    public function checkoutWithAtmOnline(array $data): CheckoutResponseData
+    public function checkoutWithAtmOnline(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_ATM_ONLINE;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_ATM_ONLINE, $merchantId);
     }
 
     /**
+     * @param string|int|null $merchantId
      * @param array $data
      * @return CheckoutResponseData
      */
-    public function checkoutWithAtmOffline(array $data): CheckoutResponseData
+    public function checkoutWithAtmOffline(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_ATM_OFFLINE;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_ATM_OFFLINE, $merchantId);
     }
 
     /**
+     * @param string|int|null $merchantId
      * @param array $data
      * @return CheckoutResponseData
      */
-    public function checkoutWithInternetBanking(array $data): CheckoutResponseData
+    public function checkoutWithInternetBanking(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_INTERNET_BANKING;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_INTERNET_BANKING, $merchantId);
     }
 
     /**

@@ -92,25 +92,23 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
+     * @param string|int|null $merchantId
      * @param array $data
      * @return CheckoutResponseData
      */
-    public function checkoutWithLocalBank(array $data): CheckoutResponseData
+    public function checkoutWithLocalBank(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_LOCAL_BANK;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_LOCAL_BANK, $merchantId);
     }
 
     /**
+     * @param string|int|null $merchantId
      * @param array $data
      * @return CheckoutResponseData
      */
-    public function checkoutWithInterBank(array $data): CheckoutResponseData
+    public function checkoutWithInterBank(array $data, $merchantId = null): CheckoutResponseData
     {
-        $data['method'] = self::CHECKOUT_METHOD_INTER_BANK;
-
-        return $this->checkout($data);
+        return $this->checkout($data, self::CHECKOUT_METHOD_INTER_BANK, $merchantId);
     }
 
     /**
