@@ -69,8 +69,8 @@ interface PaymentGatewayInterface
      * @param string $method
      * @param string|int $merchantId
      * @param \yii\web\Request|null $request
-     * @return bool
+     * @return bool|CheckoutData
      */
-    public function verifyCheckoutReturnRequest(string $method, $merchantId, \yii\web\Request $request = null): bool;
+    public function verifyCheckoutReturnRequest(string $method, $merchantId, \yii\web\Request $request = null);
 
 }

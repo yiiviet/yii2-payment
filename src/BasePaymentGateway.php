@@ -220,7 +220,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @throws InvalidConfigException|InvalidArgumentException
      * @inheritdoc
      */
-    public function verifyCheckoutReturnRequest(string $method = null, $merchantId = null, \yii\web\Request $request = null): bool
+    public function verifyCheckoutReturnRequest(string $method = null, $merchantId = null, \yii\web\Request $request = null)
     {
         $merchant = $this->getMerchant($merchantId);
         $method = $method ?? $this->getDefaultCheckoutMethod();
@@ -231,12 +231,16 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
             throw new InvalidArgumentException('Request instance arg must be set to verify return request is valid or not!');
         }
 
+        /** @var CheckoutData $requestData */
+
         $requestData = Yii::createObject($this->checkoutReturnRequestDataConfig, [$method, $merchant, $request->getQueryParams()]);
 
-        return $this->verifyCheckoutReturnRequestInternal($requestData);
+        if ($requestData->validate()) {
+            return $requestData;
+        } else {
+            return false;
+        }
     }
-
-    abstract protected function verifyCheckoutReturnRequestInternal(CheckoutData $requestData): bool;
 
     /**
      * @return null|string
