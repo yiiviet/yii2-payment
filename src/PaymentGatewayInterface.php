@@ -60,7 +60,7 @@ interface PaymentGatewayInterface
      * @param array $data
      * @param string $method
      * @param string|int $merchantId
-     * @return mixed
+     * @return bool|CheckoutData
      */
     public function checkout(array $data, string $method, $merchantId);
 
