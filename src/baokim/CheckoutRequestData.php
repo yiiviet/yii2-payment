@@ -25,8 +25,8 @@ class CheckoutRequestData extends CheckoutData
     public function rules(): array
     {
         return [
-            [['seri_field', 'pin_field', 'transaction_id', 'card_id'], 'required', 'on' => [PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE]],
-            [['order_id', 'total_amount', 'payer_name', 'payer_email', 'payer_phone_no', 'url_success'], 'required', 'on' => [
+            [['merchant_id', 'seri_field', 'pin_field', 'transaction_id', 'card_id'], 'required', 'on' => [PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE]],
+            [['business', 'order_id', 'total_amount', 'payer_name', 'payer_email', 'payer_phone_no', 'url_success'], 'required', 'on' => [
                 PaymentGateway::CHECKOUT_METHOD_LOCAL_BANK, PaymentGateway::CHECKOUT_METHOD_CREDIT_CARD, PaymentGateway::CHECKOUT_METHOD_INTERNET_BANKING,
                 PaymentGateway::CHECKOUT_METHOD_BAO_KIM, PaymentGateway::CHECKOUT_METHOD_BANK_TRANSFER, PaymentGateway::CHECKOUT_METHOD_ATM_TRANSFER,
             ]],
