@@ -58,19 +58,24 @@ interface PaymentGatewayInterface
 
     /**
      * @param array $data
-     * @param string $method
      * @param string|int $merchantId
-     * @return bool|CheckoutData
+     * @return bool|DataInterface
      */
-    public function checkout(array $data, string $method, $merchantId);
+    public function purchase(array $data, $merchantId);
+
+    /**
+     * @param array $data
+     * @param string|int $merchantId
+     * @return bool|DataInterface
+     */
+    public function queryDR(array $data, $merchantId);
 
 
     /**
-     * @param string $method
      * @param string|int $merchantId
      * @param \yii\web\Request|null $request
-     * @return bool|CheckoutData
+     * @return bool|DataInterface
      */
-    public function verifyCheckoutReturnRequest(string $method, $merchantId, \yii\web\Request $request = null);
+    public function verifyPurchaseSuccessRequest($merchantId, \yii\web\Request $request = null);
 
 }

@@ -27,9 +27,21 @@ use yii\httpclient\Client as HttpClient;
 abstract class BasePaymentGateway extends Component implements PaymentGatewayInterface
 {
 
-    const EVENT_BEFORE_CHECKOUT = 'beforeCheckout';
+    const REQUEST_COMMAND_PURCHASE = 'purchase';
 
-    const EVENT_AFTER_CHECKOUT = 'afterCheckout';
+    const REQUEST_COMMAND_QUERY_DR = 'queryDR';
+
+    const EVENT_BEFORE_PURCHASE = 'beforePurchase';
+
+    const EVENT_AFTER_PURCHASE = 'afterPurchase';
+
+    const EVENT_BEFORE_REQUEST = 'beforeRequest';
+
+    const EVENT_AFTER_REQUEST = 'afterRequest';
+
+    const EVENT_BEFORE_QUERY_DR = 'beforeQueryDR';
+
+    const EVENT_AFTER_QUERY_DR = 'afterQueryDR';
 
     /**
      * @var bool
@@ -39,22 +51,22 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @var array
      */
-    public $checkoutRequestDataConfig = ['class' => CheckoutData::class];
+    public $requestDataConfig = [];
 
     /**
      * @var array
      */
-    public $checkoutResponseDataConfig = ['class' => CheckoutData::class];
+    public $responseDataConfig = [];
 
     /**
      * @var array
      */
-    public $checkoutReturnRequestDataConfig = ['class' => CheckoutData::class];
+    public $returnRequestDataConfig = [];
 
     /**
      * @var array
      */
-    public $merchantConfig;
+    public $merchantConfig = [];
 
     /**
      * @var array|BaseMerchant[]
@@ -67,9 +79,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      */
     public static function baseUrl(): string
     {
-        $sandbox = ArrayHelper::getValue(func_get_args(), 0, false);
-
-        return static::getBaseUrl($sandbox);
+        return static::getBaseUrl(func_get_arg(0));
     }
 
     /**
@@ -77,6 +87,30 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @return string
      */
     abstract protected static function getBaseUrl(bool $sandbox): string;
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        $this->on(self::EVENT_BEFORE_REQUEST, function (RequestEvent $event) {
+            if ($event->command === self::REQUEST_COMMAND_PURCHASE) {
+                $this->trigger(self::EVENT_BEFORE_PURCHASE, $event);
+            } elseif ($event->command === self::REQUEST_COMMAND_QUERY_DR) {
+                $this->trigger(self::EVENT_BEFORE_QUERY_DR, $event);
+            }
+        });
+
+        $this->on(self::EVENT_AFTER_REQUEST, function (RequestEvent $event) {
+            if ($event->command === self::REQUEST_COMMAND_PURCHASE) {
+                $this->trigger(self::EVENT_AFTER_PURCHASE, $event);
+            } elseif ($event->command === self::REQUEST_COMMAND_QUERY_DR) {
+                $this->trigger(self::EVENT_AFTER_QUERY_DR, $event);
+            }
+        });
+
+        parent::init();
+    }
 
     /**
      * @param bool $load
@@ -112,7 +146,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 
     /**
      * @param null|string|int $id
-     * @return object|BaseMerchant
+     * @return object|BaseMerchant|MerchantInterface
      * @throws InvalidConfigException|InvalidArgumentException
      */
     public function getMerchant($id = null): MerchantInterface
@@ -170,7 +204,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @return BaseMerchant
      * @throws InvalidConfigException
      */
-    protected function getDefaultMerchant(): BaseMerchant
+    public function getDefaultMerchant(): BaseMerchant
     {
         if (!$this->_defaultMerchant) {
             $merchantIds = array_keys($this->_merchants);
@@ -185,74 +219,61 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @inheritdoc
+     * @param array $data
+     * @param null $merchantId
+     * @return bool|object|DataInterface|Data
+     * @throws InvalidConfigException
      */
-    public function checkout(array $data, string $method = null, $merchantId = null)
+    public function purchase(array $data, $merchantId = null)
     {
-        $method = $method ?? $this->getDefaultCheckoutMethod();
+        return $this->request(self::REQUEST_COMMAND_PURCHASE, $data, $merchantId);
+    }
+
+    /**
+     * @param array $data
+     * @param int|string $merchantId
+     * @return bool|object|Data
+     * @throws InvalidConfigException
+     */
+    public function queryDR(array $data, $merchantId)
+    {
+        return $this->request(self::REQUEST_COMMAND_QUERY_DR, $data, $merchantId);
+    }
+
+    /**
+     * @param int|string $command
+     * @param array $data
+     * @param null $merchantId
+     * @return bool|object|Data
+     * @throws InvalidConfigException
+     */
+    public function request($command, array $data, $merchantId = null)
+    {
         $merchant = $this->getMerchant($merchantId);
 
-        /** @var CheckoutData $requestData */
+        /** @var Data $requestData */
 
-        $requestData = Yii::createObject($this->checkoutRequestDataConfig, [$method, $merchant, $data]);
+        $requestData = Yii::createObject($this->requestDataConfig, [$command, $merchant, $data]);
 
         $event = Yii::createObject([
-            'class' => CheckoutEvent::class,
+            'class' => RequestEvent::class,
             'requestData' => $requestData,
-            'method' => $method,
+            'command' => $command,
         ]);
 
-        $this->trigger(self::EVENT_BEFORE_CHECKOUT, $event);
+        $this->trigger(self::EVENT_BEFORE_REQUEST, $event);
 
         if ($event->isValid) {
-            $data = $this->checkoutInternal($requestData);
-            $responseData = Yii::createObject($this->checkoutResponseDataConfig, [$method, $merchant, $data]);
+            $data = $this->requestInternal($requestData, $this->getHttpClient());
+            $responseData = Yii::createObject($this->responseDataConfig, [$command, $merchant, $data]);
             $event->responseData = $responseData;
-            $this->trigger(self::EVENT_AFTER_CHECKOUT, $event);
+            $this->trigger(self::EVENT_AFTER_REQUEST, $event);
 
             return $responseData;
         } else {
             return false;
         }
     }
-
-    /**
-     * @throws InvalidConfigException|InvalidArgumentException
-     * @inheritdoc
-     */
-    public function verifyCheckoutReturnRequest(string $method = null, $merchantId = null, \yii\web\Request $request = null)
-    {
-        $merchant = $this->getMerchant($merchantId);
-        $method = $method ?? $this->getDefaultCheckoutMethod();
-
-        if ($request === null && Yii::$app) {
-            $request = Yii::$app->getRequest();
-        } else {
-            throw new InvalidArgumentException('Request instance arg must be set to verify return request is valid or not!');
-        }
-
-        /** @var CheckoutData $requestData */
-
-        $requestData = Yii::createObject($this->checkoutReturnRequestDataConfig, [$method, $merchant, $request->getQueryParams()]);
-
-        if ($requestData->validate()) {
-            return $requestData;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @return null|string
-     */
-    abstract protected function getDefaultCheckoutMethod(): string;
-
-    /**
-     * @param CheckoutData $data
-     * @return array
-     */
-    abstract protected function checkoutInternal(CheckoutData $data): array;
-
 
     /**
      * @var HttpClient|null
@@ -270,9 +291,9 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
             /** @var HttpClient $client */
 
             $client = $this->_httpClient = Yii::createObject(ArrayHelper::merge([
-                'class' => HttpClient::class
+                'class' => HttpClient::class,
+                'baseUrl' => static::baseUrl($this->sandbox)
             ], $this->getHttpClientConfig()));
-            $client->baseUrl = static::baseUrl($this->sandbox);
 
             return $client;
         } else {
@@ -283,6 +304,51 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     protected function getHttpClientConfig(): array
     {
         return [];
+    }
+
+    /**
+     * @param Data $requestData
+     * @param HttpClient $httpClient
+     * @return array
+     */
+    abstract protected function requestInternal(Data $requestData, HttpClient $httpClient): array;
+
+
+    /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     */
+    public function verifyPurchaseSuccessRequest($merchantId, \yii\web\Request $request = null)
+    {
+        return $this->verifyReturnRequest(self::REQUEST_COMMAND_PURCHASE, $merchantId, $request);
+    }
+
+    /**
+     * @param $command
+     * @param null|int|string $merchantId
+     * @param \yii\web\Request|null $request
+     * @return bool|Data
+     * @throws InvalidConfigException
+     */
+    public function verifyReturnRequest($command, $merchantId = null, \yii\web\Request $request = null)
+    {
+        $merchant = $this->getMerchant($merchantId);
+
+        if ($request === null && Yii::$app) {
+            $request = Yii::$app->getRequest();
+        } else {
+            throw new InvalidArgumentException('Request instance arg must be set to verify return request is valid or not!');
+        }
+
+        /** @var Data $requestData */
+
+        $requestData = Yii::createObject($this->returnRequestDataConfig, [$command, $merchant, $request->getQueryParams()]);
+
+        if ($requestData->validate()) {
+            return $requestData;
+        } else {
+            return false;
+        }
     }
 
 }

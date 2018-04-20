@@ -15,21 +15,21 @@ use yii\base\Event;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class CheckoutEvent extends Event
+class RequestEvent extends Event
 {
 
     /**
      * @var string
      */
-    public $method;
+    public $command;
 
     /**
-     * @var CheckoutData
+     * @var Data
      */
     public $requestData;
 
     /**
-     * @var CheckoutData
+     * @var Data
      */
     public $responseData;
 

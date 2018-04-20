@@ -14,23 +14,27 @@ use yii\base\InvalidConfigException;
 /**
  * Class Data
  *
- * @property MerchantInterface $merchant
+ * @property BaseMerchant $merchant
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class Data extends DynamicModel
+class Data extends DynamicModel implements DataInterface
 {
 
     /**
      * Data constructor.
-     * @param MerchantInterface $merchant
+     * @param string $command
+     * @param BaseMerchant $merchant
      * @param array $attributes
      * @param array $config
      */
-    public function __construct(MerchantInterface $merchant, array $attributes = [], array $config = [])
+    public function __construct(string $command, BaseMerchant $merchant, array $attributes = [], array $config = [])
     {
+        $this->_command = $command;
         $this->_merchant = $merchant;
+
+        $this->setScenario($command);
 
         parent::__construct($this->ensureAttributes($attributes), $config);
     }
@@ -44,32 +48,42 @@ class Data extends DynamicModel
     }
 
     /**
-     * @var MerchantInterface
+     * @var string
+     */
+    private $_command;
+
+    /**
+     * @return string
+     */
+    public function getCommand(): string
+    {
+        return $this->_command;
+    }
+
+    /**
+     * @var BaseMerchant
      */
     private $_merchant;
 
     /**
-     * @return MerchantInterface
+     * @return BaseMerchant
      */
-    public function getMerchant(): MerchantInterface
+    public function getMerchant(): BaseMerchant
     {
         return $this->_merchant;
     }
 
     /**
      * @param bool $validate
-     * @param string $signatureKey
      * @return array
      * @throws InvalidConfigException|NotSupportedException
      */
-    public function getData(bool $validate = true, string $signatureKey = null): array
+    public function get(bool $validate = true): array
     {
         if (!$validate || $this->validate()) {
             $data = $this->toArray();
 
-            if ($signatureKey) {
-                $data[$signatureKey] = $this->signature($data);
-            }
+            $this->prepare($data);
 
             return $data;
         } else {
@@ -79,12 +93,10 @@ class Data extends DynamicModel
 
     /**
      * @param $data
-     * @return string
-     * @throws NotSupportedException
      */
-    protected function signature(array $data): string
+    protected function prepare(array &$data)
     {
-        throw new NotSupportedException(__CLASS__ . ' do not support data signature by default');
+
     }
 
 }

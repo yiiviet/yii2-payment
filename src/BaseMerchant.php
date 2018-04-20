@@ -10,7 +10,6 @@ namespace yii2vn\payment;
 
 use yii\base\Component;
 use yii\base\NotSupportedException;
-use yii\di\Instance;
 
 /**
  * @property BasePaymentGateway $paymentGateway
@@ -18,7 +17,7 @@ use yii\di\Instance;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseMerchant extends Component implements MerchantInterface
+abstract class BaseMerchant extends Component
 {
 
     /**
@@ -55,7 +54,7 @@ abstract class BaseMerchant extends Component implements MerchantInterface
     /**
      * @return BasePaymentGateway
      */
-    public function getPaymentGateway(): PaymentGatewayInterface
+    public function getPaymentGateway(): BasePaymentGateway
     {
         return $this->_paymentGateway;
     }
