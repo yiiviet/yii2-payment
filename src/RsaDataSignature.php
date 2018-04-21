@@ -90,7 +90,7 @@ use yii\base\InvalidConfigException;
         if (($privateKey = openssl_pkey_get_private($this->getPrivateCertificate())) && openssl_sign($this->getData(), $signature, $privateKey, $this->openSSLAlgo)) {
             openssl_free_key($privateKey);
 
-            return urlencode(base64_encode($signature));
+            return $signature;
         } else {
             throw new InvalidConfigException('Can not signature data via current private certificate!');
         }
@@ -101,7 +101,6 @@ use yii\base\InvalidConfigException;
      */
     public function validate(string $expect): bool
     {
-        $expect = urldecode(base64_decode($expect));
         $isValid = ($publicKey = openssl_pkey_get_public($this->getPublicCertificate())) && openssl_verify($this->getData(), $expect, $publicKey, $this->openSSLAlgo);
         openssl_free_key($publicKey);
 

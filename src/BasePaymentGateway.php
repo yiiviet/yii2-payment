@@ -13,10 +13,12 @@ use Yii;
 use yii\base\Component;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
 use yii\httpclient\Client as HttpClient;
 
 /**
+ * Class BasePaymentGateway
  *
  * @property BaseMerchant $defaultMerchant
  * @property BaseMerchant $merchant
@@ -221,8 +223,8 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @param array $data
      * @param null $merchantId
-     * @return bool|object|DataInterface|Data
-     * @throws InvalidConfigException
+     * @return bool|Data|DataInterface
+     * @throws InvalidConfigException|NotSupportedException
      */
     public function purchase(array $data, $merchantId = null)
     {
@@ -232,8 +234,8 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @param array $data
      * @param int|string $merchantId
-     * @return bool|object|Data
-     * @throws InvalidConfigException
+     * @return bool|Data|DataInterface
+     * @throws InvalidConfigException|NotSupportedException
      */
     public function queryDR(array $data, $merchantId)
     {
@@ -241,11 +243,11 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @param int|string $command
+     * @param mixed $command
      * @param array $data
-     * @param null $merchantId
-     * @return bool|object|Data
-     * @throws InvalidConfigException
+     * @param int|string|null $merchantId
+     * @return bool|Data|DataInterface
+     * @throws InvalidConfigException|NotSupportedException
      */
     public function request($command, array $data, $merchantId = null)
     {
@@ -264,12 +266,14 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
         $this->trigger(self::EVENT_BEFORE_REQUEST, $event);
 
         if ($event->isValid) {
-            $data = $this->requestInternal($requestData, $this->getHttpClient());
-            $responseData = Yii::createObject($this->responseDataConfig, [$command, $merchant, $data]);
-            $event->responseData = $responseData;
-            $this->trigger(self::EVENT_AFTER_REQUEST, $event);
-
-            return $responseData;
+            if ($data = $this->requestInternal($requestData, $this->getHttpClient())) {
+                $responseData = Yii::createObject($this->responseDataConfig, [$command, $merchant, $data]);
+                $event->responseData = $responseData;
+                $this->trigger(self::EVENT_AFTER_REQUEST, $event);
+                return $responseData;
+            } else {
+                throw new NotSupportedException("Request command '$command' not supported in " . __CLASS__);
+            }
         } else {
             return false;
         }
@@ -292,7 +296,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 
             $client = $this->_httpClient = Yii::createObject(ArrayHelper::merge([
                 'class' => HttpClient::class,
-                'baseUrl' => static::baseUrl($this->sandbox)
+                'baseUrl' => self::baseUrl($this->sandbox)
             ], $this->getHttpClientConfig()));
 
             return $client;
@@ -311,7 +315,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @param HttpClient $httpClient
      * @return array
      */
-    abstract protected function requestInternal(Data $requestData, HttpClient $httpClient): array;
+    abstract protected function requestInternal(Data $requestData, HttpClient $httpClient): ?array;
 
 
     /**

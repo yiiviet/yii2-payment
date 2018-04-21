@@ -11,10 +11,10 @@ use Yii;
 
 use yii\di\Instance;
 use yii\base\NotSupportedException;
+use yii\httpclient\Client as HttpClient;
 
 use yii2vn\payment\BasePaymentGateway;
-use yii2vn\payment\CheckoutData;
-use yii2vn\payment\CardChargePaymentGatewayInterface;
+use yii2vn\payment\Data;
 
 
 /**
@@ -23,33 +23,23 @@ use yii2vn\payment\CardChargePaymentGatewayInterface;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGatewayInterface
+class PaymentGateway extends BasePaymentGateway
 {
 
-    const CHECKOUT_METHOD_BAO_KIM = 'baoKim';
+    const REQUEST_COMMAND_PURCHASE_PRO = 'purchasePro';
 
-    const CHECKOUT_METHOD_LOCAL_BANK = 'localBank';
+    const REQUEST_COMMAND_MERCHANT_DATA = 'merchantData';
 
-    const CHECKOUT_METHOD_ATM_TRANSFER = 'atmTransfer';
+    const PURCHASE_URL = '/payment/order/version11';
 
-    const CHECKOUT_METHOD_BANK_TRANSFER = 'bankTransfer';
-
-    const CHECKOUT_METHOD_CARD_CHARGE = 'cardCharge';
-
-    const CHECKOUT_METHOD_INTERNET_BANKING = 'internetBanking';
-
-    const CHECKOUT_METHOD_CREDIT_CARD = 'creditCard';
-
-    const BK_PAYMENT_URL = '/payment/order/version11';
-
-    const CARD_CHARGE_URL = '/the-cao/restFul/send';
+    const PURCHASE_PRO_URL = '/payment/rest/payment_pro_api/pay_by_card';
 
     const PRO_SELLER_INFO_URL = '/payment/rest/payment_pro_api/get_seller_info';
 
-    const PRO_PAYMENT_URL = '/payment/rest/payment_pro_api/pay_by_card';
+    const QUERY_DR_URL = '/payment/order/queryTransaction';
 
     /**
-     * @var string|array|\yii\caching\Cache
+     * @var bool|string|array|\yii\caching\Cache
      */
     public $merchantDataCache = 'cache';
 
@@ -60,14 +50,11 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
      */
     public $merchantConfig = ['class' => Merchant::class];
 
-    public $merchantRequestDataConfig = ['class' => MerchantRequestData::class];
+    public $requestDataConfig = ['class' => RequestData::class];
 
-    public $merchantResponseDataConfig = ['class' => MerchantResponseData::class];
+    public $responseDataConfig = ['class' => RequestData::class];
 
-    public $checkoutRequestDataConfig = ['class' => CheckoutRequestData::class];
-
-    public $checkoutResponseDataConfig = ['class' => CheckoutResponseData::class];
-
+    public $returnRequestDataConfig = ['class' => ReturnRequestData::class];
 
     /**
      * @inheritdoc
@@ -91,19 +78,11 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
      */
     public function init()
     {
-        $this->merchantDataCache = Instance::ensure($this->merchantDataCache, 'yii\caching\Cache');
+        if ($this->merchantDataCache) {
+            $this->merchantDataCache = Instance::ensure($this->merchantDataCache, 'yii\caching\Cache');
+        }
 
         parent::init();
-    }
-
-    /**
-     * @param array $data
-     * @param string|int|null $merchantId
-     * @return bool|CheckoutResponseData
-     */
-    public function cardCharge(array $data, $merchantId = null)
-    {
-        return $this->checkoutWithCardCharge($data, $merchantId);
     }
 
     /**
@@ -129,9 +108,9 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
      * @param string $emailBusiness
      * @param int|string|null $merchantId
      * @throws \yii\base\InvalidConfigException|NotSupportedException
-     * @return object|MerchantRequestData
+     * @return object|ResponseData|bool
      */
-    public function getMerchantData(string $emailBusiness = null, $merchantId = null): MerchantRequestData
+    public function getMerchantData(string $emailBusiness = null, $merchantId = null): ResponseData
     {
         /** @var Merchant $merchant */
         $merchant = $this->getMerchant($merchantId);
@@ -141,129 +120,57 @@ class PaymentGateway extends BasePaymentGateway implements CardChargePaymentGate
             $merchant->id
         ];
 
-        if (!$data = $this->merchantDataCache->get($cacheKey)) {
-            $requestData = Yii::createObject($this->merchantRequestDataConfig, [$merchant, [
-                'business' => $emailBusiness
-            ]]);
+        if (!$this->merchantDataCache || !$responseData = $this->merchantDataCache->get($cacheKey)) {
+            $responseData = $this->request(self::REQUEST_COMMAND_MERCHANT_DATA, [
+                'business' => $emailBusiness ?? $merchant->email
+            ]);
 
-            $queryData = $requestData->getData(true, 'signature');
-            $httpResponse = $this->getHttpClient()->get(self::PRO_SELLER_INFO_URL, $queryData, [], [
-                CURLOPT_USERPWD => $merchant->apiUser . ':' . $merchant->apiPassword
-            ])->send();
-
-            $this->merchantDataCache->set($cacheKey, $data = $httpResponse->getData(), $this->merchantDataCacheDuration);
+            if ($this->merchantDataCache) {
+                $this->merchantDataCache->set($cacheKey, $responseData, $this->merchantDataCacheDuration);
+            }
         }
 
-        return Yii::createObject($this->merchantResponseDataConfig, [$merchant, $data]);
-    }
-
-    /**
-     * @param array $data
-     * @param string|int|null $merchantId
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithAtmTransfer(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_ATM_TRANSFER, $merchantId);
-    }
-
-    /**
-     * @param array $data
-     * @param string|int|null $merchantId
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithBankTransfer(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_BANK_TRANSFER, $merchantId);
-    }
-
-    /**
-     * @param array $data
-     * @param string|int|null $merchantId
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithBaoKim(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_BAO_KIM, $merchantId);
-    }
-
-
-    /**
-     * @param array $data
-     * @param string|int|null $merchantId
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithLocalBank(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_LOCAL_BANK, $merchantId);
-    }
-
-    /**
-     * @param array $data
-     * @param string|int|null $merchantId
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithCreditCard(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_CREDIT_CARD, $merchantId);
-    }
-
-    /**
-     * @param array $data
-     * @param string|int|null $merchantId
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithInternetBanking(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_INTERNET_BANKING, $merchantId);
-    }
-
-    /**
-     * @param array $data
-     * @param string|int|null $merchantId
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithCardCharge(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_CARD_CHARGE, $merchantId);
+        return $responseData;
     }
 
     /**
      * @inheritdoc
+     * @throws NotSupportedException|\yii\base\InvalidConfigException
      */
-    protected function checkoutInternal(CheckoutData $data): array
+    protected function requestInternal(Data $requestData, HttpClient $httpClient): ?array
     {
         /** @var Merchant $merchant */
 
-        $merchant = $data->getMerchant();
-        $method = $data->getMethod();
+        $merchant = $requestData->getMerchant();
+        $command = $requestData->getCommand();
+        $httpMethod = 'POST';
 
-        switch ($method) {
-            case self::CHECKOUT_METHOD_CARD_CHARGE:
-                $signKey = 'data_sign';
-                $url = self::CARD_CHARGE_URL;
-                break;
-            case self::CHECKOUT_METHOD_ATM_TRANSFER || self::CHECKOUT_METHOD_BANK_TRANSFER || self::CHECKOUT_METHOD_BAO_KIM:
-                $signKey = 'checksum';
-                $url = self::BK_PAYMENT_URL;
-                break;
-            case self::CHECKOUT_METHOD_LOCAL_BANK || self::CHECKOUT_METHOD_INTERNET_BANKING || self::CHECKOUT_METHOD_CREDIT_CARD:
-                $signKey = 'signature';
-                $url = self::PRO_PAYMENT_URL;
-                break;
-            default:
-                throw new NotSupportedException("Checkout method '$method' not supported in " . __CLASS__);
+        if ($command === self::REQUEST_COMMAND_MERCHANT_DATA || $command === self::REQUEST_COMMAND_QUERY_DR) {
+            if ($command === self::REQUEST_COMMAND_MERCHANT_DATA) {
+                $url = self::PRO_SELLER_INFO_URL;
+            } else {
+                $url = self::QUERY_DR_URL;
+            }
+            $httpMethod = 'GET';
+        } elseif ($command === self::REQUEST_COMMAND_PURCHASE) {
+            $url = self::PURCHASE_URL;
+        } elseif ($command === self::REQUEST_COMMAND_PURCHASE_PRO) {
+            $url = self::PURCHASE_PRO_URL;
+        } else {
+            return null;
         }
 
-        $data = $data->getData(true, $signKey);
-        $httpResponse = $this->getHttpClient()->post($url, $data, [], [CURLOPT_USERPWD => $merchant->apiUser . ':' . $merchant->apiPassword])->send();
-        Yii::debug(__CLASS__ . " checkout requested sent with method: $method");
+        $data = $requestData->get();
+        $httpRequest = $httpClient->createRequest();
+        $httpResponse = $httpRequest->setUrl($url)
+            ->setMethod($httpMethod)
+            ->setOptions([CURLOPT_USERPWD => $merchant->apiUser . ':' . $merchant->apiPassword])
+            ->setData($data)
+            ->send();
+
+
+        Yii::debug(__CLASS__ . " requested sent with command: $command");
 
         return $httpResponse->getData();
-    }
-
-    protected function getDefaultCheckoutMethod(): string
-    {
-        return self::CHECKOUT_METHOD_LOCAL_BANK;
     }
 }
