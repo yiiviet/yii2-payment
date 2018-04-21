@@ -78,4 +78,12 @@ interface PaymentGatewayInterface
      */
     public function verifyPurchaseSuccessRequest($merchantId, \yii\web\Request $request = null);
 
+
+    /**
+     * @param $merchantId
+     * @param \yii\web\Request|null $request
+     * @return bool|DataInterface
+     */
+    public function verifyPaymentNotificationRequest($merchantId, \yii\web\Request $request = null);
+
 }

@@ -7,8 +7,6 @@
 
 namespace yii2vn\payment\baokim;
 
-use Yii;
-
 use yii\di\Instance;
 use yii\base\NotSupportedException;
 use yii\httpclient\Client as HttpClient;
@@ -26,9 +24,9 @@ use yii2vn\payment\Data;
 class PaymentGateway extends BasePaymentGateway
 {
 
-    const REQUEST_COMMAND_PURCHASE_PRO = 'purchasePro';
+    const RC_PURCHASE_PRO = 0x04;
 
-    const REQUEST_COMMAND_MERCHANT_DATA = 'merchantData';
+    const RC_MERCHANT_DATA = 0x08;
 
     const PURCHASE_URL = '/payment/order/version11';
 
@@ -121,7 +119,7 @@ class PaymentGateway extends BasePaymentGateway
         ];
 
         if (!$this->merchantDataCache || !$responseData = $this->merchantDataCache->get($cacheKey)) {
-            $responseData = $this->request(self::REQUEST_COMMAND_MERCHANT_DATA, [
+            $responseData = $this->request(self::RC_MERCHANT_DATA, [
                 'business' => $emailBusiness ?? $merchant->email
             ]);
 
@@ -145,16 +143,16 @@ class PaymentGateway extends BasePaymentGateway
         $command = $requestData->getCommand();
         $httpMethod = 'POST';
 
-        if ($command === self::REQUEST_COMMAND_MERCHANT_DATA || $command === self::REQUEST_COMMAND_QUERY_DR) {
-            if ($command === self::REQUEST_COMMAND_MERCHANT_DATA) {
+        if ($command & (self::RC_MERCHANT_DATA | self::RC_QUERY_DR)) {
+            if ($command === self::RC_MERCHANT_DATA) {
                 $url = self::PRO_SELLER_INFO_URL;
             } else {
                 $url = self::QUERY_DR_URL;
             }
             $httpMethod = 'GET';
-        } elseif ($command === self::REQUEST_COMMAND_PURCHASE) {
+        } elseif ($command & self::RC_PURCHASE) {
             $url = self::PURCHASE_URL;
-        } elseif ($command === self::REQUEST_COMMAND_PURCHASE_PRO) {
+        } elseif ($command & self::RC_PURCHASE_PRO) {
             $url = self::PURCHASE_PRO_URL;
         } else {
             return null;
@@ -167,9 +165,6 @@ class PaymentGateway extends BasePaymentGateway
             ->setOptions([CURLOPT_USERPWD => $merchant->apiUser . ':' . $merchant->apiPassword])
             ->setData($data)
             ->send();
-
-
-        Yii::debug(__CLASS__ . " requested sent with command: $command");
 
         return $httpResponse->getData();
     }

@@ -16,6 +16,8 @@ use yii\di\Instance;
 /**
  * Class PaymentNotificationAction
  *
+ * @property array|string|bool $verifiedData
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
@@ -29,10 +31,11 @@ abstract class PaymentNotificationAction extends Action
     /**
      * @var \yii\web\Request
      */
-    public $request;
+    public $request = 'request';
 
     /**
      * @inheritdoc
+     * @throws InvalidConfigException
      */
     public function init()
     {
@@ -70,6 +73,6 @@ abstract class PaymentNotificationAction extends Action
     /**
      * @return bool|string|array
      */
-    abstract protected function getVerifiedData();
+    abstract public function getVerifiedData();
 
 }

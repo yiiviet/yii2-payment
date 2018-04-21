@@ -25,13 +25,10 @@ class RequestData extends Data
     public function rules(): array
     {
         return [
-            [['merchant_id', 'seri_field', 'pin_field', 'transaction_id', 'card_id'], 'required', 'on' => [PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE]],
-            [['business', 'order_id', 'total_amount', 'payer_name', 'payer_email', 'payer_phone_no', 'url_success'], 'required', 'on' => [
-                PaymentGateway::CHECKOUT_METHOD_LOCAL_BANK, PaymentGateway::CHECKOUT_METHOD_CREDIT_CARD, PaymentGateway::CHECKOUT_METHOD_INTERNET_BANKING,
-                PaymentGateway::CHECKOUT_METHOD_BAO_KIM, PaymentGateway::CHECKOUT_METHOD_BANK_TRANSFER, PaymentGateway::CHECKOUT_METHOD_ATM_TRANSFER,
-            ]],
-            [['bank_payment_method_id'], 'required', 'on' => [
-                PaymentGateway::CHECKOUT_METHOD_LOCAL_BANK, PaymentGateway::CHECKOUT_METHOD_CREDIT_CARD, PaymentGateway::CHECKOUT_METHOD_INTERNET_BANKING
+            [['payer_name', 'payer_email', 'payer_phone_no'], 'required', 'on' => PaymentGateway::RC_PURCHASE],
+            [['customer_name', 'customer_email', 'customer_phone_no', 'bank_payment_method_id'], 'required', 'on' => PaymentGateway::RC_PURCHASE_PRO],
+            [['business', 'order_id', 'total_amount', 'url_success'], 'required', 'on' => [
+                PaymentGateway::RC_PURCHASE_PRO, PaymentGateway::RC_PURCHASE
             ]]
         ];
     }
@@ -43,13 +40,7 @@ class RequestData extends Data
     {
         /** @var Merchant $merchant */
         $merchant = $this->getMerchant();
-
-        if ($this->method === PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE) {
-            $attributes['merchant_id'] = $this->merchant->id;
-        } else {
-            $attributes['business'] = $attributes['business'] ?? $merchant->email;
-        }
-
+        $attributes['business'] = $attributes['business'] ?? $merchant->email;
     }
 
     protected function signature(array &$data)
