@@ -10,6 +10,7 @@ namespace yii2vn\payment\baokim;
 use yii\di\Instance;
 use yii\base\NotSupportedException;
 use yii\httpclient\Client as HttpClient;
+use yii\helpers\ArrayHelper;
 
 use yii2vn\payment\BasePaymentGateway;
 use yii2vn\payment\Data;
@@ -35,6 +36,16 @@ class PaymentGateway extends BasePaymentGateway
     const PRO_SELLER_INFO_URL = '/payment/rest/payment_pro_api/get_seller_info';
 
     const QUERY_DR_URL = '/payment/order/queryTransaction';
+
+    const MUI_CHARGE = 'charge';
+
+    const MUI_BASE = 'base';
+
+    const MUI_IFRAME = 'iframe';
+
+    const DIRECT_TRANSACTION = 1;
+
+    const SAFE_TRANSACTION = 2;
 
     /**
      * @var bool|string|array|\yii\caching\Cache
@@ -141,6 +152,7 @@ class PaymentGateway extends BasePaymentGateway
 
         $merchant = $requestData->getMerchant();
         $command = $requestData->getCommand();
+        $data = $requestData->get();
         $httpMethod = 'POST';
 
         if ($command & (self::RC_MERCHANT_DATA | self::RC_QUERY_DR)) {
@@ -149,16 +161,20 @@ class PaymentGateway extends BasePaymentGateway
             } else {
                 $url = self::QUERY_DR_URL;
             }
+            $data[0] = $url;
+            $url = $data;
+            $data = null;
             $httpMethod = 'GET';
-        } elseif ($command & self::RC_PURCHASE) {
-            $url = self::PURCHASE_URL;
-        } elseif ($command & self::RC_PURCHASE_PRO) {
-            $url = self::PURCHASE_PRO_URL;
+        } elseif ($command === self::RC_PURCHASE) {
+            $data[0] = self::PURCHASE_URL;
+            return ['redirect_url' => $httpClient->createRequest()->setUrl($data)->getFullUrl()];
+        } elseif ($command === self::RC_PURCHASE_PRO) {
+            $url = [self::PURCHASE_PRO_URL, 'signature' => ArrayHelper::remove($data, 'signature')];
         } else {
             return null;
         }
 
-        $data = $requestData->get();
+
         $httpRequest = $httpClient->createRequest();
         $httpResponse = $httpRequest->setUrl($url)
             ->setMethod($httpMethod)
