@@ -71,6 +71,7 @@ class Merchant extends BaseMerchant
 
     /**
      * @inheritdoc
+     * @throws \yii\base\InvalidConfigException
      */
     protected function initDataSignature(string $data, string $type): ?DataSignature
     {
