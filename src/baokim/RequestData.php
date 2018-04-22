@@ -13,6 +13,7 @@ use yii2vn\payment\Data;
  * Class BaoKimCheckoutInstance
  *
  * @property Merchant $merchant
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
@@ -25,9 +26,9 @@ class RequestData extends Data
     public function rules(): array
     {
         return [
-            [['payer_name', 'payer_email', 'payer_phone_no'], 'required', 'on' => PaymentGateway::RC_PURCHASE],
-            [['customer_name', 'customer_email', 'customer_phone_no', 'bank_payment_method_id'], 'required', 'on' => PaymentGateway::RC_PURCHASE_PRO],
-            [['business', 'order_id', 'total_amount', 'url_success'], 'required', 'on' => [
+            [['business'], 'required'],
+            [['payer_name', 'payer_email', 'payer_phone_no', 'bank_payment_method_id'], 'required', 'on' => PaymentGateway::RC_PURCHASE_PRO],
+            [['order_id', 'total_amount', 'url_success'], 'required', 'on' => [
                 PaymentGateway::RC_PURCHASE_PRO, PaymentGateway::RC_PURCHASE
             ]]
         ];
@@ -43,30 +44,33 @@ class RequestData extends Data
         $attributes['business'] = $attributes['business'] ?? $merchant->email;
     }
 
-    protected function signature(array &$data)
+    /**
+     * @inheritdoc
+     * @throws \yii\base\NotSupportedException
+     */
+    protected function prepare(array &$data)
     {
-        $dataSign = $data;
-        ksort($dataSign);
+        ksort($data);
 
-        switch ($this->getCommand()) {
-            case PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE || PaymentGateway::CHECKOUT_METHOD_ATM_TRANSFER || PaymentGateway::CHECKOUT_METHOD_BANK_TRANSFER || PaymentGateway::CHECKOUT_METHOD_BAO_KIM:
-                break;
-            case PaymentGateway::REQUEST_COMMAND_MERCHANT_DATA:
+        /** @var Merchant $merchant */
 
-        }
-        if (in_array($this->getCommand(), [
-            PaymentGateway::CHECKOUT_METHOD_CARD_CHARGE, PaymentGateway::CHECKOUT_METHOD_ATM_TRANSFER,
-            PaymentGateway::CHECKOUT_METHOD_BANK_TRANSFER, PaymentGateway::CHECKOUT_METHOD_BAO_KIM
-        ], true)) {
+        $merchant = $this->getMerchant();
+        $command = $this->getCommand();
+
+        if ($command & (PaymentGateway::RC_PURCHASE_PRO | PaymentGateway::RC_MERCHANT_DATA)) {
+            if ($command === PaymentGateway::RC_PURCHASE_PRO) {
+                $strSign = 'POST' . '&' . urlencode(PaymentGateway::PURCHASE_PRO_URL) . '&&' . urlencode(http_build_query($data));
+            } else {
+                $strSign = 'GET' . '&' . urlencode(PaymentGateway::PRO_SELLER_INFO_URL) . '&' . urlencode(http_build_query($data)) . '&';
+            }
+            $signature = $merchant->signature($strSign, Merchant::SIGNATURE_RSA);
+            $data['signature'] = urlencode(base64_encode($signature));
+        } elseif ($command & (PaymentGateway::RC_PURCHASE | PaymentGateway::RC_QUERY_DR)) {
             $strSign = implode("", $data);
-            $signType = Merchant::SIGNATURE_HMAC;
-            $signKey = 'data_sign';
-        } else {
-            $strSign = 'POST' . '&' . urlencode(PaymentGateway::PRO_PAYMENT_URL) . '&&' . urlencode(http_build_query($data));
-            $signType = Merchant::SIGNATURE_RSA;
+            $data['checksum'] = $merchant->signature($strSign, Merchant::SIGNATURE_HMAC);
         }
 
-        return $this->getMerchant()->signature($dataSign, $signType);
+
     }
 
 }
