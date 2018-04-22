@@ -26,7 +26,7 @@ interface MerchantInterface
      * @param null|string $type
      * @return string
      */
-    public function signature(string $data, string $type = null): string;
+    public function signature(string $data, string $type): string;
 
     /**
      * @param string $data
@@ -34,6 +34,6 @@ interface MerchantInterface
      * @param null|string $type
      * @return bool
      */
-    public function validateSignature(string $data, string $expectSignature, string $type = null): bool;
+    public function validateSignature(string $data, string $expectSignature, string $type): bool;
 
 }

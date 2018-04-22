@@ -7,7 +7,7 @@
 
 namespace yii2vn\payment;
 
-use Yii;
+use yii\base\InvalidConfigException;
 
 /**
  * Class HmacDataSignature
@@ -18,12 +18,6 @@ use Yii;
 class HmacDataSignature extends DataSignature
 {
 
-    const HMAC_ALGO_MD5 = 'md5';
-
-    const HMAC_ALGO_SHA1 = 'sha1';
-
-    const HMAC_ALGO_SHA256 = 'sha256';
-
     /**
      * @var string
      */
@@ -33,6 +27,19 @@ class HmacDataSignature extends DataSignature
      * @var string
      */
     public $key;
+
+    /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     */
+    public function init()
+    {
+        if (!$this->hmacAlgo) {
+            throw new InvalidConfigException("'hmacAlgo' property must be set!");
+        }
+
+        parent::init();
+    }
 
     /**
      * @inheritdoc
@@ -49,11 +56,7 @@ class HmacDataSignature extends DataSignature
     {
         $actual = $this->generate();
 
-        if (Yii::$app) {
-            return Yii::$app->getSecurity()->compareString($expect, $actual);
-        } else {
-            return $expect === $actual;
-        }
+        return strcasecmp($expect, $actual) === 0;
     }
 
 }

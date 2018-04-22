@@ -12,12 +12,14 @@ use yii\base\Component;
 use yii\base\NotSupportedException;
 
 /**
- * @property BasePaymentGateway $paymentGateway
+ * Class BaseMerchant
+ *
+ * @property BasePaymentGateway|PaymentGatewayInterface $paymentGateway
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BaseMerchant extends Component
+abstract class BaseMerchant extends Component implements MerchantInterface
 {
 
     /**
@@ -47,14 +49,14 @@ abstract class BaseMerchant extends Component
     }
 
     /**
-     * @var BasePaymentGateway
+     * @var BasePaymentGateway|PaymentGatewayInterface
      */
     private $_paymentGateway;
 
     /**
-     * @return BasePaymentGateway
+     * @return BasePaymentGateway|PaymentGatewayInterface
      */
-    public function getPaymentGateway(): BasePaymentGateway
+    public function getPaymentGateway(): PaymentGatewayInterface
     {
         return $this->_paymentGateway;
     }
@@ -88,7 +90,7 @@ abstract class BaseMerchant extends Component
     /**
      * @param string $data
      * @param string $type
-     * @return DataSignature
+     * @return null|DataSignature
      */
     abstract protected function initDataSignature(string $data, string $type): ?DataSignature;
 

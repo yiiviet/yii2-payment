@@ -19,10 +19,26 @@ use yii\base\InvalidConfigException;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
- class RsaDataSignature extends DataSignature
+class RsaDataSignature extends DataSignature
 {
 
+    /**
+     * @var int
+     */
     public $openSSLAlgo;
+
+    /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     */
+    public function init()
+    {
+        if (!$this->openSSLAlgo) {
+            throw new InvalidConfigException("'openSSLAlgo' property must be set!");
+        }
+
+        parent::init();
+    }
 
     /**
      * @var null|string
@@ -84,6 +100,7 @@ use yii\base\InvalidConfigException;
 
     /**
      * @inheritdoc
+     * @throws InvalidConfigException
      */
     public function generate(): string
     {
@@ -98,6 +115,7 @@ use yii\base\InvalidConfigException;
 
     /**
      * @inheritdoc
+     * @throws InvalidConfigException
      */
     public function validate(string $expect): bool
     {
