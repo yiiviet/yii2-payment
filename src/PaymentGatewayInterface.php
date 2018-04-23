@@ -59,16 +59,16 @@ interface PaymentGatewayInterface
     /**
      * @param array $data
      * @param string|int $merchantId
-     * @return bool|DataInterface
+     * @return DataInterface
      */
-    public function purchase(array $data, $merchantId);
+    public function purchase(array $data, $merchantId): DataInterface;
 
     /**
      * @param array $data
      * @param string|int $merchantId
-     * @return bool|DataInterface
+     * @return DataInterface
      */
-    public function queryDR(array $data, $merchantId);
+    public function queryDR(array $data, $merchantId): DataInterface;
 
 
     /**
@@ -85,5 +85,6 @@ interface PaymentGatewayInterface
      * @return bool|DataInterface
      */
     public function verifyPaymentNotificationRequest($merchantId, \yii\web\Request $request = null);
+
 
 }
