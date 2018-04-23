@@ -8,7 +8,6 @@
 namespace yii2vn\payment;
 
 use yii\base\BaseObject;
-use yii\base\InvalidConfigException;
 
 /**
  * Class DataSignature
