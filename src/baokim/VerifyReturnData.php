@@ -10,12 +10,12 @@ namespace yii2vn\payment\baokim;
 use yii2vn\payment\Data;
 
 /**
- * Class ReturnRequestData
+ * Class VerifyReturnData
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class ReturnRequestData extends Data
+class VerifyReturnData extends Data
 {
 
 }
