@@ -30,22 +30,8 @@ abstract class BaseMerchant extends Component implements MerchantInterface
     public function __construct(BasePaymentGateway $paymentGateway, array $config = [])
     {
         $this->_paymentGateway = $paymentGateway;
+
         parent::__construct($config);
-    }
-
-    public function init()
-    {
-        if ($this->getPaymentGateway()->sandbox) {
-            $this->initSandboxEnvironment();
-        }
-
-        parent::init();
-    }
-
-
-    protected function initSandboxEnvironment()
-    {
-
     }
 
     /**
