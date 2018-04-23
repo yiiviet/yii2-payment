@@ -81,22 +81,11 @@ class Data extends DynamicModel implements DataInterface
     public function get(bool $validate = true): array
     {
         if (!$validate || $this->validate()) {
-            $data = $this->toArray();
-
-            $this->prepare($data);
-
-            return $data;
+            return $this->toArray();
         } else {
             throw new InvalidConfigException(current($this->getFirstErrors()));
         }
     }
 
-    /**
-     * @param $data
-     */
-    protected function prepare(array &$data)
-    {
-
-    }
 
 }
