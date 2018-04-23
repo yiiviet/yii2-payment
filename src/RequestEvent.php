@@ -17,7 +17,6 @@ use yii\base\Event;
  */
 class RequestEvent extends Event
 {
-
     /**
      * @var string
      */
@@ -34,8 +33,8 @@ class RequestEvent extends Event
     public $responseData;
 
     /**
-     * @var bool
+     * @var BaseMerchant
      */
-    public $isValid = true;
+    public $merchant;
 
 }

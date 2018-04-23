@@ -75,11 +75,6 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     public $merchantConfig = [];
 
     /**
-     * @var array|BaseMerchant[]
-     */
-    private $_merchants = [];
-
-    /**
      * @param bool $sandbox
      * @inheritdoc
      */
@@ -100,23 +95,29 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     public function init()
     {
         $this->on(self::EVENT_BEFORE_REQUEST, function (RequestEvent $event) {
-            if ($event->command & self::RC_PURCHASE) {
+            if ($event->command === self::RC_PURCHASE) {
                 $this->trigger(self::EVENT_BEFORE_PURCHASE, $event);
-            } elseif ($event->command & self::RC_QUERY_DR) {
+            } elseif ($event->command === self::RC_QUERY_DR) {
                 $this->trigger(self::EVENT_BEFORE_QUERY_DR, $event);
             }
         });
 
         $this->on(self::EVENT_AFTER_REQUEST, function (RequestEvent $event) {
-            if ($event->command & self::RC_PURCHASE) {
+            if ($event->command === self::RC_PURCHASE) {
                 $this->trigger(self::EVENT_AFTER_PURCHASE, $event);
-            } elseif ($event->command & self::RC_QUERY_DR) {
+            } elseif ($event->command === self::RC_QUERY_DR) {
                 $this->trigger(self::EVENT_AFTER_QUERY_DR, $event);
             }
         });
 
         parent::init();
     }
+
+
+    /**
+     * @var array|BaseMerchant[]
+     */
+    private $_merchants = [];
 
     /**
      * @param bool $load
@@ -163,10 +164,11 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
             if (isset($this->_merchants[$id])) {
                 $merchant = $this->_merchants[$id];
 
-                if (is_array($merchant) || is_string($merchant)) {
-                    if (is_string($merchant)) {
-                        $merchant = ['class' => $merchant];
-                    }
+                if (is_string($merchant)) {
+                    $merchant = ['class' => $merchant];
+                }
+
+                if (is_array($merchant)) {
                     $merchant = ArrayHelper::merge($this->merchantConfig, $merchant);
                 }
 
@@ -227,10 +229,10 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @param array $data
      * @param null $merchantId
-     * @return bool|Data|DataInterface
+     * @return Data|DataInterface
      * @throws InvalidConfigException|NotSupportedException
      */
-    public function purchase(array $data, $merchantId = null)
+    public function purchase(array $data, $merchantId = null): DataInterface
     {
         return $this->request(self::RC_PURCHASE, $data, $merchantId);
     }
@@ -238,22 +240,22 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @param array $data
      * @param int|string $merchantId
-     * @return bool|Data|DataInterface
+     * @return Data|DataInterface
      * @throws InvalidConfigException|NotSupportedException
      */
-    public function queryDR(array $data, $merchantId)
+    public function queryDR(array $data, $merchantId): DataInterface
     {
         return $this->request(self::RC_QUERY_DR, $data, $merchantId);
     }
 
     /**
-     * @param mixed $command
+     * @param int|string $command
      * @param array $data
      * @param int|string|null $merchantId
      * @return bool|Data|DataInterface
      * @throws InvalidConfigException|NotSupportedException
      */
-    public function request($command, array $data, $merchantId = null)
+    public function request($command, array $data, $merchantId = null): Data
     {
         $merchant = $this->getMerchant($merchantId);
 
@@ -263,27 +265,23 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 
         $event = Yii::createObject([
             'class' => RequestEvent::class,
-            'requestData' => $requestData,
             'command' => $command,
+            'merchant' => $merchant,
+            'requestData' => $requestData
         ]);
 
         $this->trigger(self::EVENT_BEFORE_REQUEST, $event);
+        $httpClient = $this->getHttpClient();
 
-        if ($event->isValid) {
-            $httpClient = $this->getHttpClient();
-            if ($data = $this->requestInternal($requestData, $httpClient)) {
-                Yii::debug(__CLASS__ . " requested sent with command: '$command'");
+        if ($data = $this->requestInternal($command, $merchant, $requestData, $httpClient)) {
+            $responseData = Yii::createObject($this->responseDataConfig, [$command, $merchant, $data]);
+            $event->responseData = $responseData;
+            $this->trigger(self::EVENT_AFTER_REQUEST, $event);
+            Yii::debug(__CLASS__ . " requested sent with command: '$command'");
 
-                $responseData = Yii::createObject($this->responseDataConfig, [$command, $merchant, $data]);
-                $event->responseData = $responseData;
-                $this->trigger(self::EVENT_AFTER_REQUEST, $event);
-
-                return $responseData;
-            } else {
-                throw new NotSupportedException("Request command '$command' not supported in " . __CLASS__);
-            }
+            return $responseData;
         } else {
-            return false;
+            throw new NotSupportedException("Request command '$command' not supported in " . __CLASS__);
         }
     }
 
@@ -319,11 +317,13 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
+     * @param int|string $command
+     * @param BaseMerchant $merchant
      * @param Data $requestData
      * @param HttpClient $httpClient
-     * @return array
+     * @return array|null
      */
-    abstract protected function requestInternal(Data $requestData, HttpClient $httpClient): ?array;
+    abstract protected function requestInternal($command, \yii2vn\payment\BaseMerchant $merchant, Data $requestData, HttpClient $httpClient): ?array;
 
 
     /**
