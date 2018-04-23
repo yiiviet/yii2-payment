@@ -34,8 +34,8 @@ class HmacDataSignature extends DataSignature
      */
     public function init()
     {
-        if (!$this->hmacAlgo) {
-            throw new InvalidConfigException("'hmacAlgo' property must be set!");
+        if (!$this->hmacAlgo || !$this->key) {
+            throw new InvalidConfigException("'hmacAlgo' and 'key' properties must be set!");
         }
 
         parent::init();
