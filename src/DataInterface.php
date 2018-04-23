@@ -16,6 +16,10 @@ namespace yii2vn\payment;
 interface DataInterface
 {
 
+    /**
+     * @param bool $validate
+     * @return array
+     */
     public function get(bool $validate = true): array;
 
 }
