@@ -15,14 +15,14 @@ use yii2vn\payment\CheckoutData;
 use yii2vn\payment\MerchantInterface;
 
 /**
- * Class CheckoutRequestData
+ * Class RequestData
  *
  * @property Merchant|\yii2vn\payment\MerchantInterface $merchant
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class CheckoutRequestData extends CheckoutData
+class RequestData extends CheckoutData
 {
 
     const AVS_ATTRIBUTES = [

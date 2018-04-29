@@ -30,7 +30,7 @@ class Merchant extends BaseMerchant
     /**
      * @inheritdoc
      */
-    protected function initDataSignature(string $data, string $type): ?DataSignature
+    protected function initDataSignature(string $data, string $type): ?\yii2vn\payment\DataSignature
     {
         return null;
     }

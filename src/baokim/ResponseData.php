@@ -7,69 +7,39 @@
 
 namespace yii2vn\payment\baokim;
 
-use yii\helpers\ArrayHelper;
+use Yii;
 
-use yii2vn\payment\Data;
+use yii2vn\payment\ResponseData as BaseResponseData;
 
 /**
  * Class ResponseData
  *
  * @property Merchant $merchant
+ * @property null|string $errorMessage
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class ResponseData extends Data
+class ResponseData extends BaseResponseData
 {
 
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function getIsOk(): bool
     {
-        return [
-            [['seller_account', 'bank_payment_methods'], 'required', 'on' => PaymentGateway::RC_GET_MERCHANT_DATA],
-            [['next_action', 'rv_id'], 'required', 'on' => PaymentGateway::RC_PURCHASE_PRO],
-            [['redirect_url'], 'required', 'on' => PaymentGateway::RC_PURCHASE],
-            [[
-                'order_id', 'transaction_id', 'created_on', 'payment_type', 'transaction_status', 'checksum',
-                'total_amount', 'net_amount', 'fee_amount', 'merchant_id', 'customer_name', 'customer_email', 'customer_phone'
-            ], 'required', 'on' => PaymentGateway::RC_QUERY_DR],
-            [['checksum'], 'verifyChecksum', 'message' => '{attribute} not match', 'on' => PaymentGateway::RC_QUERY_DR]
-        ];
+        return !$this->hasProperty('error_code');
     }
 
     /**
-     * @inheritdoc
+     * @return null|string
      */
-    public function ensureAttributes(array &$attributes)
+    public function getErrorMessage(): ?string
     {
-        $ensuredAttributes = [];
-
-        foreach ($attributes as $k => $v) {
-            $ensuredAttributes[strtolower($k)] = $v;
-        }
-
-        $attributes = $ensuredAttributes;
-    }
-
-    /**
-     * @param $attribute
-     * @param $params
-     * @param \yii\validators\InlineValidator $validator
-     * @throws \yii\base\NotSupportedException
-     */
-    public function verifyChecksum($attribute, $params, \yii\validators\InlineValidator $validator)
-    {
-        /** @var Merchant $merchant */
-        $merchant = $this->getMerchant();
-        $data = $this->toArray();
-        $checksum = ArrayHelper::remove($data, 'checksum');
-
-        ksort($data);
-
-        if (!$merchant->validateSignature(implode("", $data), $checksum, Merchant::SIGNATURE_HMAC)) {
-            $validator->addError($this, $attribute, $validator->message);
+        if ($this->hasProperty('error')) {
+            return Yii::t('yii2vn', $this->error);
+        } else {
+            return null;
         }
     }
 

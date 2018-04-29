@@ -12,7 +12,6 @@ use Yii;
 use yii\httpclient\Client as HttpClient;
 
 use yii2vn\payment\BasePaymentGateway;
-use yii2vn\payment\CheckoutData;
 use yii2vn\payment\Data;
 
 
@@ -25,26 +24,34 @@ use yii2vn\payment\Data;
 class PaymentGateway extends BasePaymentGateway
 {
 
-    const CHECKOUT_METHOD_LOCAL_BANK = 'localBank';
+    const RC_PURCHASE_INTERNATIONAL = 0x04;
 
-    const CHECKOUT_METHOD_INTER_BANK = 'interBank';
+    const EVENT_BEFORE_PURCHASE_INTERNATIONAL = 'beforePurchaseInternational';
 
-    const ONECOMM_PAY_URL = '/onecomm-pay/vpc.op';
+    const EVENT_AFTER_PURCHASE_INTERNATIONAL = 'afterPurchaseInternational';
+
+    const PURCHASE_URL = '/onecomm-pay/vpc.op';
+
+    const PURCHASE_INTERNATIONAL_URL = '/vpcpay/vpcpay.op';
 
     const QUERY_DR_URL = '/onecomm-pay/Vpcdps.op';
 
     public $merchantConfig = ['class' => Merchant::class];
 
-    public $checkoutRequestDataConfig = ['class' => CheckoutRequestData::class];
+    public $requestDataConfig = ['class' => RequestData::class];
 
-    public $checkoutResponseDataConfig = ['class' => CheckoutResponseData::class];
+    public $responseDataConfig = ['class' => ResponseData::class];
 
-    public $queryDRDataConfig = ['class' => Data::class];
+    public $verifiedDataConfig = ['class' => Data::class];
 
-    public static function getBaseUrl(bool $sandbox): string
+    /**
+     * @inheritdoc
+     */
+    protected static function getBaseUrl(bool $sandbox): string
     {
         return $sandbox ? 'https://mtf.onepay.vn' : 'https://onepay.vn';
     }
+
 
     public static function version(): string
     {
@@ -65,63 +72,14 @@ class PaymentGateway extends BasePaymentGateway
         ];
     }
 
-    /**
-     * @param int|string $vpcMerchTxnRef
-     * @param null|int|string $merchantId
-     * @return Data
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function queryDR($vpcMerchTxnRef, $merchantId = null): Data
+    protected function requestInternal($command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
     {
         /** @var Merchant $merchant */
-        $merchant = $this->getMerchant($merchantId);
-        $url = [
-            self::QUERY_DR_URL,
-            'merchant' => $merchant->id,
-            'command' => 'queryDR',
-            'vpc_User' => $merchant->user,
-            'vpc_Password' => $merchant->password,
-            'vpc_AccessCode' => $merchant->accessCode,
-            'vpc_Version' => static::version(),
-            'vpc_MerchTxnRef' => (string)$vpcMerchTxnRef
-        ];
-
-        $responseData = $this->getHttpClient()->post($url)->send()->getData();
-
-        return Yii::createObject($this->queryDRDataConfig, [$responseData]);
-    }
-
-    /**
-     * @param string|int|null $merchantId
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithLocalBank(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_LOCAL_BANK, $merchantId);
-    }
-
-    /**
-     * @param string|int|null $merchantId
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithInterBank(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_INTER_BANK, $merchantId);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function checkoutInternal(CheckoutData $data): array
-    {
-        /** @var Merchant $merchant */
-        $merchant = $data->getMerchant();
-        $dataQuery = $data->getData();
-        ksort($dataQuery);
+        $commandUrls = [self::RC_PURCHASE => self::PURCHASE_URL, self::RC_PURCHASE]
+        $data = $requestData->get();
+        ksort($data);
         $dataSign = [];
-        foreach ($dataQuery as $attribute => $value) {
+        foreach ($data as $attribute => $value) {
             if (substr($attribute, 0, 4) === 'vpc_') {
                 $dataSign[$attribute] = $value;
             }
@@ -130,11 +88,6 @@ class PaymentGateway extends BasePaymentGateway
         $location = rtrim(static::baseUrl()) . self::ONECOMM_PAY_URL . '?' . http_build_query($dataQuery);
 
         return ['location' => $location];
-    }
-
-    protected function getDefaultCheckoutMethod(): string
-    {
-        return self::CHECKOUT_METHOD_LOCAL_BANK;
     }
 
 }

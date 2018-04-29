@@ -13,7 +13,6 @@ use Yii;
 use yii\base\Component;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
-use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
 use yii\httpclient\Client as HttpClient;
 
@@ -37,13 +36,19 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
 
     const RC_QUERY_DR = 0x02;
 
-    const EVENT_BEFORE_PURCHASE = 'beforePurchase';
+    const EVENT_VERIFIED_REQUEST = 'verifiedRequest';
 
-    const EVENT_AFTER_PURCHASE = 'afterPurchase';
+    const EVENT_VERIFIED_PURCHASE_SUCCESS_REQUEST = 'verifiedPurchaseSuccessRequest';
+
+    const EVENT_VERIFIED_PAYMENT_NOTIFICATION_REQUEST = 'verifiedPaymentNotificationRequest';
 
     const EVENT_BEFORE_REQUEST = 'beforeRequest';
 
     const EVENT_AFTER_REQUEST = 'afterRequest';
+
+    const EVENT_BEFORE_PURCHASE = 'beforePurchase';
+
+    const EVENT_AFTER_PURCHASE = 'afterPurchase';
 
     const EVENT_BEFORE_QUERY_DR = 'beforeQueryDR';
 
@@ -67,7 +72,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @var array
      */
-    public $verifyReturnDataConfig = [];
+    public $verifiedDataConfig = [];
 
     /**
      * @var array
@@ -88,31 +93,6 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @return string
      */
     abstract protected static function getBaseUrl(bool $sandbox): string;
-
-    /**
-     * @inheritdoc
-     */
-    public function init()
-    {
-        $this->on(self::EVENT_BEFORE_REQUEST, function (RequestEvent $event) {
-            if ($event->command === self::RC_PURCHASE) {
-                $this->trigger(self::EVENT_BEFORE_PURCHASE, $event);
-            } elseif ($event->command === self::RC_QUERY_DR) {
-                $this->trigger(self::EVENT_BEFORE_QUERY_DR, $event);
-            }
-        });
-
-        $this->on(self::EVENT_AFTER_REQUEST, function (RequestEvent $event) {
-            if ($event->command === self::RC_PURCHASE) {
-                $this->trigger(self::EVENT_AFTER_PURCHASE, $event);
-            } elseif ($event->command === self::RC_QUERY_DR) {
-                $this->trigger(self::EVENT_AFTER_QUERY_DR, $event);
-            }
-        });
-
-        parent::init();
-    }
-
 
     /**
      * @var array|BaseMerchant[]
@@ -230,7 +210,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @param array $data
      * @param null $merchantId
      * @return Data|DataInterface
-     * @throws InvalidConfigException|NotSupportedException
+     * @throws InvalidConfigException|InvalidArgumentException
      */
     public function purchase(array $data, $merchantId = null): DataInterface
     {
@@ -241,7 +221,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @param array $data
      * @param int|string $merchantId
      * @return Data|DataInterface
-     * @throws InvalidConfigException|NotSupportedException
+     * @throws InvalidConfigException|InvalidArgumentException
      */
     public function queryDR(array $data, $merchantId): DataInterface
     {
@@ -252,17 +232,16 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @param int|string $command
      * @param array $data
      * @param int|string|null $merchantId
-     * @return bool|Data|DataInterface
-     * @throws InvalidConfigException|NotSupportedException
+     * @return ResponseData
+     * @throws InvalidConfigException|InvalidArgumentException
      */
-    public function request($command, array $data, $merchantId = null): Data
+    public function request($command, array $data, $merchantId = null): \yii2vn\payment\ResponseData
     {
         $merchant = $this->getMerchant($merchantId);
 
         /** @var Data $requestData */
 
         $requestData = Yii::createObject($this->requestDataConfig, [$command, $merchant, $data]);
-
         $event = Yii::createObject([
             'class' => RequestEvent::class,
             'command' => $command,
@@ -270,19 +249,46 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
             'requestData' => $requestData
         ]);
 
-        $this->trigger(self::EVENT_BEFORE_REQUEST, $event);
-        $httpClient = $this->getHttpClient();
-
-        if ($data = $this->requestInternal($command, $merchant, $requestData, $httpClient)) {
+        if (in_array($command, $this->requestCommands(), true)) {
+            $httpClient = $this->getHttpClient();
+            $this->beforeRequest($event);
+            $this->requestInternal($command, $merchant, $requestData, $httpClient);
             $responseData = Yii::createObject($this->responseDataConfig, [$command, $merchant, $data]);
             $event->responseData = $responseData;
-            $this->trigger(self::EVENT_AFTER_REQUEST, $event);
+            $this->afterRequest($event);
             Yii::debug(__CLASS__ . " requested sent with command: '$command'");
 
             return $responseData;
         } else {
-            throw new NotSupportedException("Request command '$command' not supported in " . __CLASS__);
+            throw new InvalidArgumentException("Unknown request command '$command'");
         }
+    }
+
+    public function requestCommands(): array
+    {
+        return [self::RC_QUERY_DR, self::RC_PURCHASE];
+    }
+
+    public function beforeRequest(\yii2vn\payment\RequestEvent $event)
+    {
+        if ($event->command === self::RC_PURCHASE) {
+            $this->trigger(self::EVENT_BEFORE_PURCHASE, $event);
+        } elseif ($event->command === self::RC_QUERY_DR) {
+            $this->trigger(self::EVENT_BEFORE_QUERY_DR, $event);
+        }
+
+        $this->trigger(self::EVENT_BEFORE_REQUEST, $event);
+    }
+
+    public function afterRequest(\yii2vn\payment\RequestEvent $event)
+    {
+        if ($event->command === self::RC_PURCHASE) {
+            $this->trigger(self::EVENT_AFTER_PURCHASE, $event);
+        } elseif ($event->command === self::RC_QUERY_DR) {
+            $this->trigger(self::EVENT_AFTER_QUERY_DR, $event);
+        }
+
+        $this->trigger(self::EVENT_AFTER_REQUEST, $event);
     }
 
     /**
@@ -321,37 +327,37 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @param BaseMerchant $merchant
      * @param Data $requestData
      * @param HttpClient $httpClient
-     * @return array|null
+     * @return array
      */
-    abstract protected function requestInternal($command, \yii2vn\payment\BaseMerchant $merchant, Data $requestData, HttpClient $httpClient): ?array;
+    abstract protected function requestInternal($command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array;
 
 
     /**
      * @inheritdoc
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|InvalidArgumentException
      */
-    public function verifyPurchaseSuccessRequest($merchantId, \yii\web\Request $request = null)
+    public function verifyPurchaseSuccessRequest($merchantId = null, \yii\web\Request $request = null)
     {
-        return $this->verifyReturnRequest(self::VC_PURCHASE_SUCCESS, $merchantId, $request);
+        return $this->verifyRequest(self::VC_PURCHASE_SUCCESS, $merchantId, $request);
     }
 
     /**
      * @inheritdoc
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|InvalidArgumentException
      */
-    public function verifyPaymentNotificationRequest($merchantId, \yii\web\Request $request = null)
+    public function verifyPaymentNotificationRequest($merchantId = null, \yii\web\Request $request = null)
     {
-        return $this->verifyReturnRequest(self::VC_PAYMENT_NOTIFICATION, $merchantId, $request);
+        return $this->verifyRequest(self::VC_PAYMENT_NOTIFICATION, $merchantId, $request);
     }
 
     /**
      * @param $command
      * @param null|int|string $merchantId
      * @param \yii\web\Request|null $request
-     * @return bool|Data
-     * @throws InvalidConfigException
+     * @return bool|VerifiedData
+     * @throws InvalidConfigException|InvalidArgumentException
      */
-    public function verifyReturnRequest($command, $merchantId = null, \yii\web\Request $request = null)
+    public function verifyRequest($command, $merchantId = null, \yii\web\Request $request = null)
     {
         $merchant = $this->getMerchant($merchantId);
 
@@ -361,15 +367,54 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
             throw new InvalidArgumentException('Request instance arg must be set to verify return request is valid or not!');
         }
 
-        /** @var Data $requestData */
+        if (in_array($command, $this->verifyRequestCommands(), true)) {
+            $data = $this->getVerifyRequestData($command, $merchant, $request);
+            /** @var Data $requestData */
+            $requestData = Yii::createObject($this->verifiedDataConfig, [$command, $merchant, $data]);
+            if ($requestData->validate()) {
+                $event = Yii::createObject([
+                    'class' => VerifiedRequestEvent::class,
+                    'requestData' => $requestData,
+                    'merchant' => $merchant,
+                    'command' => $command
+                ]);
+                $this->verifiedRequest($event);
 
-        $requestData = Yii::createObject($this->verifyReturnDataConfig, [$command, $merchant, $request->getQueryParams()]);
-
-        if ($requestData->validate()) {
-            return $requestData;
+                return $requestData;
+            } else {
+                return false;
+            }
         } else {
-            return false;
+            throw new InvalidArgumentException("Unknown verify request command: `$command`");
         }
     }
+
+    /**
+     * @param VerifiedRequestEvent $event
+     */
+    public function verifiedRequest(\yii2vn\payment\VerifiedRequestEvent $event)
+    {
+        if ($event->command === self::VC_PAYMENT_NOTIFICATION) {
+            $this->trigger(self::EVENT_VERIFIED_PAYMENT_NOTIFICATION_REQUEST, $event);
+        } elseif ($event->command === self::VC_PURCHASE_SUCCESS) {
+            $this->trigger(self::EVENT_VERIFIED_PURCHASE_SUCCESS_REQUEST, $event);
+        }
+
+        $this->trigger(self::EVENT_VERIFIED_REQUEST, $event);
+    }
+
+    public function verifyRequestCommands(): array
+    {
+        return [self::VC_PURCHASE_SUCCESS, self::VC_PAYMENT_NOTIFICATION];
+    }
+
+    /**
+     * @param int|string $command
+     * @param BaseMerchant $merchant
+     * @param \yii\web\Request $request
+     * @return array|null
+     */
+    abstract protected function getVerifyRequestData($command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array;
+
 
 }

@@ -7,10 +7,9 @@
 
 namespace yii2vn\payment\nganluong;
 
-use Yii;
+use yii\base\NotSupportedException;
 
 use yii2vn\payment\BasePaymentGateway;
-use yii2vn\payment\CheckoutData;
 
 /**
  * Class PaymentGateway
@@ -21,36 +20,46 @@ use yii2vn\payment\CheckoutData;
 class PaymentGateway extends BasePaymentGateway
 {
 
-    const CHECKOUT_METHOD_NL = 'NL';
+    const PAYMENT_METHOD_NL = 'NL';
 
-    const CHECKOUT_METHOD_QR_CODE = 'QRCODE';
+    const PAYMENT_METHOD_QR_CODE = 'QRCODE';
 
-    const CHECKOUT_METHOD_BANK_OFFLINE = 'NH_OFFLINE';
+    const PAYMENT_METHOD_BANK_OFFLINE = 'NH_OFFLINE';
 
-    const CHECKOUT_METHOD_CREDIT_CARD_PREPAID = 'CREDIT_CARD_PREPAID';
+    const PAYMENT_METHOD_CREDIT_CARD_PREPAID = 'CREDIT_CARD_PREPAID';
 
-    const CHECKOUT_METHOD_VISA = 'VISA';
+    const PAYMENT_METHOD_VISA = 'VISA';
 
-    const CHECKOUT_METHOD_ATM_ONLINE = 'ATM_ONLINE';
+    const PAYMENT_METHOD_ATM_ONLINE = 'ATM_ONLINE';
 
-    const CHECKOUT_METHOD_ATM_OFFLINE = 'ATM_ONLINE';
+    const PAYMENT_METHOD_ATM_OFFLINE = 'ATM_ONLINE';
 
-    const CHECKOUT_METHOD_INTERNET_BANKING = 'IB_ONLINE';
+    const PAYMENT_METHOD_INTERNET_BANKING = 'IB_ONLINE';
 
-    const CHECKOUT_API_POST_URL = '/checkout.api.nganluong.post.php';
+    const PAYMENT_TYPE_REDIRECT = 1;
+
+    const PAYMENT_TYPE_SAFE = 2;
+
+    const TRANSACTION_STATUS_SUCCESS = '00';
+
+    const TRANSACTION_STATUS_PENDING = '01';
+
+    const TRANSACTION_STATUS_ERROR = '02';
 
     public $merchantConfig = ['class' => Merchant::class];
 
-    public $checkoutRequestDataConfig = ['class' => CheckoutRequestData::class];
+    public $requestDataConfig = ['class' => RequestData::class];
 
-    public $checkoutResponseDataConfig = ['class' => CheckoutResponseData::class];
+    public $responseDataConfig = ['class' => ResponseData::class];
+
+    public $verifiedDataConfig = ['class' => VerifiedData::class];
 
     /**
      * @inheritdoc
      */
     protected static function getBaseUrl(bool $sandbox): string
     {
-        return $sandbox ? 'https://sandbox.nganluong.vn:8088/nl30' : 'https://www.nganluong.vn';
+        return ($sandbox ? 'https://sandbox.nganluong.vn:8088/nl30' : 'https://www.nganluong.vn') . '/checkout.api.nganluong.post.php';
     }
 
     /**
@@ -59,86 +68,6 @@ class PaymentGateway extends BasePaymentGateway
     public static function version(): string
     {
         return '3.1';
-    }
-
-    /**
-     * @param string|int|null $merchantId
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithNganLuong(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_NL, $merchantId);
-    }
-
-    /**
-     * @param string|int|null $merchantId
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithQrCode(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data,self::CHECKOUT_METHOD_QR_CODE, $merchantId);
-    }
-
-    /**
-     * @param string|int|null $merchantId
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithBankOffline(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_BANK_OFFLINE, $merchantId);
-    }
-
-    /**
-     * @param string|int|null $merchantId
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithCreditCardPrepaid(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_CREDIT_CARD_PREPAID, $merchantId);
-    }
-
-    /**
-     * @param string|int|null $merchantId
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithVisa(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_VISA, $merchantId);
-    }
-
-    /**
-     * @param string|int|null $merchantId
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithAtmOnline(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_ATM_ONLINE, $merchantId);
-    }
-
-    /**
-     * @param string|int|null $merchantId
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithAtmOffline(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_ATM_OFFLINE, $merchantId);
-    }
-
-    /**
-     * @param string|int|null $merchantId
-     * @param array $data
-     * @return CheckoutResponseData
-     */
-    public function checkoutWithInternetBanking(array $data, $merchantId = null): CheckoutResponseData
-    {
-        return $this->checkout($data, self::CHECKOUT_METHOD_INTERNET_BANKING, $merchantId);
     }
 
     /**
@@ -159,21 +88,29 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
+     * @throws NotSupportedException
      */
-    protected function checkoutInternal(CheckoutData $data): array
+    public function verifyPaymentNotificationRequest($merchantId = null, \yii\web\Request $request = null)
     {
-        $httpResponse = $this->getHttpClient()->post(self::CHECKOUT_API_POST_URL, $data->getData())->send();
-        Yii::debug(__CLASS__ . " checkout requested sent with method: {$data->getMethod()}");
-
-        return $httpResponse->getData();
+        throw new NotSupportedException(__METHOD__ . " doesn't supported in Ngan Luong gateway");
     }
 
     /**
-     * @return string
+     * @inheritdoc
+     * @throws \yii\base\InvalidConfigException|NotSupportedException
      */
-    protected function getDefaultCheckoutMethod(): string
+    protected function requestInternal($command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
     {
-        return self::CHECKOUT_METHOD_ATM_ONLINE;
+        $data = $requestData->get();
+
+        return $httpClient->post('', $data)->send()->getData();
+    }
+
+    protected function getVerifyRequestData($command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
+    {
+        return [
+            'token' => $request->get('token')
+        ];
     }
 
 }

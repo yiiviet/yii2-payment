@@ -5,19 +5,21 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\onepay;
-
-use yii2vn\payment\CheckoutData;
+namespace yii2vn\payment;
 
 /**
- * Class CheckoutResponseData
+ * Class ResponseData
  *
- * @property Merchant|\yii2vn\payment\MerchantInterface $merchant
+ * @property bool $isOk
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class CheckoutResponseData extends CheckoutData
+abstract class ResponseData extends Data
 {
+
+
+    abstract public function getIsOk(): bool;
+
 
 }

@@ -7,27 +7,13 @@
 
 namespace yii2vn\payment;
 
-use yii\base\Event;
-
 /**
- * Class PaymentNotificationEvent
+ * Class VerifiedData
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class PaymentNotificationEvent extends Event
+class VerifiedData extends Data
 {
-
-    public $isValid = true;
-
-    /**
-     * @var \yii\web\Request
-     */
-    public $request;
-
-    /**
-     * @var string|array
-     */
-    public $verifiedData;
 
 }

@@ -8,16 +8,15 @@
 namespace yii2vn\payment\nganluong;
 
 use Yii;
-use yii2vn\payment\CheckoutData;
 
 /**
- * Class CheckoutResponseData
+ * Class ResponseData
  *
  * @property Merchant $merchant
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class CheckoutResponseData extends CheckoutData
+class ResponseData extends \yii2vn\payment\ResponseData
 {
 
     public static $responseMessages = [
@@ -62,6 +61,18 @@ class CheckoutResponseData extends CheckoutData
         '135' => 'Lỗi kết nối tới hệ thống ngân hàng',
         '140' => 'Đơn hàng không hỗ trợ thanh toán trả góp'
     ];
+
+    /**
+     * @inheritdoc
+     */
+    public function getIsOk(): bool
+    {
+        if ($this->hasProperty('error_code')) {
+            return $this->error_code === PaymentGateway::TRANSACTION_STATUS_SUCCESS;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * @return null|string

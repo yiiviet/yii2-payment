@@ -9,12 +9,9 @@ namespace yii2vn\payment\baokim;
 
 use yii\di\Instance;
 use yii\base\NotSupportedException;
-use yii\httpclient\Client as HttpClient;
 use yii\helpers\ArrayHelper;
 
 use yii2vn\payment\BasePaymentGateway;
-use yii2vn\payment\Data;
-
 
 /**
  * Class PaymentGateway
@@ -71,7 +68,7 @@ class PaymentGateway extends BasePaymentGateway
 
     public $responseDataConfig = ['class' => RequestData::class];
 
-    public $verifyReturnDataConfig = ['class' => VerifyReturnData::class];
+    public $verifiedDataConfig = ['class' => VerifiedData::class];
 
     /**
      * @inheritdoc
@@ -98,22 +95,6 @@ class PaymentGateway extends BasePaymentGateway
         if ($this->merchantDataCache) {
             $this->merchantDataCache = Instance::ensure($this->merchantDataCache, 'yii\caching\Cache');
         }
-
-        $this->on(self::EVENT_BEFORE_REQUEST, function (\yii2vn\payment\RequestEvent $event) {
-            if ($event->command === self::RC_PURCHASE_PRO) {
-                $this->trigger(self::EVENT_BEFORE_PURCHASE_PRO, $event);
-            } elseif ($event->command === self::RC_GET_MERCHANT_DATA) {
-                $this->trigger(self::EVENT_BEFORE_GET_MERCHANT_DATA, $event);
-            }
-        });
-
-        $this->on(self::EVENT_AFTER_REQUEST, function (\yii2vn\payment\RequestEvent $event) {
-            if ($event->command === self::RC_PURCHASE_PRO) {
-                $this->trigger(self::EVENT_AFTER_PURCHASE_PRO, $event);
-            } elseif ($event->command === self::RC_GET_MERCHANT_DATA) {
-                $this->trigger(self::EVENT_AFTER_GET_MERCHANT_DATA, $event);
-            }
-        });
 
         parent::init();
     }
@@ -149,8 +130,9 @@ class PaymentGateway extends BasePaymentGateway
         $merchant = $this->getMerchant($merchantId);
         $cacheKey = [
             __METHOD__,
-            $emailBusiness,
-            $merchant->id
+            get_class($merchant),
+            $merchant->id,
+            $emailBusiness
         ];
 
         if (!$this->merchantDataCache || !$responseData = $this->merchantDataCache->get($cacheKey)) {
@@ -168,9 +150,42 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
+     */
+    public function beforeRequest(\yii2vn\payment\RequestEvent $event)
+    {
+        if ($event->command === self::RC_PURCHASE_PRO) {
+            $this->trigger(self::EVENT_BEFORE_PURCHASE_PRO, $event);
+        } elseif ($event->command === self::RC_GET_MERCHANT_DATA) {
+            $this->trigger(self::EVENT_BEFORE_GET_MERCHANT_DATA, $event);
+        }
+
+        parent::beforeRequest($event);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterRequest(\yii2vn\payment\RequestEvent $event)
+    {
+        if ($event->command === self::RC_PURCHASE_PRO) {
+            $this->trigger(self::EVENT_AFTER_PURCHASE_PRO, $event);
+        } elseif ($event->command === self::RC_GET_MERCHANT_DATA) {
+            $this->trigger(self::EVENT_AFTER_GET_MERCHANT_DATA, $event);
+        }
+
+        parent::afterRequest($event);
+    }
+
+    public function requestCommands(): array
+    {
+        return array_merge(parent::requestCommands(), [self::RC_PURCHASE_PRO, self::RC_GET_MERCHANT_DATA]);
+    }
+
+    /**
+     * @inheritdoc
      * @throws NotSupportedException|\yii\base\InvalidConfigException
      */
-    protected function requestInternal($command, \yii2vn\payment\BaseMerchant $merchant, Data $requestData, HttpClient $httpClient): ?array
+    protected function requestInternal($command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
     {
         /** @var Merchant $merchant */
 
@@ -190,10 +205,8 @@ class PaymentGateway extends BasePaymentGateway
         } elseif ($command === self::RC_PURCHASE) {
             $data[0] = self::PURCHASE_URL;
             return ['redirect_url' => $httpClient->createRequest()->setUrl($data)->getFullUrl()];
-        } elseif ($command === self::RC_PURCHASE_PRO) {
-            $url = [self::PURCHASE_PRO_URL, 'signature' => ArrayHelper::remove($data, 'signature')];
         } else {
-            return null;
+            $url = [self::PURCHASE_PRO_URL, 'signature' => ArrayHelper::remove($data, 'signature')];
         }
 
         return $httpClient->createRequest()
@@ -203,5 +216,25 @@ class PaymentGateway extends BasePaymentGateway
             ->setData($data)
             ->send()
             ->getData();
+    }
+
+    protected function getVerifyRequestData($command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
+    {
+        $params = [
+            'order_id', 'transaction_id', 'created_on', 'payment_type', 'transaction_status', 'total_amount', 'net_amount',
+            'fee_amount', 'merchant_id', 'customer_name', 'customer_email', 'customer_phone', 'customer_address', 'checksum',
+            'error', 'error_code'
+        ];
+        $commandRequestMethods = [self::VC_PURCHASE_SUCCESS => 'get', self::VC_PAYMENT_NOTIFICATION => 'post'];
+        $requestMethod = $commandRequestMethods[$command];
+        $data = [];
+
+        foreach ($params as $param) {
+            if (($value = call_user_func([$request, $requestMethod], $param)) && !is_null($value)) {
+                $data[$param] = $value;
+            }
+        }
+
+        return $data;
     }
 }

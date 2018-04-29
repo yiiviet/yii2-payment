@@ -11,8 +11,6 @@ use Yii;
 
 use yii\helpers\ArrayHelper;
 
-use yii2vn\payment\DataSignature;
-use yii2vn\payment\HmacDataSignature;
 use yii2vn\payment\BaseMerchant;
 
 /**
@@ -24,7 +22,6 @@ use yii2vn\payment\BaseMerchant;
 class Merchant extends BaseMerchant
 {
 
-
     public $id;
 
     public $user;
@@ -35,19 +32,19 @@ class Merchant extends BaseMerchant
 
     public $secureSecret;
 
-    public $dataSignatureConfig = ['class' => HmacDataSignature::class];
+    public $dataSignatureConfig = ['class' => 'yii2vn\payment\HmacDataSignature'];
 
     /**
      * @param string $data
      * @param string $type
-     * @return null|object|HmacDataSignature|DataSignature
+     * @return null|object|\yii2vn\payment\HmacDataSignature
      * @throws \yii\base\InvalidConfigException
      */
-    public function initDataSignature(string $data, string $type): ?DataSignature
+    public function initDataSignature(string $data, string $type): ?\yii2vn\payment\DataSignature
     {
         return Yii::createObject(ArrayHelper::merge($this->dataSignatureConfig, [
             'key' => pack('H*', $this->secureSecret),
-            'hmacAlgo' => HmacDataSignature::HMAC_ALGO_SHA256
+            'hmacAlgo' => 'sha256'
         ]), [$data]);
     }
 

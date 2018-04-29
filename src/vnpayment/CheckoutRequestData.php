@@ -13,7 +13,7 @@ use yii2vn\payment\CheckoutData;
 use yii2vn\payment\MerchantInterface;
 
 /**
- * Class CheckoutRequestData
+ * Class RequestData
  *
  * @property Merchant|\yii2vn\payment\MerchantInterface $merchant
  *

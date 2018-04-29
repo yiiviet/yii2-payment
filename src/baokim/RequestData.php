@@ -7,7 +7,7 @@
 
 namespace yii2vn\payment\baokim;
 
-use yii2vn\payment\Data;
+use yii2vn\payment\RequestData as BaseRequestData;
 
 /**
  * Class BaoKimCheckoutInstance
@@ -17,7 +17,7 @@ use yii2vn\payment\Data;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class RequestData extends Data
+class RequestData extends BaseRequestData
 {
 
     /**
