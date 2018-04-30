@@ -90,22 +90,22 @@ class RequestData extends BaseRequestData
     }
 
     /**
-     * @param array $attributes
+     * @param array $data
      * @return string
      * @throws \yii\base\NotSupportedException
      */
-    private function signature(array $attributes): string
+    private function signature(array $data): string
     {
-        ksort($attributes);
-        $attributesSign = [];
+        ksort($data);
+        $dataSign = [];
 
-        foreach ($attributes as $attribute => $value) {
+        foreach ($data as $attribute => $value) {
             if (strpos($attribute, 'vpc_') === 0) {
-                $attributesSign[$attribute] = $value;
+                $dataSign[$attribute] = $value;
             }
         }
 
-        return strtoupper($this->getMerchant()->signature(http_build_query($attributesSign)));
+        return strtoupper($this->getMerchant()->signature(http_build_query($dataSign)));
     }
 
 }
