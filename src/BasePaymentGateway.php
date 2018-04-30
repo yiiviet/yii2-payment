@@ -28,13 +28,28 @@ use yii\httpclient\Client as HttpClient;
 abstract class BasePaymentGateway extends Component implements PaymentGatewayInterface
 {
 
+    /**
+     * Purchase request command use to make request purchase.
+     */
+    const RC_PURCHASE = 0x01;
+
+    /**
+     * Query DR request command use to make request query DR.
+     */
+    const RC_QUERY_DR = 0x02;
+
+    /**
+     * Constance request command all. It only use for checking command is valid or not.
+     *
+     * @var int
+     */
+    const RC_ALL = 0x03;
+
     const VC_PURCHASE_SUCCESS = 0x01;
 
     const VC_PAYMENT_NOTIFICATION = 0x02;
 
-    const RC_PURCHASE = 0x01;
-
-    const RC_QUERY_DR = 0x02;
+    const VC_ALL = 0x03;
 
     const EVENT_VERIFIED_REQUEST = 'verifiedRequest';
 
@@ -229,13 +244,13 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @param int|string $command
+     * @param int $command
      * @param array $data
      * @param int|string|null $merchantId
      * @return ResponseData
      * @throws InvalidConfigException|InvalidArgumentException
      */
-    public function request($command, array $data, $merchantId = null): \yii2vn\payment\ResponseData
+    public function request(int $command, array $data, $merchantId = null): \yii2vn\payment\ResponseData
     {
         $merchant = $this->getMerchant($merchantId);
 
@@ -249,10 +264,10 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
             'requestData' => $requestData
         ]);
 
-        if (in_array($command, $this->requestCommands(), true)) {
-            $httpClient = $this->getHttpClient();
+        if ($command & static::RC_ALL) {
             $this->beforeRequest($event);
-            $this->requestInternal($command, $merchant, $requestData, $httpClient);
+            $httpClient = $this->getHttpClient();
+            $data = $this->requestInternal($command, $merchant, $requestData, $httpClient)
             $responseData = Yii::createObject($this->responseDataConfig, [$command, $merchant, $data]);
             $event->responseData = $responseData;
             $this->afterRequest($event);
@@ -262,11 +277,6 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
         } else {
             throw new InvalidArgumentException("Unknown request command '$command'");
         }
-    }
-
-    public function requestCommands(): array
-    {
-        return [self::RC_QUERY_DR, self::RC_PURCHASE];
     }
 
     public function beforeRequest(\yii2vn\payment\RequestEvent $event)
@@ -323,13 +333,13 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @param int|string $command
+     * @param int $command
      * @param BaseMerchant $merchant
      * @param Data $requestData
      * @param HttpClient $httpClient
      * @return array
      */
-    abstract protected function requestInternal($command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array;
+    abstract protected function requestInternal(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array;
 
 
     /**
@@ -367,20 +377,20 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
             throw new InvalidArgumentException('Request instance arg must be set to verify return request is valid or not!');
         }
 
-        if (in_array($command, $this->verifyRequestCommands(), true)) {
+        if ($command & static::VC_ALL) {
             $data = $this->getVerifyRequestData($command, $merchant, $request);
-            /** @var Data $requestData */
-            $requestData = Yii::createObject($this->verifiedDataConfig, [$command, $merchant, $data]);
-            if ($requestData->validate()) {
+            /** @var VerifiedData $requestData */
+            $verifyData = Yii::createObject($this->verifiedDataConfig, [$command, $merchant, $data]);
+            if ($verifyData->validate()) {
                 $event = Yii::createObject([
                     'class' => VerifiedRequestEvent::class,
-                    'requestData' => $requestData,
+                    'verifiedData' => $verifyData,
                     'merchant' => $merchant,
                     'command' => $command
                 ]);
                 $this->verifiedRequest($event);
 
-                return $requestData;
+                return $verifyData;
             } else {
                 return false;
             }
@@ -401,11 +411,6 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
         }
 
         $this->trigger(self::EVENT_VERIFIED_REQUEST, $event);
-    }
-
-    public function verifyRequestCommands(): array
-    {
-        return [self::VC_PURCHASE_SUCCESS, self::VC_PAYMENT_NOTIFICATION];
     }
 
     /**
