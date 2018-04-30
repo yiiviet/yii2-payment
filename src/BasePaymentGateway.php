@@ -222,9 +222,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @param array $data
-     * @param null $merchantId
-     * @return Data|DataInterface
+     * @inheritdoc
      * @throws InvalidConfigException|InvalidArgumentException
      */
     public function purchase(array $data, $merchantId = null): DataInterface
@@ -233,9 +231,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @param array $data
-     * @param int|string $merchantId
-     * @return Data|DataInterface
+     * @inheritdoc
      * @throws InvalidConfigException|InvalidArgumentException
      */
     public function queryDR(array $data, $merchantId): DataInterface
@@ -264,7 +260,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
             'requestData' => $requestData
         ]);
 
-        if ($command & static::RC_ALL) {
+        if ($command & static::RC_ALL && $command !== static::RC_ALL) {
             $this->beforeRequest($event);
             $httpClient = $this->getHttpClient();
             $data = $this->requestInternal($command, $merchant, $requestData, $httpClient)
@@ -377,7 +373,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
             throw new InvalidArgumentException('Request instance arg must be set to verify return request is valid or not!');
         }
 
-        if ($command & static::VC_ALL) {
+        if ($command & static::VC_ALL && $command !== static::VC_ALL) {
             $data = $this->getVerifyRequestData($command, $merchant, $request);
             /** @var VerifiedData $requestData */
             $verifyData = Yii::createObject($this->verifiedDataConfig, [$command, $merchant, $data]);
