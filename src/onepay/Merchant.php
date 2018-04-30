@@ -32,7 +32,7 @@ class Merchant extends BaseMerchant
 
     public $secureSecret;
 
-    public $dataSignatureConfig = ['class' => 'yii2vn\payment\HmacDataSignature'];
+    public $dataSignatureConfig = [];
 
     /**
      * @param string $data
@@ -42,10 +42,14 @@ class Merchant extends BaseMerchant
      */
     public function initDataSignature(string $data, string $type): ?\yii2vn\payment\DataSignature
     {
-        return Yii::createObject(ArrayHelper::merge($this->dataSignatureConfig, [
+        $config = ArrayHelper::merge($this->dataSignatureConfig, [
             'key' => pack('H*', $this->secureSecret),
             'hmacAlgo' => 'sha256'
-        ]), [$data]);
+        ]);
+
+        $config['class'] = $config['class'] ?? 'yii2vn\payment\HmacDataSignature';
+
+        return Yii::createObject($config, [$data]);
     }
 
 }
