@@ -9,25 +9,21 @@ namespace yii2vn\payment\onepay;
 
 use Yii;
 
+use yii2vn\payment\RequestData as BaseRequestData;
 use yii\helpers\Url;
-
-use yii2vn\payment\CheckoutData;
-use yii2vn\payment\MerchantInterface;
 
 /**
  * Class RequestData
  *
- * @property Merchant|\yii2vn\payment\MerchantInterface $merchant
+ * @property Merchant $merchant
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class RequestData extends CheckoutData
+class RequestData extends BaseRequestData
 {
 
-    const AVS_ATTRIBUTES = [
-        'Street01', 'City', 'StateProv', 'PostCode', 'Country'
-    ];
+    const AVS_ATTRIBUTES = ['Street01', 'City', 'StateProv', 'PostCode', 'Country'];
 
     const VPC_ATTRIBUTES = [
         'Amount', 'Locale', 'TicketNo', 'MerchTxnRef', 'ReturnURL', 'Currency', 'OrderInfo',
@@ -38,62 +34,78 @@ class RequestData extends CheckoutData
     /**
      * @inheritdoc
      */
-    public function __construct(string $method, MerchantInterface $merchant, array $attributes = [], array $config = [])
-    {
-        parent::__construct($method, $merchant, $this->prepareAttributes($attributes), $config);
-    }
-
-    /**
-     * @param array $attributes
-     * @return array
-     */
-    protected function prepareAttributes(array $attributes): array
-    {
-        $attributesPrepared = [];
-
-        foreach ($attributes as $attribute => $value) {
-            if (in_array($attribute, self::AVS_ATTRIBUTES, true)) {
-                $attributesPrepared['AVS_' . $attribute] = $value;
-            } elseif (in_array($attribute, self::VPC_ATTRIBUTES, true)) {
-                $attributesPrepared['vpc_' . $attribute] = $value;
-            } else {
-                $attributesPrepared[$attribute] = $value;
-            }
-        }
-
-        return $attributesPrepared;
-    }
-
     public function rules()
     {
         return [
-            [['vpc_Amount', 'vpc_ReturnUrl', 'vpc_MerchTxnRef', 'vpc_OrderInfo'], 'required'],
-            [['vpc_Currency'], 'required', 'on' => [PaymentGateway::CHECKOUT_METHOD_LOCAL_BANK]]
+            [['vpc_Version', 'vpc_Command', 'vpc_AccessCode', 'vpc_Merchant', 'vpc_MerchTxnRef'], 'required', 'on' => [
+                PaymentGateway::RC_PURCHASE, PaymentGateway::RC_PURCHASE_INTERNATIONAL, PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_DR_INTERNATIONAL
+            ]],
+            [[
+                'vpc_Locale', 'vpc_ReturnURL', 'vpc_OrderInfo', 'vpc_Amount',
+                'vpc_TicketNo', 'AgainLink', 'Title', 'vpc_SecureHash'
+            ], 'vpc_User', 'on' => [PaymentGateway::RC_PURCHASE_INTERNATIONAL, PaymentGateway::RC_PURCHASE]],
+            [['vpc_Currency'], 'required', 'on' => [PaymentGateway::RC_PURCHASE]],
+            [['vpc_User', 'vpc_Password'], 'required', 'on' => [PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_DR_INTERNATIONAL]],
         ];
     }
 
     /**
      * @inheritdoc
+     * @throws \yii\base\NotSupportedException
      */
-    public function getData(bool $validate = true): array
+    protected function ensureAttributes(array &$attributes)
     {
-        $data = parent::getData($validate);
-
         /** @var Merchant $merchant */
         $merchant = $this->getMerchant();
+        $command = $this->getCommand();
+        $attributesEnsured = [];
 
-        // Absolutely data value
-        $data['vpc_Merchant'] = $merchant->id;
-        $data['vpc_AccessCode'] = $merchant->accessCode;
-        $data['vpc_Command'] = 'pay';
-        $data['vpc_Version'] = $merchant->getPaymentGateway()->version();
+        foreach ($attributes as $attribute => $value) {
+            if (in_array($attribute, self::AVS_ATTRIBUTES, true)) {
+                $attributesEnsured['AVS_' . $attribute] = $value;
+            } elseif (in_array($attribute, self::VPC_ATTRIBUTES, true)) {
+                $attributesEnsured['vpc_' . $attribute] = $value;
+            } else {
+                $attributesEnsured[$attribute] = $value;
+            }
+        }
 
-        // Ensure data value
-        $data['vpc_Locale'] = $data['vpc_Locale'] ?? 'vn';
-        $data['vpc_TicketNo'] = $data['vpc_TicketNo'] ?? Yii::$app->getRequest()->getUserIP();
-        $data['AgainLink'] = $data['AgainLink'] ?? Url::current();
-        $data['Title'] = $data['Title'] ?? (string)Yii::$app->getView()->title;
+        $attributesEnsured['vpc_Merchant'] = $merchant->id;
+        $attributesEnsured['vpc_AccessCode'] = $merchant->accessCode;
+        $attributesEnsured['vpc_Command'] = $command === PaymentGateway::RC_QUERY_DR ? 'queryDR' : 'pay';
+        $attributesEnsured['vpc_Version'] = $merchant->getPaymentGateway()->version();
 
-        return $data;
+        if ($command === PaymentGateway::RC_QUERY_DR) {
+            $attributesEnsured['vpc_User'] = $merchant->user;
+            $attributesEnsured['vpc_Password'] = $merchant->password;
+        } else {
+            $attributesEnsured['vpc_Locale'] = $data['vpc_Locale'] ?? 'vn';
+            $attributesEnsured['vpc_TicketNo'] = $data['vpc_TicketNo'] ?? Yii::$app->getRequest()->getUserIP();
+            $attributesEnsured['AgainLink'] = $data['AgainLink'] ?? Url::current();
+            $attributesEnsured['Title'] = $data['Title'] ?? (string)Yii::$app->getView()->title;
+            $attributesEnsured['vpc_SecureHash'] = $this->signature($attributesEnsured);
+        }
+
+        $attributes = $attributesEnsured;
     }
+
+    /**
+     * @param array $attributes
+     * @return string
+     * @throws \yii\base\NotSupportedException
+     */
+    private function signature(array $attributes): string
+    {
+        ksort($attributes);
+        $attributesSign = [];
+
+        foreach ($attributes as $attribute => $value) {
+            if (strpos($attribute, 'vpc_') === 0) {
+                $attributesSign[$attribute] = $value;
+            }
+        }
+
+        return strtoupper($this->getMerchant()->signature(http_build_query($attributesSign)));
+    }
+
 }
