@@ -67,7 +67,7 @@ class ResponseData extends \yii2vn\payment\ResponseData
      */
     public function getIsOk(): bool
     {
-        if ($this->hasProperty('error_code')) {
+        if ($this->canGetProperty('error_code')) {
             return $this->error_code === PaymentGateway::TRANSACTION_STATUS_SUCCESS;
         } else {
             return false;
@@ -79,8 +79,8 @@ class ResponseData extends \yii2vn\payment\ResponseData
      */
     public function getMessage(): ?string
     {
-        if ($this->hasProperty('error_code')) {
-            return Yii::t('yii2vn', static::$responseMessages[$this->error_code]);
+        if ($this->canGetProperty('error_code')) {
+            return Yii::t('yii2vn/payment/nganluong', static::$responseMessages[$this->error_code]);
         } else {
             return null;
         }

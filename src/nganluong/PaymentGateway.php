@@ -20,6 +20,8 @@ use yii2vn\payment\BasePaymentGateway;
 class PaymentGateway extends BasePaymentGateway
 {
 
+    const VC_ALL = self::VC_PURCHASE_SUCCESS;
+
     const PAYMENT_METHOD_NL = 'NL';
 
     const PAYMENT_METHOD_QR_CODE = 'QRCODE';
@@ -99,13 +101,16 @@ class PaymentGateway extends BasePaymentGateway
      * @inheritdoc
      * @throws \yii\base\InvalidConfigException|NotSupportedException
      */
-    protected function requestInternal($command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
+    protected function requestInternal(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
     {
         $data = $requestData->get();
 
         return $httpClient->post('', $data)->send()->getData();
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getVerifyRequestData($command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
     {
         return [

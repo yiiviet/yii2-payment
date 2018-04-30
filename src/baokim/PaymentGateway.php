@@ -26,6 +26,8 @@ class PaymentGateway extends BasePaymentGateway
 
     const RC_GET_MERCHANT_DATA = 0x08;
 
+    const RC_ALL = 0x0F;
+
     const EVENT_BEFORE_PURCHASE_PRO = 'beforePurchasePro';
 
     const EVENT_AFTER_PURCHASE_PRO = 'afterPurchasePro';
@@ -97,6 +99,17 @@ class PaymentGateway extends BasePaymentGateway
         }
 
         parent::init();
+    }
+
+    /**
+     * @param array $data
+     * @param null $merchantId
+     * @return \yii2vn\payment\ResponseData
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function purchasePro(array $data, $merchantId = null)
+    {
+        return $this->request(self::RC_PURCHASE_PRO, $data, $merchantId);
     }
 
     /**
@@ -176,16 +189,11 @@ class PaymentGateway extends BasePaymentGateway
         parent::afterRequest($event);
     }
 
-    public function requestCommands(): array
-    {
-        return array_merge(parent::requestCommands(), [self::RC_PURCHASE_PRO, self::RC_GET_MERCHANT_DATA]);
-    }
-
     /**
      * @inheritdoc
      * @throws NotSupportedException|\yii\base\InvalidConfigException
      */
-    protected function requestInternal($command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
+    protected function requestInternal(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
     {
         /** @var Merchant $merchant */
 
@@ -202,11 +210,11 @@ class PaymentGateway extends BasePaymentGateway
             $url = $data;
             $data = null;
             $httpMethod = 'GET';
-        } elseif ($command === self::RC_PURCHASE) {
-            $data[0] = self::PURCHASE_URL;
-            return ['redirect_url' => $httpClient->createRequest()->setUrl($data)->getFullUrl()];
-        } else {
+        } elseif ($command === self::RC_PURCHASE_PRO) {
             $url = [self::PURCHASE_PRO_URL, 'signature' => ArrayHelper::remove($data, 'signature')];
+        } else {
+            $data[0] = self::PURCHASE_URL;
+            return ['location' => $httpClient->createRequest()->setUrl($data)->getFullUrl()];
         }
 
         return $httpClient->createRequest()
@@ -222,8 +230,7 @@ class PaymentGateway extends BasePaymentGateway
     {
         $params = [
             'order_id', 'transaction_id', 'created_on', 'payment_type', 'transaction_status', 'total_amount', 'net_amount',
-            'fee_amount', 'merchant_id', 'customer_name', 'customer_email', 'customer_phone', 'customer_address', 'checksum',
-            'error', 'error_code'
+            'fee_amount', 'merchant_id', 'customer_name', 'customer_email', 'customer_phone', 'customer_address', 'checksum'
         ];
         $commandRequestMethods = [self::VC_PURCHASE_SUCCESS => 'get', self::VC_PAYMENT_NOTIFICATION => 'post'];
         $requestMethod = $commandRequestMethods[$command];

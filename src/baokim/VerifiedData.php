@@ -7,6 +7,8 @@
 
 namespace yii2vn\payment\baokim;
 
+use Yii;
+
 use yii\base\InvalidConfigException;
 
 use yii2vn\payment\VerifiedData as BaseVerifiedData;
@@ -50,4 +52,5 @@ class VerifiedData extends BaseVerifiedData
             $validator->addError($this, $attribute, $validator->message);
         }
     }
+
 }

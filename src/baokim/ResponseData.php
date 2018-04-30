@@ -28,7 +28,7 @@ class ResponseData extends BaseResponseData
      */
     public function getIsOk(): bool
     {
-        return !$this->hasProperty('error_code');
+        return !$this->canGetProperty('error_code');
     }
 
     /**
@@ -36,11 +36,10 @@ class ResponseData extends BaseResponseData
      */
     public function getErrorMessage(): ?string
     {
-        if ($this->hasProperty('error')) {
-            return Yii::t('yii2vn', $this->error);
+        if ($this->canGetProperty('error')) {
+            return Yii::t('yii2vn/payment/baokim', $this->error);
         } else {
             return null;
         }
     }
-
 }
