@@ -24,19 +24,20 @@ class Data extends DynamicModel implements DataInterface
 
     /**
      * Data constructor.
-     * @param string $command
+     * @param int $command
      * @param BaseMerchant $merchant
      * @param array $attributes
      * @param array $config
      */
-    public function __construct(string $command, BaseMerchant $merchant, array $attributes = [], array $config = [])
+    public function __construct(int $command, BaseMerchant $merchant, array $attributes = [], array $config = [])
     {
         $this->_command = $command;
         $this->_merchant = $merchant;
 
         $this->setScenario($command);
+        $this->ensureAttributes($attributes);
 
-        parent::__construct($this->ensureAttributes($attributes), $config);
+        parent::__construct($attributes, $config);
     }
 
     /**
@@ -44,7 +45,6 @@ class Data extends DynamicModel implements DataInterface
      */
     protected function ensureAttributes(array &$attributes)
     {
-
     }
 
     /**
