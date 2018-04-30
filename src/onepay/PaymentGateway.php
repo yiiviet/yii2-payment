@@ -157,14 +157,14 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
-     * @param int|string $command
+     * @param int $command
      * @param \yii2vn\payment\BaseMerchant $merchant
      * @param Data $requestData
      * @param HttpClient $httpClient
      * @return array
      * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
      */
-    protected function requestInternal($command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): ?array
+    protected function requestInternal(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
     {
         $commandUrls = [
             self::RC_PURCHASE => self::PURCHASE_URL,
@@ -192,7 +192,7 @@ class PaymentGateway extends BasePaymentGateway
      * @param \yii\web\Request $request
      * @return array|null
      */
-    protected function getVerifyRequestData($command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): ?array
+    protected function getVerifyRequestData($command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
     {
         if ($command & self::VC_ALL) {
             $params = [
