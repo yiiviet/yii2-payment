@@ -43,9 +43,8 @@ class RequestData extends BaseRequestData
             [[
                 'vpc_Locale', 'vpc_ReturnURL', 'vpc_OrderInfo', 'vpc_Amount',
                 'vpc_TicketNo', 'AgainLink', 'Title', 'vpc_SecureHash'
-            ], 'vpc_User', 'on' => [PaymentGateway::RC_PURCHASE_INTERNATIONAL, PaymentGateway::RC_PURCHASE]],
-            [['vpc_Currency'], 'required', 'on' => [PaymentGateway::RC_PURCHASE]],
-            [['vpc_User', 'vpc_Password'], 'required', 'on' => [PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_DR_INTERNATIONAL]],
+            ], 'required', 'on' => [PaymentGateway::RC_PURCHASE_INTERNATIONAL, PaymentGateway::RC_PURCHASE]],
+            [['vpc_Currency'], 'required', 'on' => [PaymentGateway::RC_PURCHASE]]
         ];
     }
 
@@ -55,6 +54,7 @@ class RequestData extends BaseRequestData
      */
     protected function ensureAttributes(array &$attributes)
     {
+        parent::ensureAttributes($attributes);
         /** @var Merchant $merchant */
         $merchant = $this->getMerchant();
         $command = $this->getCommand();
@@ -75,10 +75,12 @@ class RequestData extends BaseRequestData
         $attributesEnsured['vpc_Command'] = $command === PaymentGateway::RC_QUERY_DR ? 'queryDR' : 'pay';
         $attributesEnsured['vpc_Version'] = $merchant->getPaymentGateway()->version();
 
-        if ($command === PaymentGateway::RC_QUERY_DR) {
-            $attributesEnsured['vpc_User'] = $merchant->user;
-            $attributesEnsured['vpc_Password'] = $merchant->password;
+        if ($command & (PaymentGateway::RC_QUERY_DR | PaymentGateway::RC_QUERY_DR_INTERNATIONAL)) {
+            $attributesEnsured['vpc_Command'] = 'queryDR';
+            $attributesEnsured['vpc_User'] = 'op01';
+            $attributesEnsured['vpc_Password'] = 'op123456';
         } else {
+            $attributesEnsured['vpc_Command'] = 'pay';
             $attributesEnsured['vpc_Locale'] = $data['vpc_Locale'] ?? 'vn';
             $attributesEnsured['vpc_TicketNo'] = $data['vpc_TicketNo'] ?? Yii::$app->getRequest()->getUserIP();
             $attributesEnsured['AgainLink'] = $data['AgainLink'] ?? Url::current();
