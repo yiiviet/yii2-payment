@@ -19,5 +19,11 @@
         "psr-4": {
             "yii2vn\\payment\\": "src"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
 }
