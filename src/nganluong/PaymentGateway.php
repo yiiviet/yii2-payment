@@ -64,12 +64,22 @@ class PaymentGateway extends BasePaymentGateway
         return ($sandbox ? 'https://sandbox.nganluong.vn:8088/nl30' : 'https://www.nganluong.vn') . '/checkout.api.nganluong.post.php';
     }
 
+
     /**
      * @inheritdoc
      */
     public static function version(): string
     {
         return '3.1';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function initSandboxEnvironment()
+    {
+        $merchantConfig = require(__DIR__ . '/sandbox-merchant.php');
+        $this->setMerchant($merchantConfig);
     }
 
     /**
@@ -111,7 +121,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    protected function getVerifyRequestData($command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
+    protected function getVerifyRequestData(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
     {
         return [
             'token' => $request->get('token')
