@@ -5,7 +5,6 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-
 namespace yii2vn\payment;
 
 use Yii;
@@ -108,6 +107,25 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @return string
      */
     abstract protected static function getBaseUrl(bool $sandbox): string;
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        if ($this->sandbox) {
+            $this->initSandboxEnvironment();
+        }
+
+        parent::init();
+    }
+
+    /**
+     * Init sandbox environment.
+     * In this method you may add merchants use for send request to payment gateway for test your system work corectly.
+     * This method only call when property `sandbox` is true.
+     */
+    abstract protected function initSandboxEnvironment();
 
     /**
      * @var array|BaseMerchant[]
@@ -234,7 +252,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @inheritdoc
      * @throws InvalidConfigException|InvalidArgumentException
      */
-    public function queryDR(array $data, $merchantId): DataInterface
+    public function queryDR(array $data, $merchantId = null): DataInterface
     {
         return $this->request(self::RC_QUERY_DR, $data, $merchantId);
     }
@@ -243,7 +261,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @param int $command
      * @param array $data
      * @param int|string|null $merchantId
-     * @return ResponseData
+     * @return ResponseData|DataInterface
      * @throws InvalidConfigException|InvalidArgumentException
      */
     public function request(int $command, array $data, $merchantId = null): \yii2vn\payment\ResponseData
@@ -263,7 +281,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
         if ($command & static::RC_ALL && $command !== static::RC_ALL) {
             $this->beforeRequest($event);
             $httpClient = $this->getHttpClient();
-            $data = $this->requestInternal($command, $merchant, $requestData, $httpClient)
+            $data = $this->requestInternal($command, $merchant, $requestData, $httpClient);
             $responseData = Yii::createObject($this->responseDataConfig, [$command, $merchant, $data]);
             $event->responseData = $responseData;
             $this->afterRequest($event);
@@ -410,12 +428,12 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @param int|string $command
+     * @param int $command
      * @param BaseMerchant $merchant
      * @param \yii\web\Request $request
      * @return array|null
      */
-    abstract protected function getVerifyRequestData($command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array;
+    abstract protected function getVerifyRequestData(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array;
 
 
 }

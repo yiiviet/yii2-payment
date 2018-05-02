@@ -18,7 +18,11 @@ namespace yii2vn\payment;
 abstract class ResponseData extends Data
 {
 
-
+    /**
+     * Check response data is ok or not. Ok meaning a result is valid you (transaction completed, query result is valid).
+     *
+     * @return bool
+     */
     abstract public function getIsOk(): bool;
 
 

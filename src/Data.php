@@ -45,6 +45,8 @@ class Data extends DynamicModel implements DataInterface
      */
     protected function ensureAttributes(array &$attributes)
     {
+        $activeAttributes = array_fill_keys($this->activeAttributes(), null);
+        $attributes = array_merge($activeAttributes, $attributes);
     }
 
     /**

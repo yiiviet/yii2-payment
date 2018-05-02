@@ -7,9 +7,8 @@
 
 namespace yii2vn\payment\vnpayment;
 
-use yii\base\NotSupportedException;
+use Yii;
 
-use yii2vn\payment\DataSignature;
 use yii2vn\payment\BaseMerchant;
 
 /**
@@ -21,7 +20,9 @@ use yii2vn\payment\BaseMerchant;
 class Merchant extends BaseMerchant
 {
 
-    public $hashSecret;
+    public $dataSignatureConfig = [];
+
+    public $secureHash;
 
     /**
      * @var string
@@ -29,10 +30,20 @@ class Merchant extends BaseMerchant
     public $tmnCode;
 
     /**
-     * @inheritdoc
+     * @var int
      */
-    protected function initDataSignature(string $data, string $type): ?DataSignature
+    public $defaultOrderType;
+
+    /**
+     * @inheritdoc
+     * @throws \yii\base\InvalidConfigException
+     */
+    protected function initDataSignature(string $data, string $type): ?\yii2vn\payment\DataSignature
     {
-        return null;
+        return Yii::createObject(array_merge([
+            'class' => DataSignature::class,
+            'hashAlgo' => $type,
+            'secureHash' => $this->secureHash
+        ], $this->dataSignatureConfig), [$data]);
     }
 }

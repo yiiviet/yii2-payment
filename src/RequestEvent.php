@@ -18,23 +18,24 @@ use yii\base\Event;
 class RequestEvent extends Event
 {
     /**
-     * @var string
+     * @var int
      */
     public $command;
-
-    /**
-     * @var Data
-     */
-    public $requestData;
-
-    /**
-     * @var Data
-     */
-    public $responseData;
 
     /**
      * @var BaseMerchant
      */
     public $merchant;
+
+    /**
+     * @var RequestData
+     */
+    public $requestData;
+
+    /**
+     * @var ResponseData
+     */
+    public $responseData;
+
 
 }

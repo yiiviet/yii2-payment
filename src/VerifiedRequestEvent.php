@@ -18,7 +18,7 @@ use yii\base\Event;
 class VerifiedRequestEvent extends Event
 {
     /**
-     * @var int|string
+     * @var int
      */
     public $command;
 

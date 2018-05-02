@@ -8,7 +8,6 @@
 namespace yii2vn\payment\vnpayment;
 
 use yii2vn\payment\BasePaymentGateway;
-use yii2vn\payment\CheckoutData;
 
 /**
  * Class PaymentGateway
@@ -19,19 +18,23 @@ use yii2vn\payment\CheckoutData;
 class PaymentGateway extends BasePaymentGateway
 {
 
-    const CHECKOUT_METHOD_DYNAMIC = 'dynamic';
+    const RC_REFUND = 0x04;
 
-    const CHECKOUT_METHOD_DETECT = 'detect';
+    const RC_ALL = 0x07;
 
-    const PAYMENT_URL = '/paymentv2/vpcpay.html';
+    const PURCHASE_URL = '/paymentv2/vpcpay.html';
 
-    const QUERY_DR_URL = '';
+    const QUERY_DR_URL = '/merchant_webapi/merchant.html';
+
+    const REFUND_URL = '/merchant_webapi/merchant.html';
 
     public $merchantConfig = ['class' => Merchant::class];
 
-    public $checkoutRequestDataConfig = ['class' => CheckoutRequestData::class];
+    public $requestDataConfig = ['class' => RequestData::class];
 
-    public $checkoutResponseDataConfig = ['class' => CheckoutResponseData::class];
+    public $responseDataConfig = ['class' => ResponseData::class];
+
+    public $verifiedDataConfig = ['class' => VerifiedData::class];
 
     /**
      * @inheritdoc
@@ -41,26 +44,72 @@ class PaymentGateway extends BasePaymentGateway
         return $sandbox ? 'http://sandbox.vnpayment.vn' : 'http://vnpayment.vn';
     }
 
+    /**
+     * @inheritdoc
+     */
     public static function version(): string
     {
         return '2.0.0';
     }
 
     /**
+     * @param array $data
+     * @param null $merchantId
+     * @return ResponseData|\yii2vn\payment\ResponseData
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function refund(array $data, $merchantId = null): ResponseData
+    {
+        return $this->request(self::RC_REFUND, $data, $merchantId);
+    }
+
+    /**
      * @inheritdoc
      */
-    protected function checkoutInternal(CheckoutData $data): array
+    protected function initSandboxEnvironment()
     {
-        /** @var Merchant $merchant */
-        $merchant = $data->merchant;
-        $queryData = $data->getData();
-        ksort($queryData);
-        $queryData['vnp_SecureHash'] = md5($merchant->hashSecret . urldecode(http_build_query($queryData)));
-        $queryData['vnp_SecureHashType'] = 'md5';
+        $merchantConfig = require(__DIR__ . '/sandbox-merchant.php');
 
-        $location = rtrim(static::baseUrl()) . self::PAYMENT_URL . '?' . http_build_query($queryData);
+        $this->setMerchant($merchantConfig);
+    }
 
-        return ['location' => $location, 'code' => '00'];
+    /**
+     * @inheritdoc
+     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
+     */
+    protected function requestInternal(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
+    {
+        $commandUrls = [
+            self::RC_PURCHASE => self::PURCHASE_URL,
+            self::RC_REFUND => self::REFUND_URL,
+            self::RC_QUERY_DR => self::QUERY_DR_URL
+        ];
+        $data = $requestData->get();
+        $data[0] = $commandUrls[$command];
+
+        if ($command === self::RC_PURCHASE) {
+            return ['location' => $httpClient->createRequest()->setUrl($data)->getFullUrl()];
+        } else {
+            return $httpClient->get($data)->send()->getData();
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getVerifyRequestData(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
+    {
+        $params = [
+            'vnp_TmnCode', 'vnp_Amount', 'vnp_BankCode', 'vnp_BankTranNo', 'vnp_CardType', 'vnp_PayDate', 'vnp_CurrCode',
+            'vnp_OrderInfo', 'vnp_TransactionNo', 'vnp_ResponseCode', 'vnp_TxnRef', 'vnp_SecureHashType', 'vnp_SecureHash'
+        ];
+
+        $data = [];
+        foreach ($params as $param) {
+            $data[$param] = $request->get($param);
+        }
+
+        return $data;
     }
 
     protected function getHttpClientConfig(): array
@@ -68,14 +117,11 @@ class PaymentGateway extends BasePaymentGateway
         return [
             'transport' => 'yii\httpclient\CurlTransport',
             'requestConfig' => [
-
+                'options' => [
+                    CURLOPT_SSL_VERIFYHOST => false,
+                    CURLOPT_SSL_VERIFYPEER => false
+                ]
             ]
         ];
     }
-
-    protected function getDefaultCheckoutMethod(): string
-    {
-        return self::CHECKOUT_METHOD_DETECT;
-    }
-
 }
