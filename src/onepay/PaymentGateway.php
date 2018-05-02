@@ -13,6 +13,7 @@ use yii\httpclient\Client as HttpClient;
 
 use yii2vn\payment\BasePaymentGateway;
 use yii2vn\payment\Data;
+use yii2vn\payment\DataInterface;
 
 
 /**
@@ -28,12 +29,18 @@ class PaymentGateway extends BasePaymentGateway
 
     const RC_QUERY_DR_INTERNATIONAL = 0x08;
 
-    const RC_ALL = 0xF;
-
     const VC_PURCHASE_SUCCESS_INTERNATIONAL = 0x04;
 
     const VC_PAYMENT_NOTIFICATION_INTERNATIONAL = 0x08;
 
+    /**
+     * @inheritdoc
+     */
+    const RC_ALL = 0xF;
+
+    /**
+     * @inheritdoc
+     */
     const VC_ALL = 0xF;
 
     const EVENT_BEFORE_PURCHASE_INTERNATIONAL = 'beforePurchaseInternational';
@@ -56,15 +63,33 @@ class PaymentGateway extends BasePaymentGateway
 
     const QUERY_DR_INTERNATIONAL_URL = '/vpcpay/Vpcdps.op';
 
+    const SANDBOX_MERCHANT_INTERNATIONAL_ID = '__sandboxInternational';
+
+    const SANDBOX_MERCHANT_DOMESTIC_ID = '__sandboxDomestic';
+
+    /**
+     * @inheritdoc
+     */
     public $merchantConfig = ['class' => Merchant::class];
 
+    /**
+     * @inheritdoc
+     */
     public $requestDataConfig = ['class' => RequestData::class];
 
+    /**
+     * @inheritdoc
+     */
     public $responseDataConfig = ['class' => ResponseData::class];
 
+    /**
+     * @inheritdoc
+     */
     public $verifiedDataConfig = ['class' => Data::class];
 
-
+    /**
+     * @inheritdoc
+     */
     public static function version(): string
     {
         return '2';
@@ -120,6 +145,21 @@ class PaymentGateway extends BasePaymentGateway
         parent::verifiedRequest($event);
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function initSandboxEnvironment()
+    {
+        $merchantDomesticConfig = require(__DIR__ . '/sandbox-merchant-domestic.php');
+        $merchantInternationalConfig = require(__DIR__ . '/sandbox-merchant-international.php');
+
+        $this->setMerchant(static::SANDBOX_MERCHANT_DOMESTIC_ID, $merchantDomesticConfig);
+        $this->setMerchant(static::SANDBOX_MERCHANT_INTERNATIONAL_ID, $merchantInternationalConfig);
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function getHttpClientConfig(): array
     {
         return [
@@ -135,33 +175,104 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
-     * @param null $merchantId
+     * @return ResponseData|DataInterface
+     * @inheritdoc
+     */
+    public function purchase(array $data, $merchantId = null): DataInterface
+    {
+        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_DOMESTIC_ID : null);
+
+        return parent::purchase($data, $merchantId);
+    }
+
+    /**
+     * @param array $data
+     * @param null|int|string $merchantId
+     * @return ResponseData|DataInterface
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function purchaseInternational(array $data, $merchantId = null): DataInterface
+    {
+        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_INTERNATIONAL_ID : null);
+
+        return $this->request(self::RC_PURCHASE_INTERNATIONAL, $data, $merchantId);
+    }
+
+    /**
+     * @return ResponseData|DataInterface
+     * @inheritdoc
+     */
+    public function queryDR(array $data, $merchantId = null): DataInterface
+    {
+        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_DOMESTIC_ID : null);
+
+        return parent::queryDR($data, $merchantId);
+    }
+
+    /**
+     * @param array $data
+     * @param null|int|string $merchantId
+     * @return ResponseData|DataInterface
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function queryDRInternational(array $data, $merchantId = null): DataInterface
+    {
+        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_INTERNATIONAL_ID : null);
+
+        return $this->request(self::RC_QUERY_DR_INTERNATIONAL, $data, $merchantId);
+    }
+
+    /**
+     * @return bool|VerifiedData
+     * @inheritdoc
+     */
+    public function verifyPaymentNotificationRequest($merchantId = null, \yii\web\Request $request = null)
+    {
+        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_DOMESTIC_ID : null);
+
+        return parent::verifyPaymentNotificationRequest($merchantId, $request);
+    }
+
+    /**
+     * @param null|int|string $merchantId
+     * @param \yii\web\Request|null $request
+     * @return bool|VerifiedData
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function verifyPaymentNotificationInternationalRequest($merchantId = null, \yii\web\Request $request = null)
+    {
+        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_INTERNATIONAL_ID : null);
+
+        return $this->verifyRequest(self::VC_PAYMENT_NOTIFICATION_INTERNATIONAL, $merchantId, $request);
+    }
+
+    /**
+     * @return bool|VerifiedData
+     * @inheritdoc
+     */
+    public function verifyPurchaseSuccessRequest($merchantId = null, \yii\web\Request $request = null)
+    {
+        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_DOMESTIC_ID : null);
+
+        return parent::verifyPurchaseSuccessRequest($merchantId, $request);
+    }
+
+    /**
+     * @param null|int|string $merchantId
      * @param \yii\web\Request|null $request
      * @return bool|VerifiedData
      * @throws \yii\base\InvalidConfigException
      */
     public function verifyPurchaseInternationalSuccessRequest($merchantId = null, \yii\web\Request $request = null)
     {
+        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_INTERNATIONAL_ID : null);
+
         return $this->verifyRequest(self::VC_PURCHASE_SUCCESS_INTERNATIONAL, $merchantId, $request);
     }
 
-    /**
-     * @param array $data
-     * @param null $merchantId
-     * @return ResponseData|\yii2vn\payment\ResponseData
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function purchaseInternational(array $data, $merchantId = null): ResponseData
-    {
-        return $this->request(self::RC_PURCHASE_INTERNATIONAL, $data, $merchantId);
-    }
 
     /**
-     * @param int $command
-     * @param \yii2vn\payment\BaseMerchant $merchant
-     * @param Data $requestData
-     * @param HttpClient $httpClient
-     * @return array
+     * @inheritdoc
      * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
      */
     protected function requestInternal(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
@@ -173,55 +284,40 @@ class PaymentGateway extends BasePaymentGateway
             self::RC_QUERY_DR_INTERNATIONAL => self::QUERY_DR_INTERNATIONAL_URL,
         ];
 
-        if (isset($commandUrls[$command])) {
-            $data = $requestData->get();
-            $data[0] = $commandUrls[$command];
-            if ($command & (self::RC_PURCHASE | self::RC_PURCHASE_INTERNATIONAL)) {
-                return ['location' => $httpClient->createRequest()->setUrl($data)->getFullUrl()];
-            } else {
-                return $httpClient->get($data)->send()->getData();
-            }
+        $data = $requestData->get();
+        $data[0] = $commandUrls[$command];
+
+        if ($command & (self::RC_PURCHASE | self::RC_PURCHASE_INTERNATIONAL)) {
+            return ['location' => $httpClient->createRequest()->setUrl($data)->getFullUrl()];
         } else {
-            return null;
+            return $httpClient->get($data)->send()->getData();
         }
     }
 
     /**
-     * @param int|string $command
-     * @param \yii2vn\payment\BaseMerchant $merchant
-     * @param \yii\web\Request $request
-     * @return array|null
+     * @inheritdoc
      */
-    protected function getVerifyRequestData($command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
+    protected function getVerifyRequestData(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
     {
-        if ($command & self::VC_ALL) {
-            $params = [
-                'vpc_Command', 'vpc_Locale', 'vpc_MerchTxnRef', 'vpc_Merchant', 'vpc_OrderInfo', 'vpc_Amount',
-                'vpc_TxnResponseCode', 'vpc_TransactionNo', 'vcp_Message', 'vpc_SecureHash'
-            ];
+        $params = [
+            'vpc_Command', 'vpc_Locale', 'vpc_MerchTxnRef', 'vpc_Merchant', 'vpc_OrderInfo', 'vpc_Amount',
+            'vpc_TxnResponseCode', 'vpc_TransactionNo', 'vcp_Message', 'vpc_SecureHash'
+        ];
 
-            if ($command & (self::VC_PURCHASE_SUCCESS_INTERNATIONAL | self::VC_PAYMENT_NOTIFICATION_INTERNATIONAL)) {
-                $params = array_merge($params, [
-                    'vpc_AcqResponseCode',
-                    'vpc_Authorizeld',
-                    'vpc_Card',
-                    'vpc_3DSECI',
-                    'vpc_3Dsenrolled',
-                    'vpc_3Dsstatus',
-                    'vpc_CommercialCard'
-                ]);
-            }
-
-            $data = [];
-
-            foreach ($params as $param) {
-                $data[$param] = $request->get($param);
-            }
-
-            return $data;
-        } else {
-            return null;
+        if ($command & (self::VC_PURCHASE_SUCCESS_INTERNATIONAL | self::VC_PAYMENT_NOTIFICATION_INTERNATIONAL)) {
+            $params = array_merge($params, [
+                'vpc_AcqResponseCode', 'vpc_Authorizeld', 'vpc_Card', 'vpc_3DSECI',
+                'vpc_3Dsenrolled', 'vpc_3Dsstatus', 'vpc_CommercialCard'
+            ]);
         }
+
+        $data = [];
+
+        foreach ($params as $param) {
+            $data[$param] = $request->get($param);
+        }
+
+        return $data;
     }
 
 }
