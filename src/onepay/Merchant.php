@@ -24,10 +24,6 @@ class Merchant extends BaseMerchant
 
     public $id;
 
-    public $user;
-
-    public $password;
-
     public $accessCode;
 
     public $secureSecret;
