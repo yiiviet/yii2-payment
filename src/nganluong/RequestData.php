@@ -34,23 +34,28 @@ class RequestData extends Data
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function ensureAttributes(array &$attributes)
     {
+        parent::ensureAttributes($attributes);
         /** @var Merchant $merchant */
         $merchant = $this->getMerchant();
         $command = $this->getCommand();
-        $paymentGateway = $merchant->getPaymentGateway();
 
         $attributes = array_merge($attributes, [
             'merchant_id' => $merchant->id,
             'merchant_password' => md5($merchant->password),
-            'version' => $paymentGateway::version(),
-            'function' => $command === PaymentGateway::RC_PURCHASE ? 'SetExpressCheckout' : 'GetTransactionDetail'
+            'version' => $merchant->getPaymentGateway()->version()
         ]);
 
         if ($command === PaymentGateway::RC_PURCHASE) {
+            $attributes['function'] = 'SetExpressCheckout';
             $attributes['receiver_email'] = $attributes['receiver_email'] ?? $merchant->email;
             $attributes['payment_method'] = $attributes['payment_method'] ?? PaymentGateway::PAYMENT_METHOD_NL;
+        } else {
+            $attributes['function'] = 'GetTransactionDetail';
         }
     }
 
