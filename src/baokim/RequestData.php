@@ -40,6 +40,7 @@ class RequestData extends BaseRequestData
      */
     protected function ensureAttributes(array &$attributes)
     {
+        parent::ensureAttributes($attributes);
         /** @var Merchant $merchant */
         $merchant = $this->getMerchant();
         $command = $this->getCommand();
