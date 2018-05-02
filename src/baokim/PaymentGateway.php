@@ -102,6 +102,15 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function initSandboxEnvironment()
+    {
+        $merchantConfig = require(__DIR__ . '/sandbox-merchant.php');
+        $this->setMerchant($merchantConfig);
+    }
+
+    /**
      * @param array $data
      * @param null $merchantId
      * @return \yii2vn\payment\ResponseData
@@ -226,7 +235,10 @@ class PaymentGateway extends BasePaymentGateway
             ->getData();
     }
 
-    protected function getVerifyRequestData($command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
+    /**
+     * @inheritdoc
+     */
+    protected function getVerifyRequestData(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
     {
         $params = [
             'order_id', 'transaction_id', 'created_on', 'payment_type', 'transaction_status', 'total_amount', 'net_amount',
