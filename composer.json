@@ -1,5 +1,5 @@
 {
-    "name": "yii2vn/payment",
+    "name": "yiivn/yii2-payment",
     "description": "Extension support integrated payment gateway in Viet Nam.",
     "type": "yii2-extension",
     "keywords": ["yii2","extension","vn-payment","one-pay","bao-kim","ngan-luong"],
