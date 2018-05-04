@@ -8,7 +8,7 @@
  */
 
 return [
-    'class' => 'yiivn\payment\nganluong\Merchant',
+    'class' => 'yiiviet\payment\nganluong\Merchant',
     'email' => 'tung.tran@naustud.io',
     'id' => 45571,
     'password' => 'c57700e78cb0df1766279d91e3233c79'

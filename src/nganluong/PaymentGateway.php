@@ -5,11 +5,11 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiivn\payment\nganluong;
+namespace yiiviet\payment\nganluong;
 
 use yii\base\NotSupportedException;
 
-use yiivn\payment\BasePaymentGateway;
+use yiiviet\payment\BasePaymentGateway;
 
 /**
  * Class PaymentGateway
@@ -111,7 +111,7 @@ class PaymentGateway extends BasePaymentGateway
      * @inheritdoc
      * @throws \yii\base\InvalidConfigException|NotSupportedException
      */
-    protected function requestInternal(int $command, \yiivn\payment\BaseMerchant $merchant, \yiivn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
+    protected function requestInternal(int $command, \yiiviet\payment\BaseMerchant $merchant, \yiiviet\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
     {
         $data = $requestData->get();
 
@@ -121,7 +121,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    protected function getVerifyRequestData(int $command, \yiivn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
+    protected function getVerifyRequestData(int $command, \yiiviet\payment\BaseMerchant $merchant, \yii\web\Request $request): array
     {
         return [
             'token' => $request->get('token')

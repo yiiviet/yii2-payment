@@ -5,9 +5,9 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiivn\payment\nganluong;
+namespace yiiviet\payment\nganluong;
 
-use yiivn\payment\Data;
+use yiiviet\payment\Data;
 
 /**
  * Class RequestData

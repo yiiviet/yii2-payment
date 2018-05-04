@@ -7,7 +7,7 @@
  */
 
 return [
-    'class' => 'yiivn\payment\onepay\Merchant',
+    'class' => 'yiiviet\payment\onepay\Merchant',
     'id' => 'TESTONEPAY',
     'accessCode' => '6BEB2546',
     'secureSecret' => '6D0870CDE5F24F34F3915FB0045120DB'

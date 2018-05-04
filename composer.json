@@ -1,5 +1,5 @@
 {
-    "name": "yiivn/yii2-payment",
+    "name": "yiiviet/yii2-payment",
     "description": "Extension support integrated payment gateway in Viet Nam.",
     "type": "yii2-extension",
     "keywords": ["yii2","extension","vn-payment","one-pay","bao-kim","ngan-luong"],
@@ -15,9 +15,10 @@
         "yiisoft/yii2": ">=2.0.13",
         "yiisoft/httpclient": "~2.0.0"
     },
+	
     "autoload": {
         "psr-4": {
-            "yiivn\\payment\\": "src"
+            "yiiviet\\payment\\": "src"
         }
     },
     "repositories": [

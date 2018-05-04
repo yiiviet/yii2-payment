@@ -5,9 +5,9 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiivn\payment\baokim;
+namespace yiiviet\payment\baokim;
 
-use yiivn\payment\RequestData as BaseRequestData;
+use yiiviet\payment\RequestData as BaseRequestData;
 
 /**
  * Class BaoKimCheckoutInstance

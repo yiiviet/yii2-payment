@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiivn\payment\nganluong;
+namespace yiiviet\payment\nganluong;
 
 use Yii;
 
@@ -16,7 +16,7 @@ use Yii;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class ResponseData extends \yiivn\payment\ResponseData
+class ResponseData extends \yiiviet\payment\ResponseData
 {
 
     public static $responseMessages = [

@@ -5,11 +5,11 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiivn\payment\baokim;
+namespace yiiviet\payment\baokim;
 
 use Yii;
 
-use yiivn\payment\ResponseData as BaseResponseData;
+use yiiviet\payment\ResponseData as BaseResponseData;
 
 /**
  * Class ResponseData

@@ -5,11 +5,11 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiivn\payment\onepay;
+namespace yiiviet\payment\onepay;
 
 use Yii;
 
-use yiivn\payment\RequestData as BaseRequestData;
+use yiiviet\payment\RequestData as BaseRequestData;
 use yii\helpers\Url;
 
 /**

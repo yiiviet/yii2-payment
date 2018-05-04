@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiivn\payment;
+namespace yiiviet\payment;
 
 use yii\base\DynamicModel;
 use yii\base\NotSupportedException;
