@@ -1,6 +1,6 @@
 {
     "name": "yiiviet/yii2-payment",
-    "description": "Extension support integrated payment gateway in Viet Nam.",
+    "description": "Extension hổ trợ tích hợp các cổng thanh toán trong nước.",
     "type": "yii2-extension",
     "keywords": ["yii2","extension","vn-payment","one-pay","bao-kim","ngan-luong"],
     "license": "BSD-3-Clause",
