@@ -5,14 +5,14 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\baokim;
+namespace yiivn\payment\baokim;
 
 use Yii;
 
 use yii\helpers\ArrayHelper;
 
-use yii2vn\payment\BaseMerchant;
-use yii2vn\payment\DataSignature;
+use yiivn\payment\BaseMerchant;
+use yiivn\payment\DataSignature;
 
 /**
  * Class Merchant
@@ -41,9 +41,9 @@ class Merchant extends BaseMerchant
 
     public $publicCertificate;
 
-    public $hmacDataSignatureConfig = ['class' => 'yii2vn\payment\HmacDataSignature'];
+    public $hmacDataSignatureConfig = ['class' => 'yiivn\payment\HmacDataSignature'];
 
-    public $rsaDataSignatureConfig = ['class' => 'yii2vn\payment\RsaDataSignature'];
+    public $rsaDataSignatureConfig = ['class' => 'yiivn\payment\RsaDataSignature'];
 
     /**
      * @param $file
@@ -73,7 +73,7 @@ class Merchant extends BaseMerchant
      * @inheritdoc
      * @throws \yii\base\InvalidConfigException
      */
-    protected function initDataSignature(string $data, string $type): ?\yii2vn\payment\DataSignature
+    protected function initDataSignature(string $data, string $type): ?\yiivn\payment\DataSignature
     {
         if ($type === self::SIGNATURE_RSA) {
             return Yii::createObject(ArrayHelper::merge($this->rsaDataSignatureConfig, [

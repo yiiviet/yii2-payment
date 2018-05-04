@@ -5,16 +5,16 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\vnpayment;
+namespace yiivn\payment\vnpayment;
 
 use Yii;
 
-use yii2vn\payment\ResponseData as BaseResponseData;
+use yiivn\payment\ResponseData as BaseResponseData;
 
 /**
  * Class ResponseData
  *
- * @property Merchant|\yii2vn\payment\MerchantInterface $merchant
+ * @property Merchant|\yiivn\payment\MerchantInterface $merchant
  * @property int|null $responseCode
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>

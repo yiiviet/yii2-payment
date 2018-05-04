@@ -5,11 +5,11 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\vnpayment;
+namespace yiivn\payment\vnpayment;
 
 use Yii;
 
-use yii2vn\payment\BaseMerchant;
+use yiivn\payment\BaseMerchant;
 
 /**
  * Class Merchant
@@ -38,7 +38,7 @@ class Merchant extends BaseMerchant
      * @inheritdoc
      * @throws \yii\base\InvalidConfigException
      */
-    protected function initDataSignature(string $data, string $type): ?\yii2vn\payment\DataSignature
+    protected function initDataSignature(string $data, string $type): ?\yiivn\payment\DataSignature
     {
         return Yii::createObject(array_merge([
             'class' => DataSignature::class,

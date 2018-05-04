@@ -6,7 +6,7 @@
  */
 
 
-namespace yii2vn\payment;
+namespace yiivn\payment;
 
 use yii\base\Component;
 use yii\base\NotSupportedException;
@@ -78,7 +78,7 @@ abstract class BaseMerchant extends Component implements MerchantInterface
      * @param string $type
      * @return null|DataSignature
      */
-    abstract protected function initDataSignature(string $data, string $type): ?\yii2vn\payment\DataSignature;
+    abstract protected function initDataSignature(string $data, string $type): ?\yiivn\payment\DataSignature;
 
 
 }

@@ -5,9 +5,9 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\vnpayment;
+namespace yiivn\payment\vnpayment;
 
-use yii2vn\payment\BasePaymentGateway;
+use yiivn\payment\BasePaymentGateway;
 
 /**
  * Class PaymentGateway
@@ -55,7 +55,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @param array $data
      * @param null $merchantId
-     * @return ResponseData|\yii2vn\payment\ResponseData
+     * @return ResponseData|\yiivn\payment\ResponseData
      * @throws \yii\base\InvalidConfigException
      */
     public function refund(array $data, $merchantId = null): ResponseData
@@ -77,7 +77,7 @@ class PaymentGateway extends BasePaymentGateway
      * @inheritdoc
      * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
      */
-    protected function requestInternal(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
+    protected function requestInternal(int $command, \yiivn\payment\BaseMerchant $merchant, \yiivn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
     {
         $commandUrls = [
             self::RC_PURCHASE => self::PURCHASE_URL,
@@ -97,7 +97,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    protected function getVerifyRequestData(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
+    protected function getVerifyRequestData(int $command, \yiivn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
     {
         $params = [
             'vnp_TmnCode', 'vnp_Amount', 'vnp_BankCode', 'vnp_BankTranNo', 'vnp_CardType', 'vnp_PayDate', 'vnp_CurrCode',

@@ -5,15 +5,15 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\onepay;
+namespace yiivn\payment\onepay;
 
 use Yii;
 
 use yii\httpclient\Client as HttpClient;
 
-use yii2vn\payment\BasePaymentGateway;
-use yii2vn\payment\Data;
-use yii2vn\payment\DataInterface;
+use yiivn\payment\BasePaymentGateway;
+use yiivn\payment\Data;
+use yiivn\payment\DataInterface;
 
 
 /**
@@ -106,7 +106,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public function beforeRequest(\yii2vn\payment\RequestEvent $event)
+    public function beforeRequest(\yiivn\payment\RequestEvent $event)
     {
         if ($event->command === self::RC_PURCHASE_INTERNATIONAL) {
             $this->trigger(self::EVENT_BEFORE_PURCHASE_INTERNATIONAL, $event);
@@ -120,7 +120,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public function afterRequest(\yii2vn\payment\RequestEvent $event)
+    public function afterRequest(\yiivn\payment\RequestEvent $event)
     {
         if ($event->command === self::RC_PURCHASE_INTERNATIONAL) {
             $this->trigger(self::EVENT_AFTER_PURCHASE_INTERNATIONAL, $event);
@@ -134,7 +134,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public function verifiedRequest(\yii2vn\payment\VerifiedRequestEvent $event)
+    public function verifiedRequest(\yiivn\payment\VerifiedRequestEvent $event)
     {
         if ($event->command === self::VC_PURCHASE_SUCCESS_INTERNATIONAL) {
             $this->trigger(self::EVENT_VERIFIED_PURCHASE_INTERNATIONAL_SUCCESS_REQUEST, $event);
@@ -275,7 +275,7 @@ class PaymentGateway extends BasePaymentGateway
      * @inheritdoc
      * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
      */
-    protected function requestInternal(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
+    protected function requestInternal(int $command, \yiivn\payment\BaseMerchant $merchant, \yiivn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
     {
         $commandUrls = [
             self::RC_PURCHASE => self::PURCHASE_URL,
@@ -297,7 +297,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    protected function getVerifyRequestData(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
+    protected function getVerifyRequestData(int $command, \yiivn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
     {
         $params = [
             'vpc_Command', 'vpc_Locale', 'vpc_MerchTxnRef', 'vpc_Merchant', 'vpc_OrderInfo', 'vpc_Amount',

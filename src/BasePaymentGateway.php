@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment;
+namespace yiivn\payment;
 
 use Yii;
 
@@ -264,7 +264,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @return ResponseData|DataInterface
      * @throws InvalidConfigException|InvalidArgumentException
      */
-    public function request(int $command, array $data, $merchantId = null): \yii2vn\payment\ResponseData
+    public function request(int $command, array $data, $merchantId = null): \yiivn\payment\ResponseData
     {
         $merchant = $this->getMerchant($merchantId);
 
@@ -293,7 +293,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
         }
     }
 
-    public function beforeRequest(\yii2vn\payment\RequestEvent $event)
+    public function beforeRequest(\yiivn\payment\RequestEvent $event)
     {
         if ($event->command === self::RC_PURCHASE) {
             $this->trigger(self::EVENT_BEFORE_PURCHASE, $event);
@@ -304,7 +304,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
         $this->trigger(self::EVENT_BEFORE_REQUEST, $event);
     }
 
-    public function afterRequest(\yii2vn\payment\RequestEvent $event)
+    public function afterRequest(\yiivn\payment\RequestEvent $event)
     {
         if ($event->command === self::RC_PURCHASE) {
             $this->trigger(self::EVENT_AFTER_PURCHASE, $event);
@@ -353,7 +353,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @param HttpClient $httpClient
      * @return array
      */
-    abstract protected function requestInternal(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array;
+    abstract protected function requestInternal(int $command, \yiivn\payment\BaseMerchant $merchant, \yiivn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array;
 
 
     /**
@@ -416,7 +416,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     /**
      * @param VerifiedRequestEvent $event
      */
-    public function verifiedRequest(\yii2vn\payment\VerifiedRequestEvent $event)
+    public function verifiedRequest(\yiivn\payment\VerifiedRequestEvent $event)
     {
         if ($event->command === self::VC_PAYMENT_NOTIFICATION) {
             $this->trigger(self::EVENT_VERIFIED_PAYMENT_NOTIFICATION_REQUEST, $event);
@@ -433,7 +433,7 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
      * @param \yii\web\Request $request
      * @return array|null
      */
-    abstract protected function getVerifyRequestData(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array;
+    abstract protected function getVerifyRequestData(int $command, \yiivn\payment\BaseMerchant $merchant, \yii\web\Request $request): array;
 
 
 }

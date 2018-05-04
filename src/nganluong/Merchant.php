@@ -5,12 +5,12 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\nganluong;
+namespace yiivn\payment\nganluong;
 
 use yii\base\NotSupportedException;
 
-use yii2vn\payment\DataSignature;
-use yii2vn\payment\BaseMerchant;
+use yiivn\payment\DataSignature;
+use yiivn\payment\BaseMerchant;
 
 /**
  * Class Merchant
@@ -30,7 +30,7 @@ class Merchant extends BaseMerchant
     /**
      * @inheritdoc
      */
-    protected function initDataSignature(string $data, string $type): ?\yii2vn\payment\DataSignature
+    protected function initDataSignature(string $data, string $type): ?\yiivn\payment\DataSignature
     {
         return null;
     }

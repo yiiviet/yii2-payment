@@ -5,9 +5,9 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\nganluong;
+namespace yiivn\payment\nganluong;
 
-use yii2vn\payment\Data;
+use yiivn\payment\Data;
 
 /**
  * Class VerifiedData

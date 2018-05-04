@@ -6,7 +6,7 @@
  */
 
 
-namespace yii2vn\payment;
+namespace yiivn\payment;
 
 use yii\base\Event;
 

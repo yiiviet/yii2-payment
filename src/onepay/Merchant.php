@@ -5,13 +5,13 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\onepay;
+namespace yiivn\payment\onepay;
 
 use Yii;
 
 use yii\helpers\ArrayHelper;
 
-use yii2vn\payment\BaseMerchant;
+use yiivn\payment\BaseMerchant;
 
 /**
  * Class Merchant
@@ -33,17 +33,17 @@ class Merchant extends BaseMerchant
     /**
      * @param string $data
      * @param string $type
-     * @return null|object|\yii2vn\payment\HmacDataSignature
+     * @return null|object|\yiivn\payment\HmacDataSignature
      * @throws \yii\base\InvalidConfigException
      */
-    public function initDataSignature(string $data, string $type): ?\yii2vn\payment\DataSignature
+    public function initDataSignature(string $data, string $type): ?\yiivn\payment\DataSignature
     {
         $config = ArrayHelper::merge($this->dataSignatureConfig, [
             'key' => pack('H*', $this->secureSecret),
             'hmacAlgo' => 'sha256'
         ]);
 
-        $config['class'] = $config['class'] ?? 'yii2vn\payment\HmacDataSignature';
+        $config['class'] = $config['class'] ?? 'yiivn\payment\HmacDataSignature';
 
         return Yii::createObject($config, [$data]);
     }

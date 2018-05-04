@@ -5,13 +5,13 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\baokim;
+namespace yiivn\payment\baokim;
 
 use Yii;
 
 use yii\base\InvalidConfigException;
 
-use yii2vn\payment\VerifiedData as BaseVerifiedData;
+use yiivn\payment\VerifiedData as BaseVerifiedData;
 
 /**
  * Class VerifiedData

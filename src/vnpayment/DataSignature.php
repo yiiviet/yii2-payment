@@ -5,9 +5,9 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\vnpayment;
+namespace yiivn\payment\vnpayment;
 
-use yii2vn\payment\DataSignature as BaseDataSignature;
+use yiivn\payment\DataSignature as BaseDataSignature;
 
 /**
  * Class DataSignature

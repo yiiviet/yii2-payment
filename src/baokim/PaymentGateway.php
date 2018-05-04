@@ -5,13 +5,13 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\baokim;
+namespace yiivn\payment\baokim;
 
 use yii\di\Instance;
 use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
 
-use yii2vn\payment\BasePaymentGateway;
+use yiivn\payment\BasePaymentGateway;
 
 /**
  * Class PaymentGateway
@@ -113,7 +113,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @param array $data
      * @param null $merchantId
-     * @return \yii2vn\payment\ResponseData
+     * @return \yiivn\payment\ResponseData
      * @throws \yii\base\InvalidConfigException
      */
     public function purchasePro(array $data, $merchantId = null)
@@ -173,7 +173,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public function beforeRequest(\yii2vn\payment\RequestEvent $event)
+    public function beforeRequest(\yiivn\payment\RequestEvent $event)
     {
         if ($event->command === self::RC_PURCHASE_PRO) {
             $this->trigger(self::EVENT_BEFORE_PURCHASE_PRO, $event);
@@ -187,7 +187,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public function afterRequest(\yii2vn\payment\RequestEvent $event)
+    public function afterRequest(\yiivn\payment\RequestEvent $event)
     {
         if ($event->command === self::RC_PURCHASE_PRO) {
             $this->trigger(self::EVENT_AFTER_PURCHASE_PRO, $event);
@@ -202,7 +202,7 @@ class PaymentGateway extends BasePaymentGateway
      * @inheritdoc
      * @throws NotSupportedException|\yii\base\InvalidConfigException
      */
-    protected function requestInternal(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii2vn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
+    protected function requestInternal(int $command, \yiivn\payment\BaseMerchant $merchant, \yiivn\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
     {
         /** @var Merchant $merchant */
 
@@ -238,7 +238,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    protected function getVerifyRequestData(int $command, \yii2vn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
+    protected function getVerifyRequestData(int $command, \yiivn\payment\BaseMerchant $merchant, \yii\web\Request $request): array
     {
         $params = [
             'order_id', 'transaction_id', 'created_on', 'payment_type', 'transaction_status', 'total_amount', 'net_amount',

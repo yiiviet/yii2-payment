@@ -5,11 +5,11 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\vnpayment;
+namespace yiivn\payment\vnpayment;
 
 use yii\helpers\ArrayHelper;
 
-use yii2vn\payment\VerifiedData as BaseVerifiedData;
+use yiivn\payment\VerifiedData as BaseVerifiedData;
 
 /**
  * Class VerifiedData

@@ -5,18 +5,18 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\vnpayment;
+namespace yiivn\payment\vnpayment;
 
 use Yii;
 
 use yii\helpers\ArrayHelper;
 
-use yii2vn\payment\RequestData as BaseRequestData;
+use yiivn\payment\RequestData as BaseRequestData;
 
 /**
  * Class RequestData
  *
- * @property Merchant|\yii2vn\payment\MerchantInterface $merchant
+ * @property Merchant|\yiivn\payment\MerchantInterface $merchant
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

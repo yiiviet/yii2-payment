@@ -8,7 +8,7 @@
  */
 
 return [
-    'class' => 'yii2vn\payment\baokim\Merchant',
+    'class' => 'yiivn\payment\baokim\Merchant',
     'email' => 'dev.baokim@bk.vn',
     'id' => 647,
     'securePassword' => 'ae543c080ad91c23',

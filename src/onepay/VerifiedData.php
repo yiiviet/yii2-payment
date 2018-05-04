@@ -5,10 +5,10 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yii2vn\payment\onepay;
+namespace yiivn\payment\onepay;
 
 use yii\helpers\ArrayHelper;
-use yii2vn\payment\VerifiedData as BaseVerifiedData;
+use yiivn\payment\VerifiedData as BaseVerifiedData;
 
 /**
  * Class VerifiedData
