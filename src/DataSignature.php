@@ -1,6 +1,6 @@
 <?php
 /**
- * @link https://github.com/yii2-vn/payment
+ * @link https://github.com/yiiviet/yii2-payment
  * @copyright Copyright (c) 2017 Yii2VN
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
@@ -10,9 +10,10 @@ namespace yiiviet\payment;
 use yii\base\BaseObject;
 
 /**
- * Class DataSignature
+ * Lớp DataSignature hổ trợ tạo và xác minh tính hợp lệ của chữ ký dữ liệu.
+ * Nó thường được dùng trong phương thức [[request()]] và [[verifyRequest()]] của [[PaymentGatewayInterface]].
  *
- * @property string $data
+ * @property string $data Chuỗi dữ liệu cần được ký hoặc xác minh tính hợp lệ.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -20,14 +21,18 @@ use yii\base\BaseObject;
 abstract class DataSignature extends BaseObject
 {
     /**
+     * Thuộc tính chữa dữ liệu cần ký hoặc kiểm tra.
+     *
      * @var string
+     * @see getData
      */
     private $_data;
 
     /**
      * DataSignature constructor.
-     * @param string $data
-     * @param array $config
+     *
+     * @param string $data Dữ liệu cần ký hoặc kiểm tra tính hợp lệ.
+     * @param array $config Mảng cấu hình đối tượng khởi tạo.
      */
     public function __construct(string $data, array $config = [])
     {
@@ -36,6 +41,9 @@ abstract class DataSignature extends BaseObject
     }
 
     /**
+     * Phương thức cung cấp dữ liệu cần ký hoặc xác minh tính hợp lệ.
+     * Nó sẽ được sử dụng trong phương thức [[generate()]] và [[validate()]].
+     *
      * @return string
      */
     public function getData(): string
@@ -44,13 +52,17 @@ abstract class DataSignature extends BaseObject
     }
 
     /**
+     * Phương thức khởi tạo chữ ký dữ liệu từ chuỗi lấy từ [[getData()]].
+     *
      * @return string
      */
     abstract public function generate(): string;
 
     /**
-     * @param string $expect
-     * @return bool
+     * Phương thức kiểm tra tính hợp lệ của dữ liệu từ chuỗi lấy từ [[getData()]].
+     *
+     * @param string $expect Chữ ký của dữ liệu cần được xác minh.
+     * @return bool Trả về TRUE nếu như chữ ký xác minh hợp lệ và ngược lại.
      */
     abstract public function validate(string $expect): bool;
 

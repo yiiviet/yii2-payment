@@ -275,7 +275,7 @@ class PaymentGateway extends BasePaymentGateway
      * @inheritdoc
      * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
      */
-    protected function requestInternal(int $command, \yiiviet\payment\BaseMerchant $merchant, \yiiviet\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
+    protected function requestInternal(int $command, \yiiviet\payment\BasePaymentClient $merchant, \yiiviet\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
     {
         $commandUrls = [
             self::RC_PURCHASE => self::PURCHASE_URL,
@@ -297,7 +297,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    protected function getVerifyRequestData(int $command, \yiiviet\payment\BaseMerchant $merchant, \yii\web\Request $request): array
+    protected function getVerifyRequestData(int $command, \yiiviet\payment\BasePaymentClient $merchant, \yii\web\Request $request): array
     {
         $params = [
             'vpc_Command', 'vpc_Locale', 'vpc_MerchTxnRef', 'vpc_Merchant', 'vpc_OrderInfo', 'vpc_Amount',

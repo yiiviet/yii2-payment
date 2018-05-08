@@ -1,6 +1,6 @@
 <?php
 /**
- * @link https://github.com/yii2-vn/payment
+ * @link https://github.com/yiiviet/yii2-payment
  * @copyright Copyright (c) 2017 Yii2VN
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
@@ -8,105 +8,98 @@
 namespace yiiviet\payment;
 
 use Yii;
+use ReflectionClass;
+use ReflectionException;
 
-use yii\base\Component;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\httpclient\Client as HttpClient;
 
+use vxm\gatewayclients\BaseGateway;
+use vxm\gatewayclients\DataInterface;
+use vxm\gatewayclients\RequestEvent;
+
 /**
- * Class BasePaymentGateway
+ * Class BasePaymentGateway là một lớp trừu tượng thực thi mẫu trừu tượng [[PaymentGatewayInterface]]
+ * giúp cho việc xây dựng các lợp thực thi được tối giản.
  *
- * @property BaseMerchant $defaultMerchant
- * @property BaseMerchant $merchant
+ * @property BasePaymentClient $client
+ * @property BasePaymentClient $defaultClient
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-abstract class BasePaymentGateway extends Component implements PaymentGatewayInterface
+abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayInterface
 {
+    /**
+     * Lệnh `purchase` sử dụng cho việc khởi tạo truy vấn thanh toán.
+     */
+    const RC_PURCHASE = 'purchase';
 
     /**
-     * Purchase request command use to make request purchase.
+     * Lệnh `queryDR` sử dụng cho việc truy vấn thông tin giao dịch.
      */
-    const RC_PURCHASE = 0x01;
+    const RC_QUERY_DR = 'queryDR';
 
     /**
-     * Query DR request command use to make request query DR.
+     * Lệnh `purchaseSuccess` sử dụng cho việc yêu cấu xác thực tính hợp lệ
+     * của dữ liệu khi khách hàng thanh toán thành công (cổng thanh toán redirect khách hàng về server).
      */
-    const RC_QUERY_DR = 0x02;
+    const VRC_PURCHASE_SUCCESS = 'purchaseSuccess';
 
     /**
-     * Constance request command all. It only use for checking command is valid or not.
-     *
-     * @var int
+     * Lệnh `IPN` sử dụng cho việc yêu cấu xác thực tính hợp lệ
+     * của dữ liệu khi khách hàng thanh toán thành công (cổng thanh toán bắn request về server).
      */
-    const RC_ALL = 0x03;
+    const VRC_IPN = 'IPN';
 
-    const VC_PURCHASE_SUCCESS = 0x01;
-
-    const VC_PAYMENT_NOTIFICATION = 0x02;
-
-    const VC_ALL = 0x03;
-
+    /**
+     * @event RequestEvent được gọi khi dữ liệu truy vấn đã được xác thực.
+     * Lưu ý sự kiện này luôn luôn được gọi khi xác thực dữ liệu truy vấn.
+     */
     const EVENT_VERIFIED_REQUEST = 'verifiedRequest';
 
+    /**
+     * @event VerifiedRequestEvent được gọi khi dữ liệu truy vấn sau khi khách hàng thanh toán thành công,
+     * được cổng thanh toán dẫn về hệ thống đã xác thực.
+     */
     const EVENT_VERIFIED_PURCHASE_SUCCESS_REQUEST = 'verifiedPurchaseSuccessRequest';
 
-    const EVENT_VERIFIED_PAYMENT_NOTIFICATION_REQUEST = 'verifiedPaymentNotificationRequest';
+    /**
+     * @event VerifiedRequestEvent được gọi khi dữ liệu truy vấn sau khi khách hàng thanh toán thành công,
+     * được cổng thanh toán bắn `request` sang hệ thống đã xác thực.
+     */
+    const EVENT_VERIFIED_IPN_REQUEST = 'verifiedIPNRequest';
 
-    const EVENT_BEFORE_REQUEST = 'beforeRequest';
-
-    const EVENT_AFTER_REQUEST = 'afterRequest';
-
+    /**
+     * @event RequestEvent được gọi trước khi khởi tạo lệnh [[RC_PURCHASE]] ở phương thức [[request()]].
+     */
     const EVENT_BEFORE_PURCHASE = 'beforePurchase';
 
+    /**
+     * @event RequestEvent được gọi sau khi khởi tạo lệnh [[RC_PURCHASE]] ở phương thức [[request()]].
+     */
     const EVENT_AFTER_PURCHASE = 'afterPurchase';
 
+    /**
+     * @event RequestEvent được gọi trước khi khởi tạo lệnh [[RC_QUERY_DR]] ở phương thức [[request()]].
+     */
     const EVENT_BEFORE_QUERY_DR = 'beforeQueryDR';
 
+    /**
+     * @event RequestEvent được gọi sau khi khởi tạo lệnh [[RC_QUERY_DR]] ở phương thức [[request()]].
+     */
     const EVENT_AFTER_QUERY_DR = 'afterQueryDR';
 
     /**
      * @var bool
      */
     public $sandbox = false;
-
-    /**
-     * @var array
-     */
-    public $requestDataConfig = [];
-
-    /**
-     * @var array
-     */
-    public $responseDataConfig = [];
-
     /**
      * @var array
      */
     public $verifiedDataConfig = [];
-
-    /**
-     * @var array
-     */
-    public $merchantConfig = [];
-
-    /**
-     * @param bool $sandbox
-     * @inheritdoc
-     */
-    public static function baseUrl(): string
-    {
-        return static::getBaseUrl(func_get_arg(0));
-    }
-
-    /**
-     * @param bool $sandbox
-     * @return string
-     */
-    abstract protected static function getBaseUrl(bool $sandbox): string;
 
     /**
      * @inheritdoc
@@ -121,179 +114,75 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * Init sandbox environment.
-     * In this method you may add merchants use for send request to payment gateway for test your system work corectly.
-     * This method only call when property `sandbox` is true.
+     * Phương thức khởi tạo môi trường thử nghiệm.
+     * Nó chỉ được gọi khi thuộc tính `sandbox` được thiết lập là TRUE.
      */
     abstract protected function initSandboxEnvironment();
 
     /**
-     * @var array|BaseMerchant[]
+     * @inheritdoc
+     * @throws ReflectionException
      */
-    private $_merchants = [];
-
-    /**
-     * @param bool $load
-     * @return array|BaseMerchant[]
-     * @throws InvalidConfigException
-     */
-    public function getMerchants($load = true): array
+    public function requestCommands(): array
     {
-        if ($load) {
-            $merchants = [];
-            foreach ($this->_merchants as $id => $merchant) {
-                $merchants[$id] = $this->getMerchant($id);
+        $reflection = new ReflectionClass($this);
+
+        $commands = [];
+        foreach ($reflection->getConstants() as $name => $value) {
+            if (strpos($name, 'RC_') === 0) {
+                $commands[] = $value;
             }
-        } else {
-            $merchants = $this->_merchants;
         }
 
-        return $merchants;
-    }
-
-    /**
-     * @param array|BaseMerchant[] $merchants
-     * @return bool
-     */
-    public function setMerchants(array $merchants): bool
-    {
-        foreach ($merchants as $id => $merchant) {
-            $this->setMerchant($id, $merchant);
-        }
-
-        return true;
-    }
-
-    /**
-     * @param null|string|int $id
-     * @return object|BaseMerchant|MerchantInterface
-     * @throws InvalidConfigException|InvalidArgumentException
-     */
-    public function getMerchant($id = null): MerchantInterface
-    {
-        if ($id === null) {
-            return $this->getDefaultMerchant();
-        } elseif ((is_string($id) || is_int($id))) {
-            if (isset($this->_merchants[$id])) {
-                $merchant = $this->_merchants[$id];
-
-                if (is_string($merchant)) {
-                    $merchant = ['class' => $merchant];
-                }
-
-                if (is_array($merchant)) {
-                    $merchant = ArrayHelper::merge($this->merchantConfig, $merchant);
-                }
-
-                if (!$merchant instanceof BaseMerchant) {
-                    return $this->_merchants[$id] = Yii::createObject($merchant, [$this]);
-                } else {
-                    return $merchant;
-                }
-
-            } else {
-                throw new InvalidConfigException(__METHOD__ . ": merchant id: `$id` not found!");
-            }
-        } else {
-            throw new InvalidArgumentException('Only accept get merchant via string or int key type!');
-        }
-    }
-
-    /**
-     * @param int|string $id
-     * @param null $merchant
-     * @return bool
-     */
-    public function setMerchant($id, $merchant = null): bool
-    {
-        if ($merchant === null) {
-            $this->_merchants[] = $id;
-        } else {
-            $this->_merchants[$id] = $merchant;
-        }
-
-        return true;
-    }
-
-
-    /**
-     * @var null|BaseMerchant
-     */
-    private $_defaultMerchant;
-
-    /**
-     * @return BaseMerchant
-     * @throws InvalidConfigException
-     */
-    public function getDefaultMerchant(): BaseMerchant
-    {
-        if (!$this->_defaultMerchant) {
-            $merchantIds = array_keys($this->_merchants);
-            if ($merchantId = reset($merchantIds)) {
-                return $this->_defaultMerchant = $this->getMerchant($merchantId);
-            } else {
-                throw new InvalidConfigException('Can not get default merchant on an empty array merchants!');
-            }
-        } else {
-            return $this->_defaultMerchant;
-        }
+        return $commands;
     }
 
     /**
      * @inheritdoc
-     * @throws InvalidConfigException|InvalidArgumentException
+     * @throws ReflectionException
      */
-    public function purchase(array $data, $merchantId = null): DataInterface
+    public function verifyRequestCommands(): array
     {
-        return $this->request(self::RC_PURCHASE, $data, $merchantId);
+        $reflection = new ReflectionClass($this);
+
+        $commands = [];
+        foreach ($reflection->getConstants() as $name => $value) {
+            if (strpos($name, 'VRC_') === 0) {
+                $commands[] = $value;
+            }
+        }
+
+        return $commands;
+    }
+
+    /**
+     * Phương thức này là phương thức ánh xạ của [[request()]] nó sẽ tạo lệnh [[RC_PURCHASE]] để tạo yêu cầu giao dịch tới cổng thanh toán.
+     *
+     * @param array $data Dữ liệu dùng để yêu cầu tạo giao dịch thanh toán bên trong thường có giá tiền, địa chỉ giao hàng...
+     * @param string|int $clientId Client id dùng để tạo yêu cầu thanh toán.
+     * @return DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]] để lấy thông tin trả về từ cổng thanh toán.
+     */
+    public function purchase(array $data, $clientId = null): DataInterface
+    {
+        return $this->request(self::RC_PURCHASE, $data, $clientId);
+    }
+
+    /**
+     * Phương thức này là phương thức ánh xạ của [[request()]] nó sẽ tạo lệnh [[RC_QUERY_DR]] để tạo yêu cầu truy vấn giao dịch tới cổng thanh toán.
+     *
+     * @param array $data Dữ liệu dùng để truy vấn thông tin giao dịch bên trong thường có mã giao dịch từ cổng thanh toán...
+     * @param string|int $clientId Client id dùng để tạo yêu cầu truy vấn giao dịch.
+     * @return DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]] để lấy thông tin trả về từ cổng thanh toán.
+     */
+    public function queryDR(array $data, $clientId = null): DataInterface
+    {
+        return $this->request(self::RC_QUERY_DR, $data, $clientId);
     }
 
     /**
      * @inheritdoc
-     * @throws InvalidConfigException|InvalidArgumentException
      */
-    public function queryDR(array $data, $merchantId = null): DataInterface
-    {
-        return $this->request(self::RC_QUERY_DR, $data, $merchantId);
-    }
-
-    /**
-     * @param int $command
-     * @param array $data
-     * @param int|string|null $merchantId
-     * @return ResponseData|DataInterface
-     * @throws InvalidConfigException|InvalidArgumentException
-     */
-    public function request(int $command, array $data, $merchantId = null): \yiiviet\payment\ResponseData
-    {
-        $merchant = $this->getMerchant($merchantId);
-
-        /** @var Data $requestData */
-
-        $requestData = Yii::createObject($this->requestDataConfig, [$command, $merchant, $data]);
-        $event = Yii::createObject([
-            'class' => RequestEvent::class,
-            'command' => $command,
-            'merchant' => $merchant,
-            'requestData' => $requestData
-        ]);
-
-        if ($command & static::RC_ALL && $command !== static::RC_ALL) {
-            $this->beforeRequest($event);
-            $httpClient = $this->getHttpClient();
-            $data = $this->requestInternal($command, $merchant, $requestData, $httpClient);
-            $responseData = Yii::createObject($this->responseDataConfig, [$command, $merchant, $data]);
-            $event->responseData = $responseData;
-            $this->afterRequest($event);
-            Yii::debug(__CLASS__ . " requested sent with command: '$command'");
-
-            return $responseData;
-        } else {
-            throw new InvalidArgumentException("Unknown request command '$command'");
-        }
-    }
-
-    public function beforeRequest(\yiiviet\payment\RequestEvent $event)
+    public function beforeRequest(RequestEvent $event)
     {
         if ($event->command === self::RC_PURCHASE) {
             $this->trigger(self::EVENT_BEFORE_PURCHASE, $event);
@@ -304,7 +193,10 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
         $this->trigger(self::EVENT_BEFORE_REQUEST, $event);
     }
 
-    public function afterRequest(\yiiviet\payment\RequestEvent $event)
+    /**
+     * @inheritdoc
+     */
+    public function afterRequest(RequestEvent $event)
     {
         if ($event->command === self::RC_PURCHASE) {
             $this->trigger(self::EVENT_AFTER_PURCHASE, $event);
@@ -316,90 +208,54 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
-     * @var HttpClient|null
+     * Phương thức này là phương thức ánh xạ của [[verifyRequest()]] nó sẽ tạo lệnh [[VRC_PURCHASE_SUCCESS]]
+     * để tạo yêu cầu xác minh tính hợp lệ của dữ liệu trả về từ máy khách đến máy chủ.
+     *
+     * @param string|int $clientId Client id dùng để xác thực tính hợp lệ của dữ liệu.
+     * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
+     * @return bool|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
      */
-    private $_httpClient;
-
-    /**
-     * @param bool $force
-     * @return object|HttpClient
-     * @throws InvalidConfigException
-     */
-    protected function getHttpClient(bool $force = false): HttpClient
+    public function verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
     {
-        if (!$this->_httpClient === null || $force) {
-            /** @var HttpClient $client */
-
-            $client = $this->_httpClient = Yii::createObject(ArrayHelper::merge([
-                'class' => HttpClient::class,
-                'baseUrl' => self::baseUrl($this->sandbox)
-            ], $this->getHttpClientConfig()));
-
-            return $client;
-        } else {
-            return $this->_httpClient;
-        }
-    }
-
-    protected function getHttpClientConfig(): array
-    {
-        return [];
+        return $this->verifyRequest(self::VRC_PURCHASE_SUCCESS, $clientId, $request);
     }
 
     /**
-     * @param int $command
-     * @param BaseMerchant $merchant
-     * @param Data $requestData
-     * @param HttpClient $httpClient
-     * @return array
+     * Phương thức này là phương thức ánh xạ của [[verifyRequest()]] nó sẽ tạo lệnh [[VRC_IPN]]
+     * để tạo yêu cầu xác minh tính hợp lệ của dữ liệu trả về từ cổng thanh toán đến máy chủ.
+     *
+     * @param string|int $clientId Client id dùng để xác thực tính hợp lệ của dữ liệu.
+     * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
+     * @return bool|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
      */
-    abstract protected function requestInternal(int $command, \yiiviet\payment\BaseMerchant $merchant, \yiiviet\payment\Data $requestData, \yii\httpclient\Client $httpClient): array;
-
-
-    /**
-     * @inheritdoc
-     * @throws InvalidConfigException|InvalidArgumentException
-     */
-    public function verifyPurchaseSuccessRequest($merchantId = null, \yii\web\Request $request = null)
+    public function verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
     {
-        return $this->verifyRequest(self::VC_PURCHASE_SUCCESS, $merchantId, $request);
+        return $this->verifyRequest(self::VRC_IPN, $clientId, $request);
     }
 
     /**
      * @inheritdoc
      * @throws InvalidConfigException|InvalidArgumentException
      */
-    public function verifyPaymentNotificationRequest($merchantId = null, \yii\web\Request $request = null)
+    public function verifyRequest($command, $clientId = null, \yii\web\Request $request = null)
     {
-        return $this->verifyRequest(self::VC_PAYMENT_NOTIFICATION, $merchantId, $request);
-    }
+        if (in_array($command, $this->verifyRequestCommands(), true)) {
+            $client = $this->getClient($clientId);
 
-    /**
-     * @param $command
-     * @param null|int|string $merchantId
-     * @param \yii\web\Request|null $request
-     * @return bool|VerifiedData
-     * @throws InvalidConfigException|InvalidArgumentException
-     */
-    public function verifyRequest($command, $merchantId = null, \yii\web\Request $request = null)
-    {
-        $merchant = $this->getMerchant($merchantId);
+            if ($request === null && Yii::$app) {
+                $request = Yii::$app->getRequest();
+            } else {
+                throw new InvalidArgumentException('Request instance arg must be set to verify return request is valid or not!');
+            }
 
-        if ($request === null && Yii::$app) {
-            $request = Yii::$app->getRequest();
-        } else {
-            throw new InvalidArgumentException('Request instance arg must be set to verify return request is valid or not!');
-        }
-
-        if ($command & static::VC_ALL && $command !== static::VC_ALL) {
-            $data = $this->getVerifyRequestData($command, $merchant, $request);
+            $data = $this->getVerifyRequestData($command, $request);
             /** @var VerifiedData $requestData */
-            $verifyData = Yii::createObject($this->verifiedDataConfig, [$command, $merchant, $data]);
+            $verifyData = Yii::createObject($this->verifiedDataConfig, [$command, $data, $client]);
             if ($verifyData->validate()) {
                 $event = Yii::createObject([
                     'class' => VerifiedRequestEvent::class,
                     'verifiedData' => $verifyData,
-                    'merchant' => $merchant,
+                    'client' => $client,
                     'command' => $command
                 ]);
                 $this->verifiedRequest($event);
@@ -414,26 +270,31 @@ abstract class BasePaymentGateway extends Component implements PaymentGatewayInt
     }
 
     /**
+     * Phương thúc lấy dữ liệu cần xác minh từ lệnh yêu cầu và đối tượng `request`.
+     *
+     * @param int|string $command Lệnh yêu cầu lấy dữ liệu cần được xác minh.
+     * @param \yii\web\Request $request Đối tượng `request` được yêu cầu lấy dữ liệu.
+     * @return array Trả về mảng dữ liệu cần được xác minh.
+     */
+    abstract protected function getVerifyRequestData($command, \yii\web\Request $request): array;
+
+    /**
+     * Phương thức được gọi sau khi việc xác minh tính hợp hệ của dữ liệu thành công.
+     * Nó được xây dựng để kích hoạt các sự kiện liên quan khi dữ liệu đã được xác minh.
+     *
      * @param VerifiedRequestEvent $event
      */
-    public function verifiedRequest(\yiiviet\payment\VerifiedRequestEvent $event)
+    public function verifiedRequest(VerifiedRequestEvent $event)
     {
-        if ($event->command === self::VC_PAYMENT_NOTIFICATION) {
-            $this->trigger(self::EVENT_VERIFIED_PAYMENT_NOTIFICATION_REQUEST, $event);
-        } elseif ($event->command === self::VC_PURCHASE_SUCCESS) {
+        if ($event->command === self::VRC_IPN) {
+            $this->trigger(self::EVENT_VERIFIED_IPN_REQUEST, $event);
+        } elseif ($event->command === self::VRC_PURCHASE_SUCCESS) {
             $this->trigger(self::EVENT_VERIFIED_PURCHASE_SUCCESS_REQUEST, $event);
         }
 
         $this->trigger(self::EVENT_VERIFIED_REQUEST, $event);
     }
 
-    /**
-     * @param int $command
-     * @param BaseMerchant $merchant
-     * @param \yii\web\Request $request
-     * @return array|null
-     */
-    abstract protected function getVerifyRequestData(int $command, \yiiviet\payment\BaseMerchant $merchant, \yii\web\Request $request): array;
 
 
 }

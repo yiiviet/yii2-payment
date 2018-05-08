@@ -13,9 +13,8 @@
     "require": {
         "php": ">=7.1.0",
         "yiisoft/yii2": ">=2.0.13",
-        "yiisoft/yii2-httpclient": "~2.0.0"
+        "vxm/yii2-gateway-clients": ">=1.0.2"
     },
-	
     "autoload": {
         "psr-4": {
             "yiiviet\\payment\\": "src"

@@ -1,6 +1,6 @@
 <?php
 /**
- * @link https://github.com/yii2-vn/payment
+ * @link https://github.com/yiiviet/yii2-payment
  * @copyright Copyright (c) 2017 Yii2VN
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
@@ -11,10 +11,10 @@ use yii\base\InvalidConfigException;
 
 
 /**
- * Class RsaDataSignature
+ * Lớp RsaDataSignature dùng cho việc tạo và kiểm tra chữ ký theo chuẩn RSA.
  *
- * @property string $publicCertificate
- * @property string $privateCertificate
+ * @property string $publicCertificate Khóa công khai dùng cho việc xác minh tính hợp lệ của dữ liệu thông qua chữ ký.
+ * @property string $privateCertificate Khóa bí mật dùng cho việc tạo chữ ký dữ liệu.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -23,6 +23,7 @@ class RsaDataSignature extends DataSignature
 {
 
     /**
+     * Loại thuật toán openSSL. Ví dụ: OPENSSL_ALGO_MD5, OPENSSL_ALGO_SHA1...
      * @var int
      */
     public $openSSLAlgo;
@@ -41,11 +42,16 @@ class RsaDataSignature extends DataSignature
     }
 
     /**
+     * Khóa dùng cho việc xác minh tính hợp lệ của dữ liệu thông qua chữ ký.
+     *
+     * @see getPublicCertificate|setPublicCertificate
      * @var null|string
      */
     private $_publicCertificate;
 
     /**
+     * Phương thức lấy khóa dùng cho việc kiểm tra tính hợp lệ của dữ liệu từ chữ ký.
+     *
      * @return string
      * @throws InvalidConfigException
      */
@@ -59,8 +65,10 @@ class RsaDataSignature extends DataSignature
     }
 
     /**
-     * @var string $certificate
-     * @return bool
+     * Phương thức hổ trợ thiết lập khóa công khai
+     *
+     * @var string $certificate Khóa công khai cần được thiết lập
+     * @return bool Trả về TRUE nếu thiết lập thành công và ngược lại.
      */
     public function setPublicCertificate(string $certificate): bool
     {
@@ -75,6 +83,8 @@ class RsaDataSignature extends DataSignature
     private $_privateCertificate;
 
     /**
+     * Phương thức lấy khóa dùng cho việc tạo chữ ký dữ liệu.
+     *
      * @return string
      * @throws InvalidConfigException
      */
@@ -88,8 +98,10 @@ class RsaDataSignature extends DataSignature
     }
 
     /**
-     * @var string $certificate
-     * @return bool
+     * Phương thức hổ trợ thiết lập khóa bí mật.
+     *
+     * @var string $certificate Khóa cần được thiết lập.
+     * @return bool Trả về TRUE nếu thiết lập thành công và ngược lại.
      */
     public function setPrivateCertificate(string $certificate): bool
     {

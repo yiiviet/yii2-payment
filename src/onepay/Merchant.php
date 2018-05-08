@@ -11,7 +11,7 @@ use Yii;
 
 use yii\helpers\ArrayHelper;
 
-use yiiviet\payment\BaseMerchant;
+use yiiviet\payment\BasePaymentClient;
 
 /**
  * Class Merchant
@@ -19,7 +19,7 @@ use yiiviet\payment\BaseMerchant;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class Merchant extends BaseMerchant
+class Merchant extends BasePaymentClient
 {
 
     public $id;

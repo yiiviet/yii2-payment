@@ -11,7 +11,7 @@ use Yii;
 
 use yii\helpers\ArrayHelper;
 
-use yiiviet\payment\BaseMerchant;
+use yiiviet\payment\BasePaymentClient;
 use yiiviet\payment\DataSignature;
 
 /**
@@ -20,7 +20,7 @@ use yiiviet\payment\DataSignature;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class Merchant extends BaseMerchant
+class Merchant extends BasePaymentClient
 {
 
     const SIGNATURE_RSA = 'RSA';

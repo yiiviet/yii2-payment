@@ -16,7 +16,7 @@ use yiiviet\payment\RequestData as BaseRequestData;
 /**
  * Class RequestData
  *
- * @property Merchant|\yiiviet\payment\MerchantInterface $merchant
+ * @property Merchant|\yiiviet\payment\PaymentClientInterface $merchant
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

@@ -14,7 +14,7 @@ use yiiviet\payment\ResponseData as BaseResponseData;
 /**
  * Class ResponseData
  *
- * @property Merchant|\yiiviet\payment\MerchantInterface $merchant
+ * @property Merchant|\yiiviet\payment\PaymentClientInterface $merchant
  * @property int|null $responseCode
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>

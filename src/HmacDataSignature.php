@@ -1,6 +1,6 @@
 <?php
 /**
- * @link https://github.com/yii2-vn/payment
+ * @link https://github.com/yiiviet/yii2-payment
  * @copyright Copyright (c) 2017 Yii2VN
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
@@ -10,7 +10,7 @@ namespace yiiviet\payment;
 use yii\base\InvalidConfigException;
 
 /**
- * Class HmacDataSignature
+ * Lớp HmacDataSignature dùng cho việc tạo và kiểm tra chữ ký theo chuẩn HMAC.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -19,11 +19,15 @@ class HmacDataSignature extends DataSignature
 {
 
     /**
+     * Tên loại mã hóa. Ví dụ: md5, sha1, sha256...
+     *
      * @var string
      */
     public $hmacAlgo;
 
     /**
+     * Khóa mã hóa. Độ phức tạp càng cao thì dữ liệu càng được an toàn.
+     *
      * @var string
      */
     public $key;
