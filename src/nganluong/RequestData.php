@@ -1,22 +1,23 @@
 <?php
 /**
- * @link https://github.com/yii2-vn/payment
- * @copyright Copyright (c) 2017 Yii2VN
+ * @link https://github.com/yiiviet/yii2-payment
+ * @copyright Copyright (c) 2017 Yii Viet
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
 namespace yiiviet\payment\nganluong;
 
-use yiiviet\payment\Data;
+use vxm\gatewayclients\RequestData as BaseRequestData;
 
 /**
- * Class RequestData
+ * Lớp RequestData cung cấp dữ liệu cho phương thức [[request()]] theo lệnh, để truy vấn với Ngân Lượng.
  *
- * @property Merchant $merchant
+ * @property PaymentClient $client
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class RequestData extends Data
+class RequestData extends BaseRequestData
 {
 
     /**
@@ -40,19 +41,19 @@ class RequestData extends Data
     protected function ensureAttributes(array &$attributes)
     {
         parent::ensureAttributes($attributes);
-        /** @var Merchant $merchant */
-        $merchant = $this->getMerchant();
+        /** @var PaymentClient $client */
+        $client = $this->getClient();
         $command = $this->getCommand();
 
         $attributes = array_merge($attributes, [
-            'merchant_id' => $merchant->id,
-            'merchant_password' => md5($merchant->password),
-            'version' => $merchant->getPaymentGateway()->version()
+            'merchant_id' => $client->merchantId,
+            'merchant_password' => md5($client->merchantPassword),
+            'version' => $client->getGateway()->getVersion()
         ]);
 
         if ($command === PaymentGateway::RC_PURCHASE) {
             $attributes['function'] = 'SetExpressCheckout';
-            $attributes['receiver_email'] = $attributes['receiver_email'] ?? $merchant->email;
+            $attributes['receiver_email'] = $attributes['receiver_email'] ?? $client->email;
             $attributes['payment_method'] = $attributes['payment_method'] ?? PaymentGateway::PAYMENT_METHOD_NL;
         } else {
             $attributes['function'] = 'GetTransactionDetail';

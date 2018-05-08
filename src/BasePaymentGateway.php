@@ -1,7 +1,7 @@
 <?php
 /**
  * @link https://github.com/yiiviet/yii2-payment
- * @copyright Copyright (c) 2017 Yii2VN
+ * @copyright Copyright (c) 2017 Yii Viet
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
@@ -120,39 +120,36 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
     abstract protected function initSandboxEnvironment();
 
     /**
-     * @inheritdoc
-     * @throws ReflectionException
+     * Thuộc tính để cache lại tiến trình của [[verifyRequestCommands()]] nhầm tối ưu tốc độ khi gọi nhiều lần.
+     *
+     * @see verifyRequestCommands
+     * @var array
      */
-    public function requestCommands(): array
-    {
-        $reflection = new ReflectionClass($this);
-
-        $commands = [];
-        foreach ($reflection->getConstants() as $name => $value) {
-            if (strpos($name, 'RC_') === 0) {
-                $commands[] = $value;
-            }
-        }
-
-        return $commands;
-    }
+    private $_verifyRequestCommands;
 
     /**
+     * Phương thức này tự động thu thập các lệnh xác thực thông qua các hằng được khai bảo bằng tiền tố `VRC_`.
+     * `VRC` có nghĩa là Verify Request Command.
+     *
      * @inheritdoc
      * @throws ReflectionException
      */
     public function verifyRequestCommands(): array
     {
-        $reflection = new ReflectionClass($this);
+        if ($this->_verifyRequestCommands === null) {
+            $reflection = new ReflectionClass($this);
 
-        $commands = [];
-        foreach ($reflection->getConstants() as $name => $value) {
-            if (strpos($name, 'VRC_') === 0) {
-                $commands[] = $value;
+            $commands = [];
+            foreach ($reflection->getConstants() as $name => $value) {
+                if (strpos($name, 'VRC_') === 0) {
+                    $commands[] = $value;
+                }
             }
-        }
 
-        return $commands;
+            return $this->_verifyRequestCommands = $commands;
+        } else {
+            return $this->_verifyRequestCommands;
+        }
     }
 
     /**
@@ -294,7 +291,6 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
 
         $this->trigger(self::EVENT_VERIFIED_REQUEST, $event);
     }
-
 
 
 }

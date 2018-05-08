@@ -1,14 +1,12 @@
 <?php
 /**
- * @link https://github.com/yii2-vn/payment
- * @copyright Copyright (c) 2017 Yii2VN
+ * @link https://github.com/yiiviet/yii2-payment
+ * @copyright Copyright (c) 2017 Yii Viet
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
 namespace yiiviet\payment\baokim;
 
-use yii\base\NotSupportedException;
-use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
@@ -137,15 +135,6 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
-     * @throws NotSupportedException
-     */
-    public function getVersion(): string
-    {
-        throw new NotSupportedException('Version is not supported on ' . __CLASS__);
-    }
-
-    /**
-     * @inheritdoc
      */
     public function getBaseUrl(): string
     {
@@ -153,7 +142,7 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
-     * @throws InvalidConfigException
+     * @throws \yii\base\InvalidConfigException
      * @inheritdoc
      */
     public function init()
@@ -167,7 +156,7 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
-     * @throws InvalidConfigException
+     * @throws \yii\base\InvalidConfigException
      */
     protected function initSandboxEnvironment()
     {
@@ -183,7 +172,7 @@ class PaymentGateway extends BasePaymentGateway
      * @param null $clientId Client id sử dụng để tạo yêu cầu thanh toán.
      * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
      * @return ResponseData|\vxm\gatewayclients\DataInterface Trả về [[ResponseData]] là dữ liệu từ Bảo Kim phản hồi.
-     * @throws InvalidConfigException
+     * @throws \ReflectionException|\yii\base\InvalidConfigException|\yii\base\InvalidArgumentException
      */
     public function purchasePro(array $data, $clientId = null)
     {
@@ -215,7 +204,7 @@ class PaymentGateway extends BasePaymentGateway
      * @param string $emailBusiness Email muốn lấy thông tin từ Bảo Kim.
      * @param int|string|null $clientId Client id sử dụng để lấy thông tin.
      * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
-     * @throws \yii\base\InvalidConfigException|NotSupportedException
+     * @throws \ReflectionException|\yii\base\InvalidConfigException
      * @return ResponseData Trả về [[ResponseData]] là dữ liệu của emailBusiness từ Bảo Kim phản hồi.
      */
     public function getMerchantData(string $emailBusiness = null, $clientId = null): ResponseData
@@ -232,7 +221,7 @@ class PaymentGateway extends BasePaymentGateway
         if (!$this->merchantDataCache || !$responseData = $this->merchantDataCache->get($cacheKey)) {
             $responseData = $this->request(self::RC_GET_MERCHANT_DATA, [
                 'business' => $emailBusiness ?? $client->merchantEmail
-            ]);
+            ], $clientId);
 
             if ($this->merchantDataCache) {
                 $this->merchantDataCache->set($cacheKey, $responseData, $this->merchantDataCacheDuration);
@@ -272,7 +261,7 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
-     * @throws NotSupportedException|\yii\base\InvalidConfigException
+     * @throws \yii\base\InvalidConfigException
      */
     protected function requestInternal(\vxm\gatewayclients\RequestData $requestData, \yii\httpclient\Client $httpClient): array
     {

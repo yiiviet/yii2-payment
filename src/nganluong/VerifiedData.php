@@ -1,27 +1,30 @@
 <?php
 /**
- * @link https://github.com/yii2-vn/payment
- * @copyright Copyright (c) 2017 Yii2VN
+ * @link https://github.com/yiiviet/yii2-payment
+ * @copyright Copyright (c) 2017 Yii Viet
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
 namespace yiiviet\payment\nganluong;
 
-use yiiviet\payment\Data;
+use yiiviet\payment\VerifiedData as BaseVerifiedData;
 
 /**
- * Class VerifiedData
+ * Lớp VerifiedData cung cấp dữ liệu đã được xác thực từ Ngân Lượng gửi về.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class VerifiedData extends Data
+class VerifiedData extends BaseVerifiedData
 {
 
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
-            [['token'], 'required', 'on' => PaymentGateway::VC_PURCHASE_SUCCESS]
+            [['token'], 'required', 'on' => PaymentGateway::VRC_PURCHASE_SUCCESS]
         ];
     }
 

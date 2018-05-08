@@ -1,7 +1,7 @@
 <?php
 /**
- * @link https://github.com/yii2-vn/payment
- * @copyright Copyright (c) 2017 Yii2VN
+ * @link https://github.com/yiiviet/yii2-payment
+ * @copyright Copyright (c) 2017 Yii Viet
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
@@ -9,16 +9,25 @@ namespace yiiviet\payment\nganluong;
 
 use Yii;
 
+use vxm\gatewayclients\ResponseData as BaseResponseData;
+
 /**
- * Class ResponseData
+ * Lớp ResponseData hổ trợ việc cung cấp, tổng hợp nội dung dữ liệu nhận được từ [[request()]] của [[PaymentGateway]].
  *
- * @property Merchant $merchant
+ * @property PaymentClient $merchant
+ * @property string $message
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class ResponseData extends \yiiviet\payment\ResponseData
+class ResponseData extends BaseResponseData
 {
 
+    /**
+     * Mảng tổng hợp các message mà Ngân Lượng sẽ trả về.
+     *
+     * @var array
+     */
     public static $responseMessages = [
         '00' => 'Thành công',
         '99' => 'Lỗi chưa xác minh',
@@ -75,7 +84,10 @@ class ResponseData extends \yiiviet\payment\ResponseData
     }
 
     /**
-     * @return null|string
+     * Phương thức hổ trợ lấy và phiên dịch message nhận từ ngân lượng (nếu như bạn có thiết lập i18n).
+     *
+     * @return null|string Trả về NULL nếu như dữ liệu Ngân Lượng gửi về không tồn tại `error_code`,
+     * và ngược lại sẽ là câu thông báo đã được phiên dịch.
      */
     public function getMessage(): ?string
     {

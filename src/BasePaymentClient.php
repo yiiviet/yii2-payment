@@ -1,7 +1,7 @@
 <?php
 /**
  * @link https://github.com/yiiviet/yii2-payment
- * @copyright Copyright (c) 2017 Yii2VN
+ * @copyright Copyright (c) 2017 Yii Viet
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
@@ -17,7 +17,6 @@ use vxm\gatewayclients\BaseClient;
  * đến cổng thanh toán và cung cấp các thông tin để truy cập được cổng thanh toán.
  *
  * @property BasePaymentGateway|PaymentGatewayInterface $gateway
- * @method getGateway(): BasePaymentGateway
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
