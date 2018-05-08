@@ -25,7 +25,7 @@ class VerifiedRequestEvent extends Event
     public $command;
 
     /**
-     * Client dùng đã dùng để xác minh tính hợp lệ.
+     * PaymentClient dùng đã dùng để xác minh tính hợp lệ.
      *
      * @var BasePaymentClient
      */

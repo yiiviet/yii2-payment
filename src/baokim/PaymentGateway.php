@@ -7,11 +7,14 @@
 
 namespace yiiviet\payment\baokim;
 
-use yii\di\Instance;
 use yii\base\NotSupportedException;
+use yii\base\InvalidConfigException;
+use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
 use yiiviet\payment\BasePaymentGateway;
+
+use vxm\gatewayclients\RequestEvent;
 
 /**
  * Class PaymentGateway
@@ -21,75 +24,136 @@ use yiiviet\payment\BasePaymentGateway;
  */
 class PaymentGateway extends BasePaymentGateway
 {
+    /**
+     * Lệnh `purchasePro` sử dụng cho việc tạo [[request()]] yêu cầu thanh toán PRO.
+     */
+    const RC_PURCHASE_PRO = 'purchasePro';
 
-    const RC_PURCHASE_PRO = 0x04;
+    /**
+     * Lệnh `getMerchantData` sử dụng cho việc tạo [[request()]] yêu cầu thông tin merchant.
+     */
+    const RC_GET_MERCHANT_DATA = 'getMerchantData';
 
-    const RC_GET_MERCHANT_DATA = 0x08;
-
-    const RC_ALL = 0x0F;
-
+    /**
+     * @event RequestEvent được gọi trước khi tạo yêu câu thanh toán PRO.
+     */
     const EVENT_BEFORE_PURCHASE_PRO = 'beforePurchasePro';
 
+    /**
+     * @event RequestEvent được gọi sau khi tạo yêu câu thanh toán PRO.
+     */
     const EVENT_AFTER_PURCHASE_PRO = 'afterPurchasePro';
 
+    /**
+     * @event RequestEvent được gọi trước khi tạo yêu câu lấy thông tin merchant.
+     */
     const EVENT_BEFORE_GET_MERCHANT_DATA = 'beforeGetMerchantData';
 
+    /**
+     * @event RequestEvent được gọi sau khi tạo yêu câu lấy thông tin merchant.
+     */
     const EVENT_AFTER_GET_MERCHANT_DATA = 'afterGetMerchantData';
 
+    /**
+     * Đường dẫn API của thanh toán bảo kim.
+     */
     const PURCHASE_URL = '/payment/order/version11';
 
+    /**
+     * Đường dẫn API của thanh toán PRO.
+     */
     const PURCHASE_PRO_URL = '/payment/rest/payment_pro_api/pay_by_card';
 
+    /**
+     * Đường dẫn API để lấy thông tin merchant.
+     */
     const PRO_SELLER_INFO_URL = '/payment/rest/payment_pro_api/get_seller_info';
 
+    /**
+     * Đường dẫn API để truy vấn thông tin giao dịch.
+     */
     const QUERY_DR_URL = '/payment/order/queryTransaction';
 
+    /**
+     * MUI thuộc tính trong mảng data khi tạo thanh toán PRO, cho phép chỉ định giao diện hiển thị charge.
+     */
     const MUI_CHARGE = 'charge';
 
+    /**
+     * MUI thuộc tính trong mảng data khi tạo thanh toán PRO, cho phép chỉ định giao diện hiển thị base.
+     */
     const MUI_BASE = 'base';
 
+    /**
+     * MUI thuộc tính trong mảng data khi tạo thanh toán PRO, cho phép chỉ định giao diện hiển thị iframe.
+     */
     const MUI_IFRAME = 'iframe';
 
+    /**
+     * Transaction mode direct là thuộc tính khi tạo thanh toán bảo kim và PRO, cho phép chỉ định giao dịch trực tiếp.
+     */
     const DIRECT_TRANSACTION = 1;
 
+    /**
+     * Transaction mode safe là thuộc tính khi tạo thanh toán bảo kim và PRO, cho phép chỉ định giao dịch tạm giữ.
+     */
     const SAFE_TRANSACTION = 2;
 
     /**
+     * Cache component hổ trợ cho việc cache lại dữ liệu merchant lấy từ Bảo Kim nhầm tối ưu hóa hệ thống
+     * do dữ liệu này ít khi bị thay đổi.
+     *
+     * @see getMerchantData
      * @var bool|string|array|\yii\caching\Cache
      */
     public $merchantDataCache = 'cache';
 
+    /**
+     * Cache duration quy định thời gian cache dữ liệu của merchant lấy từ Bảo Kim.
+     *
+     * @var int
+     */
     public $merchantDataCacheDuration = 86400;
 
     /**
-     * @var array
+     * @inheritdoc
      */
-    public $merchantConfig = ['class' => Merchant::class];
+    public $clientConfig = ['class' => PaymentClient::class];
 
+    /**
+     * @inheritdoc
+     */
     public $requestDataConfig = ['class' => RequestData::class];
 
+    /**
+     * @inheritdoc
+     */
     public $responseDataConfig = ['class' => RequestData::class];
 
+    /**
+     * @inheritdoc
+     */
     public $verifiedDataConfig = ['class' => VerifiedData::class];
 
     /**
      * @inheritdoc
+     * @throws NotSupportedException
      */
-    public static function version(): string
+    public function getVersion(): string
     {
-        return '1.0';
+        throw new NotSupportedException('Version is not supported on ' . __CLASS__);
     }
 
     /**
      * @inheritdoc
      */
-    protected static function getBaseUrl(bool $sandbox): string
+    public function getBaseUrl(): string
     {
-        return $sandbox ? 'https://sandbox.baokim.vn' : 'https://www.baokim.vn';
+        return $this->sandbox ? 'https://sandbox.baokim.vn' : 'https://www.baokim.vn';
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      * @inheritdoc
      */
     public function init()
@@ -103,22 +167,27 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
+     * @throws InvalidConfigException
      */
     protected function initSandboxEnvironment()
     {
-        $merchantConfig = require(__DIR__ . '/sandbox-merchant.php');
-        $this->setMerchant($merchantConfig);
+        $clientConfig = require(__DIR__ . '/sandbox-client.php');
+        $this->setClient($clientConfig);
     }
 
     /**
-     * @param array $data
-     * @param null $merchantId
-     * @return \yiiviet\payment\ResponseData
-     * @throws \yii\base\InvalidConfigException
+     * Phương thức thanh toán pro (payment pro) hổ trợ tạo thanh toán với phương thức PRO của bảo kim.
+     * Đây là phương thức ánh xạ của [[request()]] sử dụng lệnh [[RC_PURCHASE_PRO]].
+     *
+     * @param array $data Dữ liệu yêu cầu khởi tạo thanh toán PRO
+     * @param null $clientId Client id sử dụng để tạo yêu cầu thanh toán.
+     * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
+     * @return ResponseData|\vxm\gatewayclients\DataInterface Trả về [[ResponseData]] là dữ liệu từ Bảo Kim phản hồi.
+     * @throws InvalidConfigException
      */
-    public function purchasePro(array $data, $merchantId = null)
+    public function purchasePro(array $data, $clientId = null)
     {
-        return $this->request(self::RC_PURCHASE_PRO, $data, $merchantId);
+        return $this->request(self::RC_PURCHASE_PRO, $data, $clientId);
     }
 
     /**
@@ -141,25 +210,28 @@ class PaymentGateway extends BasePaymentGateway
 
 
     /**
-     * @param string $emailBusiness
-     * @param int|string|null $merchantId
+     * Phương thức hổ trợ lấy thông tin merchant thông qua email business.
+     *
+     * @param string $emailBusiness Email muốn lấy thông tin từ Bảo Kim.
+     * @param int|string|null $clientId Client id sử dụng để lấy thông tin.
+     * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
      * @throws \yii\base\InvalidConfigException|NotSupportedException
-     * @return object|ResponseData|bool
+     * @return ResponseData Trả về [[ResponseData]] là dữ liệu của emailBusiness từ Bảo Kim phản hồi.
      */
-    public function getMerchantData(string $emailBusiness = null, $merchantId = null): ResponseData
+    public function getMerchantData(string $emailBusiness = null, $clientId = null): ResponseData
     {
-        /** @var Merchant $merchant */
-        $merchant = $this->getMerchant($merchantId);
+        /** @var PaymentClient $client */
+        $client = $this->getClient($clientId);
         $cacheKey = [
             __METHOD__,
-            get_class($merchant),
-            $merchant->id,
+            get_class($client),
+            $client->merchantId,
             $emailBusiness
         ];
 
         if (!$this->merchantDataCache || !$responseData = $this->merchantDataCache->get($cacheKey)) {
             $responseData = $this->request(self::RC_GET_MERCHANT_DATA, [
-                'business' => $emailBusiness ?? $merchant->email
+                'business' => $emailBusiness ?? $client->merchantEmail
             ]);
 
             if ($this->merchantDataCache) {
@@ -173,7 +245,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public function beforeRequest(\yiiviet\payment\RequestEvent $event)
+    public function beforeRequest(RequestEvent $event)
     {
         if ($event->command === self::RC_PURCHASE_PRO) {
             $this->trigger(self::EVENT_BEFORE_PURCHASE_PRO, $event);
@@ -187,7 +259,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public function afterRequest(\yiiviet\payment\RequestEvent $event)
+    public function afterRequest(RequestEvent $event)
     {
         if ($event->command === self::RC_PURCHASE_PRO) {
             $this->trigger(self::EVENT_AFTER_PURCHASE_PRO, $event);
@@ -202,14 +274,15 @@ class PaymentGateway extends BasePaymentGateway
      * @inheritdoc
      * @throws NotSupportedException|\yii\base\InvalidConfigException
      */
-    protected function requestInternal(int $command, \yiiviet\payment\BasePaymentClient $merchant, \yiiviet\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
+    protected function requestInternal(\vxm\gatewayclients\RequestData $requestData, \yii\httpclient\Client $httpClient): array
     {
-        /** @var Merchant $merchant */
-
+        /** @var PaymentClient $client */
+        $client = $requestData->getClient();
+        $command = $requestData->getCommand();
         $data = $requestData->get();
         $httpMethod = 'POST';
 
-        if ($command & (self::RC_GET_MERCHANT_DATA | self::RC_QUERY_DR)) {
+        if (in_array($command, [self::RC_GET_MERCHANT_DATA, self::RC_QUERY_DR], true)) {
             if ($command === self::RC_GET_MERCHANT_DATA) {
                 $url = self::PRO_SELLER_INFO_URL;
             } else {
@@ -223,13 +296,13 @@ class PaymentGateway extends BasePaymentGateway
             $url = [self::PURCHASE_PRO_URL, 'signature' => ArrayHelper::remove($data, 'signature')];
         } else {
             $data[0] = self::PURCHASE_URL;
-            return ['location' => $httpClient->createRequest()->setUrl($data)->getFullUrl()];
+            return ['location' => $httpClient->get($data)->getFullUrl()];
         }
 
         return $httpClient->createRequest()
             ->setUrl($url)
             ->setMethod($httpMethod)
-            ->setOptions([CURLOPT_USERPWD => $merchant->apiUser . ':' . $merchant->apiPassword])
+            ->setOptions([CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword])
             ->setData($data)
             ->send()
             ->getData();
@@ -238,13 +311,13 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    protected function getVerifyRequestData(int $command, \yiiviet\payment\BasePaymentClient $merchant, \yii\web\Request $request): array
+    protected function getVerifyRequestData($command, \yii\web\Request $request): array
     {
         $params = [
             'order_id', 'transaction_id', 'created_on', 'payment_type', 'transaction_status', 'total_amount', 'net_amount',
             'fee_amount', 'merchant_id', 'customer_name', 'customer_email', 'customer_phone', 'customer_address', 'checksum'
         ];
-        $commandRequestMethods = [self::VC_PURCHASE_SUCCESS => 'get', self::VC_PAYMENT_NOTIFICATION => 'post'];
+        $commandRequestMethods = [self::VRC_PURCHASE_SUCCESS => 'get', self::VRC_IPN => 'post'];
         $requestMethod = $commandRequestMethods[$command];
         $data = [];
 

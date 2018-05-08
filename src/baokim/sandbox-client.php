@@ -4,13 +4,13 @@
  * @copyright Copyright (c) 2017 Yii2VN
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  *
- * Merchant information below get from https://github.com/naustudio/node-vn-payments
+ * PaymentClient information below get from https://github.com/naustudio/node-vn-payments
  */
 
 return [
-    'class' => 'yiiviet\payment\baokim\Merchant',
-    'email' => 'dev.baokim@bk.vn',
-    'id' => 647,
+    'class' => 'yiiviet\payment\baokim\PaymentClient',
+    'merchantEmail' => 'dev.baokim@bk.vn',
+    'merchantId' => 647,
     'securePassword' => 'ae543c080ad91c23',
     'apiUser' => 'merchant',
     'apiPassword' => 1234,

@@ -159,7 +159,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      * Phương thức này là phương thức ánh xạ của [[request()]] nó sẽ tạo lệnh [[RC_PURCHASE]] để tạo yêu cầu giao dịch tới cổng thanh toán.
      *
      * @param array $data Dữ liệu dùng để yêu cầu tạo giao dịch thanh toán bên trong thường có giá tiền, địa chỉ giao hàng...
-     * @param string|int $clientId Client id dùng để tạo yêu cầu thanh toán.
+     * @param string|int $clientId PaymentClient id dùng để tạo yêu cầu thanh toán.
      * @return DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]] để lấy thông tin trả về từ cổng thanh toán.
      */
     public function purchase(array $data, $clientId = null): DataInterface
@@ -171,7 +171,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      * Phương thức này là phương thức ánh xạ của [[request()]] nó sẽ tạo lệnh [[RC_QUERY_DR]] để tạo yêu cầu truy vấn giao dịch tới cổng thanh toán.
      *
      * @param array $data Dữ liệu dùng để truy vấn thông tin giao dịch bên trong thường có mã giao dịch từ cổng thanh toán...
-     * @param string|int $clientId Client id dùng để tạo yêu cầu truy vấn giao dịch.
+     * @param string|int $clientId PaymentClient id dùng để tạo yêu cầu truy vấn giao dịch.
      * @return DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]] để lấy thông tin trả về từ cổng thanh toán.
      */
     public function queryDR(array $data, $clientId = null): DataInterface
@@ -211,7 +211,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      * Phương thức này là phương thức ánh xạ của [[verifyRequest()]] nó sẽ tạo lệnh [[VRC_PURCHASE_SUCCESS]]
      * để tạo yêu cầu xác minh tính hợp lệ của dữ liệu trả về từ máy khách đến máy chủ.
      *
-     * @param string|int $clientId Client id dùng để xác thực tính hợp lệ của dữ liệu.
+     * @param string|int $clientId PaymentClient id dùng để xác thực tính hợp lệ của dữ liệu.
      * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
      * @return bool|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
      */
@@ -224,7 +224,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      * Phương thức này là phương thức ánh xạ của [[verifyRequest()]] nó sẽ tạo lệnh [[VRC_IPN]]
      * để tạo yêu cầu xác minh tính hợp lệ của dữ liệu trả về từ cổng thanh toán đến máy chủ.
      *
-     * @param string|int $clientId Client id dùng để xác thực tính hợp lệ của dữ liệu.
+     * @param string|int $clientId PaymentClient id dùng để xác thực tính hợp lệ của dữ liệu.
      * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
      * @return bool|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
      */

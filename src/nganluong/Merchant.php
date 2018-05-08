@@ -13,7 +13,7 @@ use yiiviet\payment\DataSignature;
 use yiiviet\payment\BasePaymentClient;
 
 /**
- * Class Merchant
+ * Class PaymentClient
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

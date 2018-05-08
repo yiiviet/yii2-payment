@@ -7,12 +7,12 @@
 
 namespace yiiviet\payment\baokim;
 
-use yiiviet\payment\RequestData as BaseRequestData;
+use vxm\gatewayclients\RequestData as BaseRequestData;
 
 /**
  * Class BaoKimCheckoutInstance
  *
- * @property Merchant $merchant
+ * @property PaymentClient $merchant
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -41,29 +41,29 @@ class RequestData extends BaseRequestData
     protected function ensureAttributes(array &$attributes)
     {
         parent::ensureAttributes($attributes);
-        /** @var Merchant $merchant */
-        $merchant = $this->getMerchant();
+        /** @var PaymentClient $client */
+        $client = $this->getClient();
         $command = $this->getCommand();
 
-        if ($command & (PaymentGateway::RC_PURCHASE | PaymentGateway::RC_PURCHASE_PRO | PaymentGateway::RC_GET_MERCHANT_DATA)) {
-            $attributes['business'] = $attributes['business'] ?? $merchant->email; // because business can custom with another email in BK system not only merchant.
+        if (in_array($command, [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_PURCHASE_PRO, PaymentGateway::RC_GET_MERCHANT_DATA], true)) {
+            $attributes['business'] = $attributes['business'] ?? $client->merchantEmail;
         } elseif ($command === PaymentGateway::RC_QUERY_DR) {
-            $attributes['merchant_id'] = $merchant->id;
+            $attributes['merchant_id'] = $client->merchantId;
         }
 
         ksort($attributes);
 
-        if ($command & (PaymentGateway::RC_PURCHASE_PRO | PaymentGateway::RC_GET_MERCHANT_DATA)) {
+        if (in_array($command, [PaymentGateway::RC_PURCHASE_PRO, PaymentGateway::RC_GET_MERCHANT_DATA], true)) {
             if ($command === PaymentGateway::RC_PURCHASE_PRO) {
                 $strSign = 'POST' . '&' . urlencode(PaymentGateway::PURCHASE_PRO_URL) . '&&' . urlencode(http_build_query($attributes));
             } else {
                 $strSign = 'GET' . '&' . urlencode(PaymentGateway::PRO_SELLER_INFO_URL) . '&' . urlencode(http_build_query($attributes)) . '&';
             }
-            $signature = $merchant->signature($strSign, Merchant::SIGNATURE_RSA);
+            $signature = $client->signature($strSign, PaymentClient::SIGNATURE_RSA);
             $attributes['signature'] = urlencode(base64_encode($signature));
-        } elseif ($command & (PaymentGateway::RC_PURCHASE | PaymentGateway::RC_QUERY_DR)) {
+        } elseif (in_array($command, [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_QUERY_DR], true)) {
             $strSign = implode("", $attributes);
-            $attributes['checksum'] = $merchant->signature($strSign, Merchant::SIGNATURE_HMAC);
+            $attributes['checksum'] = $client->signature($strSign, PaymentClient::SIGNATURE_HMAC);
         }
     }
 

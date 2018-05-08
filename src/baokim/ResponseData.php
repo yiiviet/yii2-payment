@@ -9,12 +9,12 @@ namespace yiiviet\payment\baokim;
 
 use Yii;
 
-use yiiviet\payment\ResponseData as BaseResponseData;
+use vxm\gatewayclients\ResponseData as BaseResponseData;
 
 /**
  * Class ResponseData
  *
- * @property Merchant $merchant
+ * @property PaymentClient $merchant
  * @property null|string $errorMessage
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>

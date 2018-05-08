@@ -7,8 +7,6 @@
 
 namespace yiiviet\payment\baokim;
 
-use Yii;
-
 use yii\base\InvalidConfigException;
 
 use yiiviet\payment\VerifiedData as BaseVerifiedData;
@@ -31,8 +29,8 @@ class VerifiedData extends BaseVerifiedData
             [[
                 'order_id', 'transaction_id', 'created_on', 'payment_type', 'transaction_status', 'checksum',
                 'total_amount', 'net_amount', 'fee_amount', 'merchant_id', 'customer_name', 'customer_email', 'customer_phone'
-            ], 'required', 'on' => [PaymentGateway::VC_PURCHASE_SUCCESS, PaymentGateway::VC_PAYMENT_NOTIFICATION]],
-            [['checksum'], 'verifyChecksum', 'message' => '{attribute} not match', 'on' => [PaymentGateway::VC_PURCHASE_SUCCESS, PaymentGateway::VC_PAYMENT_NOTIFICATION]]
+            ], 'required', 'on' => [PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN]],
+            [['checksum'], 'verifyChecksum', 'message' => '{attribute} not match', 'on' => [PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN]]
         ];
     }
 
@@ -44,11 +42,12 @@ class VerifiedData extends BaseVerifiedData
      */
     public function verifyChecksum($attribute, $params, \yii\validators\InlineValidator $validator)
     {
-        $merchant = $this->getMerchant();
+        /** @var PaymentClient $client */
+        $client = $this->getClient();
         $data = $this->get(false);
         ksort($data);
 
-        if (!$merchant->validateSignature(implode("", $data), $data['checksum'], Merchant::SIGNATURE_HMAC)) {
+        if (!$client->validateSignature(implode("", $data), $data['checksum'], PaymentClient::SIGNATURE_HMAC)) {
             $validator->addError($this, $attribute, $validator->message);
         }
     }

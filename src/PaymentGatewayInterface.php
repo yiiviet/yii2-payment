@@ -40,7 +40,7 @@ interface PaymentGatewayInterface extends GatewayInterface
      * ```
      *
      * @param int|string $command Lệnh xác minh được yêu cầu thực hiện
-     * @param int|string|null $clientId Client id được yêu cầu sử dụng để xác minh.
+     * @param int|string|null $clientId PaymentClient id được yêu cầu sử dụng để xác minh.
      * Nếu không thiết lập tham trị này, client sẽ được chỉ định lấy từ [[getDefaultClient()]].
      * @param \yii\web\Request|null $request Đối tượng `request` dùng để lấy dữ liệu cần xác minh.
      * Nếu không thiết lập tham trị này, request sẽ được chỉ định lấy từ [[Yii::$app->get('request')]].

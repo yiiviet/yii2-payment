@@ -12,28 +12,27 @@ use Yii;
 use yii\helpers\ArrayHelper;
 
 use yiiviet\payment\BasePaymentClient;
-use yiiviet\payment\DataSignature;
 
 /**
- * Class Merchant
+ * Class PaymentClient
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class Merchant extends BasePaymentClient
+class PaymentClient extends BasePaymentClient
 {
 
     const SIGNATURE_RSA = 'RSA';
 
     const SIGNATURE_HMAC = 'HMAC';
 
-    public $id;
-
     public $apiUser;
 
     public $apiPassword;
 
-    public $email;
+    public $merchantId;
+
+    public $merchantEmail;
 
     public $securePassword;
 
@@ -71,6 +70,7 @@ class Merchant extends BasePaymentClient
 
     /**
      * @inheritdoc
+     * @return object|\yiiviet\payment\DataSignature
      * @throws \yii\base\InvalidConfigException
      */
     protected function initDataSignature(string $data, string $type): ?\yiiviet\payment\DataSignature
