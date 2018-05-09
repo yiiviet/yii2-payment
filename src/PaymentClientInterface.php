@@ -10,7 +10,7 @@ namespace yiiviet\payment;
 use vxm\gatewayclients\ClientInterface;
 
 /**
- * PaymentClientInterface là một mẫu trừu tượng kế thừa [[ClientInterface]] bổ sung thêm các phương thức liên quan đến
+ * Mẫu trừu tượng PaymentClientInterface kế thừa [[ClientInterface]] bổ sung thêm các phương thức liên quan đến
  * chữ ký dữ liệu hổ trợ cho việc tạo chữ ký dữ liệu hoặc kiểm tra chữ ký từ cổng thanh toán.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>

@@ -10,7 +10,7 @@ namespace yiiviet\payment\baokim;
 use vxm\gatewayclients\RequestData as BaseRequestData;
 
 /**
- * Class BaoKimCheckoutInstance
+ * Lớp RequestData cung cấp dữ liệu đã được kiểm tra tính trọn vẹn khi tạo [[request()]] ở [[PaymentGateway]].
  *
  * @property PaymentClient $merchant
  *

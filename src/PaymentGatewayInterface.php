@@ -11,7 +11,7 @@ use vxm\gatewayclients\DataInterface;
 use vxm\gatewayclients\GatewayInterface;
 
 /**
- * PaymentGatewayInterface là mẫu trừu tượng kế thừa [[GatewayInterface]] bổ sung thêm phương thức xác minh tính hợp lệ của dữ liệu
+ * Mẫu trừu tượng PaymentGatewayInterface kế thừa [[GatewayInterface]] bổ sung thêm phương thức xác minh tính hợp lệ của dữ liệu
  * khi khách hàng giao dịch thành công được redirect về hệ thống `success_url` và `IPN`.
  *
  * Nó được sử dụng tốt cho việc xây dụng các lớp hổ trợ cho việc tích hợp các cổng thanh toán tại Việt Nam.

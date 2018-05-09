@@ -1,7 +1,7 @@
 <?php
 /**
- * @link https://github.com/yii2-vn/payment
- * @copyright Copyright (c) 2017 Yii2VN
+ * @link https://github.com/yiiviet/yii2-payment
+ * @copyright Copyright (c) 2017 Yii Viet
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
@@ -24,36 +24,59 @@ use yiiviet\payment\DataInterface;
  */
 class PaymentGateway extends BasePaymentGateway
 {
-
-    const RC_PURCHASE_INTERNATIONAL = 0x04;
-
-    const RC_QUERY_DR_INTERNATIONAL = 0x08;
-
-    const VC_PURCHASE_SUCCESS_INTERNATIONAL = 0x04;
-
-    const VC_PAYMENT_NOTIFICATION_INTERNATIONAL = 0x08;
+    /**
+     * Lệnh `purchaseInternational` sử dụng cho việc khởi tạo truy vấn thanh toán quốc tế.
+     */
+    const RC_PURCHASE_INTERNATIONAL = 'purchaseInternational';
 
     /**
-     * @inheritdoc
+     * Lệnh `queryDR` sử dụng cho việc truy vấn thông tin giao dịch quốc tế.
      */
-    const RC_ALL = 0xF;
+    const RC_QUERY_DR_INTERNATIONAL = 'queryDRInternational';
 
     /**
-     * @inheritdoc
+     * Lệnh `purchaseSuccessInternational` sử dụng cho việc yêu cấu xác thực tính hợp lệ
+     * của dữ liệu khi khách hàng thanh toán thành công bằng cổng quốc tế (OnePay redirect khách hàng về server).
      */
-    const VC_ALL = 0xF;
+    const VRC_PURCHASE_SUCCESS_INTERNATIONAL = 'purchaseSuccessInternational';
 
+    /**
+     * Lệnh `IPNInternational` sử dụng cho việc yêu cấu xác thực tính hợp lệ
+     * của dữ liệu khi khách hàng thanh toán thành công bằng cổng quốc tế (OnePay bắn request về server).
+     */
+    const VRC_IPN_INTERNATIONAL = 'IPNInternational';
+
+    /**
+     * @event RequestEvent được gọi trước khi khởi tạo lệnh [[RC_PURCHASE_INTERNATIONAL]] ở phương thức [[request()]].
+     */
     const EVENT_BEFORE_PURCHASE_INTERNATIONAL = 'beforePurchaseInternational';
 
+    /**
+     * @event RequestEvent được gọi sau khi khởi tạo lệnh [[RC_PURCHASE_INTERNATIONAL]] ở phương thức [[request()]].
+     */
     const EVENT_AFTER_PURCHASE_INTERNATIONAL = 'afterPurchaseInternational';
 
+    /**
+     * @event RequestEvent được gọi trước khi khởi tạo lệnh [[RC_QUERY_DR_INTERNATIONAL]] ở phương thức [[request()]].
+     */
     const EVENT_BEFORE_QUERY_DR_INTERNATIONAL = 'beforeQueryDRInternational';
 
+    /**
+     * @event RequestEvent được gọi sau khi khởi tạo lệnh [[RC_QUERY_DR_INTERNATIONAL]] ở phương thức [[request()]].
+     */
     const EVENT_AFTER_QUERY_DR_INTERNATIONAL = 'afterQueryDRInternational';
 
+    /**
+     * @event VerifiedRequestEvent được gọi khi dữ liệu truy vấn sau khi khách hàng thanh toán thành công bằng cổng quốc tế,
+     * được OnePay dẫn về hệ thống đã xác thực.
+     */
     const EVENT_VERIFIED_PURCHASE_INTERNATIONAL_SUCCESS_REQUEST = 'verifiedPurchaseInternationalSuccessRequest';
 
-    const EVENT_VERIFIED_PAYMENT_NOTIFICATION_INTERNATIONAL_REQUEST = 'verifiedPaymentNotificationInternationalRequest';
+    /**
+     * @event VerifiedRequestEvent được gọi khi dữ liệu truy vấn sau khi khách hàng thanh toán thành công bằng cổng quốc tế,
+     * được OnePay bắn `request` sang hệ thống đã xác thực.
+     */
+    const EVENT_VERIFIED_IPN_INTERNATIONAL_REQUEST = 'verifiedIPNInternationalRequest';
 
     const PURCHASE_URL = '/onecomm-pay/vpc.op';
 
@@ -70,7 +93,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public $merchantConfig = ['class' => Merchant::class];
+    public $merchantConfig = ['class' => PaymentClient::class];
 
     /**
      * @inheritdoc

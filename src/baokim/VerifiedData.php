@@ -12,7 +12,7 @@ use yii\base\InvalidConfigException;
 use yiiviet\payment\VerifiedData as BaseVerifiedData;
 
 /**
- * Class VerifiedData
+ * Lớp VerifiedData cung cấp dữ liệu đã được xác minh từ các truy vấn IPN, success url.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -35,9 +35,11 @@ class VerifiedData extends BaseVerifiedData
     }
 
     /**
-     * @param $attribute
-     * @param $params
-     * @param \yii\validators\InlineValidator $validator
+     * Phương thức kiểm tra tính hợp lệ của mã `checksum` gửi từ Bảo Kim.
+     *
+     * @param string $attribute Chứa giá trị thuộc tính cần kiểm tra.
+     * @param string $params Mảng thông tin khi thiết lập rule.
+     * @param \yii\validators\InlineValidator $validator Đối tượng [[\yii\validators\InlineValidator]] đang thực thi kiểm tra dữ liệu.
      * @throws \yii\base\NotSupportedException|InvalidConfigException
      */
     public function verifyChecksum($attribute, $params, \yii\validators\InlineValidator $validator)

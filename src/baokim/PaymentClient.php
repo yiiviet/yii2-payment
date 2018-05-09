@@ -14,35 +14,90 @@ use yii\helpers\ArrayHelper;
 use yiiviet\payment\BasePaymentClient;
 
 /**
- * Class PaymentClient
+ * Lớp PaymentClient chứa các thuộc tính dùng để hổ trợ [[PaymentGateway]] kết nối đến Bảo Kim.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
 class PaymentClient extends BasePaymentClient
 {
-
+    /**
+     * Hằng khai báo kiểu chữ ký `RSA` được dùng khi gọi phương thức [[signature()]] và [[validateSignature()]].
+     */
     const SIGNATURE_RSA = 'RSA';
 
+    /**
+     * Hằng khai báo kiểu chữ ký `HMAC` được dùng khi gọi phương thức [[signature()]] và [[validateSignature()]].
+     */
     const SIGNATURE_HMAC = 'HMAC';
 
+    /**
+     * Thuộc tính dùng để khai báo `user` kết nối đến Bảo Kim khi tạo [[request()]] ở [[PaymentGateway]].
+     * Nó do Bảo Kim cấp khi đăng ký tích hợp website.
+     *
+     * @var string
+     */
     public $apiUser;
 
+    /**
+     * Thuộc tính dùng để khai báo `password` kết nối đến Bảo Kim khi tạo [[request()]] ở [[PaymentGateway]].
+     * Nó do Bảo Kim cấp khi đăng ký tích hợp website.
+     *
+     * @var string
+     */
     public $apiPassword;
 
+    /**
+     * Thuộc tính dùng để khai báo `merchant id` kết nối đến Bảo Kim khi tạo [[request()]] ở [[PaymentGateway]].
+     * Nó do Bảo Kim cấp khi đăng ký tích hợp website.
+     *
+     * @var int
+     */
     public $merchantId;
 
+    /**
+     * Thuộc tính thường được dùng để bổ sung email tài khoản nhận tiền hoặc cần lấy thông tin khi `end-user` không cung cấp thông tin.
+     * Nó chính là email tài khoản Bảo Kim của bạn.
+     *
+     * @var string
+     */
     public $merchantEmail;
 
+    /**
+     * Thuộc tính được dùng để tạo và kiểm tra chữ ký dữ liệu khi truy vấn thông tin giao dịch,
+     * tạo thanh toán theo phương thức Bảo Kim, xác minh BPN (Bao Kim Payment Notification), xác minh success url.
+     *
+     * @var string
+     */
     public $securePassword;
 
+    /**
+     * Thuộc tính được dùng để tạo chữ ký dữ liệu khi thanh toán theo phương thức PRO, lấy thông tin merchant.
+     *
+     * @var string
+     */
     public $privateCertificate;
 
+    /**
+     * Thuộc tính được dùng để kiểm tra chữ ký dữ liệu. Hiện nó chưa được dùng.
+     *
+     * @var string
+     */
     public $publicCertificate;
 
-    public $hmacDataSignatureConfig = ['class' => 'yiiviet\payment\HmacDataSignature'];
+    /**
+     * Mảng thiết lập cấu hình mặc định của [[HmacDataSignature]] khi khởi tạo.
+     *
+     * @var array
+     */
+    public $hmacDataSignatureConfig = [];
 
-    public $rsaDataSignatureConfig = ['class' => 'yiiviet\payment\RsaDataSignature'];
+    /**
+     * Mảng thiết lập cấu hình mặc định của [[RsaDataSignature]] khi khởi tạo.
+     *
+     * @var array
+     */
+    public $rsaDataSignatureConfig = [];
 
     /**
      * @param $file
@@ -76,16 +131,22 @@ class PaymentClient extends BasePaymentClient
     protected function initDataSignature(string $data, string $type): ?\yiiviet\payment\DataSignature
     {
         if ($type === self::SIGNATURE_RSA) {
-            return Yii::createObject(ArrayHelper::merge($this->rsaDataSignatureConfig, [
+            $config = ArrayHelper::merge($this->rsaDataSignatureConfig, [
                 'publicCertificate' => $this->publicCertificate,
                 'privateCertificate' => $this->privateCertificate,
                 'openSSLAlgo' => OPENSSL_ALGO_SHA1
-            ]), [$data]);
+            ]);
+            $config['class'] = $config['class'] ?? 'yiiviet\payment\RsaDataSignature';
+
+            return Yii::createObject($config, [$data]);
         } elseif ($type === self::SIGNATURE_HMAC) {
-            return Yii::createObject(ArrayHelper::merge($this->hmacDataSignatureConfig, [
+            $config = ArrayHelper::merge($this->hmacDataSignatureConfig, [
                 'key' => $this->securePassword,
                 'hmacAlgo' => 'md5'
-            ]), [$data]);
+            ]);
+            $config['class'] = $config['class'] ?? 'yiiviet\payment\HmacDataSignature';
+
+            return Yii::createObject($config, [$data]);
         } else {
             return null;
         }

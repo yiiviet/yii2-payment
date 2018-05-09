@@ -21,8 +21,7 @@ use vxm\gatewayclients\DataInterface;
 use vxm\gatewayclients\RequestEvent;
 
 /**
- * Class BasePaymentGateway là một lớp trừu tượng thực thi mẫu trừu tượng [[PaymentGatewayInterface]]
- * giúp cho việc xây dựng các lợp thực thi được tối giản.
+ * Lớp BasePaymentGateway thực thi mẫu trừu tượng [[PaymentGatewayInterface]] giúp cho việc xây dựng các lợp thực thi được tối giản.
  *
  * @property BasePaymentClient $client
  * @property BasePaymentClient $defaultClient

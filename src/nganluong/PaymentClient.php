@@ -19,14 +19,14 @@ class PaymentClient extends BasePaymentClient
 {
 
     /**
-     * Merchant id được cấp khi bạn tích hợp website với ngân lượng.
+     * PaymentClient id được cấp khi bạn tích hợp website với ngân lượng.
      *
      * @var string
      */
     public $merchantId;
 
     /**
-     * Merchant password được cấp khi bạn tích hợp website với ngân lượng.
+     * PaymentClient password được cấp khi bạn tích hợp website với ngân lượng.
      *
      * @var string
      */

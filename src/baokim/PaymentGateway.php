@@ -15,7 +15,8 @@ use yiiviet\payment\BasePaymentGateway;
 use vxm\gatewayclients\RequestEvent;
 
 /**
- * Class PaymentGateway
+ * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến Bảo Kim.
+ * Hiện tại nó hổ trợ 100% các tính năng từ cổng thanh toán Bảo Kim.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -169,7 +170,7 @@ class PaymentGateway extends BasePaymentGateway
      * Đây là phương thức ánh xạ của [[request()]] sử dụng lệnh [[RC_PURCHASE_PRO]].
      *
      * @param array $data Dữ liệu yêu cầu khởi tạo thanh toán PRO
-     * @param null $clientId Client id sử dụng để tạo yêu cầu thanh toán.
+     * @param null $clientId PaymentClient id sử dụng để tạo yêu cầu thanh toán.
      * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
      * @return ResponseData|\vxm\gatewayclients\DataInterface Trả về [[ResponseData]] là dữ liệu từ Bảo Kim phản hồi.
      * @throws \ReflectionException|\yii\base\InvalidConfigException|\yii\base\InvalidArgumentException
@@ -202,7 +203,7 @@ class PaymentGateway extends BasePaymentGateway
      * Phương thức hổ trợ lấy thông tin merchant thông qua email business.
      *
      * @param string $emailBusiness Email muốn lấy thông tin từ Bảo Kim.
-     * @param int|string|null $clientId Client id sử dụng để lấy thông tin.
+     * @param int|string|null $clientId PaymentClient id sử dụng để lấy thông tin.
      * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
      * @throws \ReflectionException|\yii\base\InvalidConfigException
      * @return ResponseData Trả về [[ResponseData]] là dữ liệu của emailBusiness từ Bảo Kim phản hồi.

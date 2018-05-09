@@ -1,7 +1,7 @@
 <?php
 /**
- * @link https://github.com/yii2-vn/payment
- * @copyright Copyright (c) 2017 Yii2VN
+ * @link https://github.com/yiiviet/yii2-payment
+ * @copyright Copyright (c) 2017 Yii Viet
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
@@ -15,7 +15,7 @@ use yii\helpers\Url;
 /**
  * Class RequestData
  *
- * @property Merchant $merchant
+ * @property PaymentClient $merchant
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -55,7 +55,7 @@ class RequestData extends BaseRequestData
     protected function ensureAttributes(array &$attributes)
     {
         parent::ensureAttributes($attributes);
-        /** @var Merchant $merchant */
+        /** @var PaymentClient $merchant */
         $merchant = $this->getMerchant();
         $command = $this->getCommand();
         $attributesEnsured = [];
