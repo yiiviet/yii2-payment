@@ -9,14 +9,14 @@ namespace yiiviet\payment\onepay;
 
 use Yii;
 
-use yiiviet\payment\ResponseData as BaseResponseData;
+use vxm\gatewayclients\ResponseData as BaseResponseData;
 
 /**
- * Class ResponseData
+ * Lớp ResponseData cung cấp dữ liệu nhận được từ OnePay khi gọi [[request()]] ở lớp [[PaymentGateway]].
  *
- * @property PaymentClient $merchant
- * @property string $message
- * @property int $responseCode
+ * @property PaymentClient $client
+ * @property string|null $message
+ * @property int|null $responseCode
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -29,7 +29,7 @@ class ResponseData extends BaseResponseData
      */
     public function getIsOk(): bool
     {
-        if ($this->getCommand() & (PaymentGateway::RC_QUERY_DR | PaymentGateway::RC_QUERY_DR_INTERNATIONAL)) {
+        if (in_array($this->getCommand(), [PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_DR_INTERNATIONAL], true)) {
             return $this->canGetProperty('vpc_DRExists') ? strcasecmp($this->vpc_DRExists, 'Y') === 0 : false;
         } else {
             return true;
@@ -37,9 +37,10 @@ class ResponseData extends BaseResponseData
     }
 
     /**
-     * Get and translate message property return from payment gateway if it exist.
+     * Phương thức hổ trợ lấy và phiên dịch message nhận từ OnePay (nếu như bạn có thiết lập i18n).
      *
-     * @return null|string
+     * @return null|string Trả về NULL nếu như dữ liệu OnePay gửi về không tồn tại `error_code`,
+     * và ngược lại sẽ là câu thông báo đã được phiên dịch.
      */
     public function getMessage(): ?string
     {
@@ -51,9 +52,10 @@ class ResponseData extends BaseResponseData
     }
 
     /**
-     * Detect and get response code from 2 properties vpc_ResponseCode and vpc_TxnResponseCode.
+     * Phương thức hổ trợ lấy response code từ OnePay,
+     * do tùy theo lệnh mà giá trị này nằm ở các attribute phản hồi khác nhau nên phương thức này sẽ tự động xác định.
      *
-     * @return int|null
+     * @return int|null Trả về NULL nếu như không có response code và ngược lại
      */
     public function getResponseCode(): ?int
     {

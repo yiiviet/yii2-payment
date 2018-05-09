@@ -23,12 +23,24 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
 class ResponseData extends BaseResponseData
 {
 
+    public function ensureAttributes(array &$attributes)
+    {
+        parent::ensureAttributes($attributes);
+        $ensuredAttributes = [];
+
+        foreach ($attributes as $attribute => $value) {
+            $ensuredAttributes[trim($attribute)] = $value;
+        }
+
+        $attributes = $ensuredAttributes;
+    }
+
     /**
      * @inheritdoc
      */
     public function getIsOk(): bool
     {
-        return !$this->canGetProperty('error_code');
+        return !$this->canGetProperty('error_code') && !$this->canGetProperty('error');
     }
 
     /**

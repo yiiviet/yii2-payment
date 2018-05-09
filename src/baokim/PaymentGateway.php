@@ -127,7 +127,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public $responseDataConfig = ['class' => RequestData::class];
+    public $responseDataConfig = ['class' => ResponseData::class];
 
     /**
      * @inheritdoc
@@ -292,8 +292,8 @@ class PaymentGateway extends BasePaymentGateway
         return $httpClient->createRequest()
             ->setUrl($url)
             ->setMethod($httpMethod)
-            ->setOptions([CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword])
-            ->setData($data)
+            ->addOptions([CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword])
+            ->addData($data)
             ->send()
             ->getData();
     }
@@ -312,7 +312,7 @@ class PaymentGateway extends BasePaymentGateway
         $data = [];
 
         foreach ($params as $param) {
-            if (($value = call_user_func([$request, $requestMethod], $param)) && !is_null($value)) {
+            if (($value = call_user_func([$request, $requestMethod], $param)) !== null) {
                 $data[$param] = $value;
             }
         }

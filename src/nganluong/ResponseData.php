@@ -84,7 +84,7 @@ class ResponseData extends BaseResponseData
     }
 
     /**
-     * Phương thức hổ trợ lấy và phiên dịch message nhận từ ngân lượng (nếu như bạn có thiết lập i18n).
+     * Phương thức hổ trợ lấy và phiên dịch message nhận từ Ngân Lượng (nếu như bạn có thiết lập i18n).
      *
      * @return null|string Trả về NULL nếu như dữ liệu Ngân Lượng gửi về không tồn tại `error_code`,
      * và ngược lại sẽ là câu thông báo đã được phiên dịch.

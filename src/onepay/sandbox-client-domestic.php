@@ -7,7 +7,7 @@
 
 return [
     'class' => 'yiiviet\payment\onepay\PaymentClient',
-    'id' => 'ONEPAY',
+    'merchantId' => 'ONEPAY',
     'accessCode' => 'D67342C2',
     'secureSecret' => 'A3EFDFABA8653DF2342E8DAC29B51AF0'
 ];

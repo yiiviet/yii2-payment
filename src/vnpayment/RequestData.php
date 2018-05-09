@@ -11,12 +11,13 @@ use Yii;
 
 use yii\helpers\ArrayHelper;
 
-use yiiviet\payment\RequestData as BaseRequestData;
+use vxm\gatewayclients\RequestData as BaseRequestData;
 
 /**
- * Class RequestData
+ * Lớp RequestData cung cấp dữ liệu để truy vấn đến VnPayment tạo lệnh thanh toán,
+ * kiểm tra giao dịch, hoàn trả hóa đơn....
  *
- * @property Merchant|\yiiviet\payment\PaymentClientInterface $merchant
+ * @property PaymentClient $client
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -58,16 +59,16 @@ class RequestData extends BaseRequestData
             }
         }
 
-        /** @var Merchant $merchant */
-        $merchant = $this->getMerchant();
+        /** @var PaymentClient $client */
+        $client = $this->getClient();
         $command = $this->getCommand();
         $attributesEnsured['vnp_IpAddr'] = $attributesEnsured['vnp_IpAddr'] ?? Yii::$app->getRequest()->getUserIP();
         $attributesEnsured['vnp_CreateDate'] = $attributesEnsured['vnp_CreateDate'] ?? date('Ymdhis');
-        $attributesEnsured['vnp_Version'] = $merchant->getPaymentGateway()->version();
-        $attributesEnsured['vnp_TmnCode'] = $merchant->tmnCode;
+        $attributesEnsured['vnp_Version'] = $client->getGateway()->getVersion();
+        $attributesEnsured['vnp_TmnCode'] = $client->tmnCode;
 
         if ($command === PaymentGateway::RC_PURCHASE) {
-            $attributesEnsured['vnp_OrderType'] = $attributesEnsured['vnp_OrderType'] ?? $merchant->defaultOrderType;
+            $attributesEnsured['vnp_OrderType'] = $attributesEnsured['vnp_OrderType'] ?? $client->defaultOrderType;
             $attributesEnsured['vnp_Locale'] = $attributesEnsured['vnp_Locale'] ?? 'vn';
             $attributesEnsured['vnp_Command'] = 'pay';
             $attributesEnsured['vnp_CurrCode'] = 'VND';
@@ -77,7 +78,7 @@ class RequestData extends BaseRequestData
 
         ksort($attributesEnsured);
         $hashType = ArrayHelper::remove($attributesEnsured, 'vnp_SecureHashType', 'MD5');
-        $attributesEnsured['vnp_SecureHash'] = $merchant->signature(http_build_query($attributesEnsured), $hashType);
+        $attributesEnsured['vnp_SecureHash'] = $client->signature(http_build_query($attributesEnsured), $hashType);
         $attributesEnsured['vnp_SecureHashType'] = $hashType;
 
         $attributes = $attributesEnsured;

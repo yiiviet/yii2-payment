@@ -12,12 +12,15 @@ use Yii;
 use yii\httpclient\Client as HttpClient;
 
 use yiiviet\payment\BasePaymentGateway;
-use yiiviet\payment\Data;
-use yiiviet\payment\DataInterface;
+use yiiviet\payment\VerifiedRequestEvent;
+
+use vxm\gatewayclients\DataInterface;
+use vxm\gatewayclients\RequestEvent;
 
 
 /**
- * Class PaymentGateway
+ * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến OnePay.
+ * Hiện tại nó hổ trợ 100% các tính năng từ cổng thanh toán OnePay v2.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -78,22 +81,40 @@ class PaymentGateway extends BasePaymentGateway
      */
     const EVENT_VERIFIED_IPN_INTERNATIONAL_REQUEST = 'verifiedIPNInternationalRequest';
 
+    /**
+     * Đường dẫn API của thanh toán nội địa.
+     */
     const PURCHASE_URL = '/onecomm-pay/vpc.op';
 
+    /**
+     * Đường dẫn API để truy vấn thông tin giao dịch nội địa.
+     */
     const QUERY_DR_URL = '/onecomm-pay/Vpcdps.op';
 
+    /**
+     * Đường dẫn API của thanh toán quốc tế.
+     */
     const PURCHASE_INTERNATIONAL_URL = '/vpcpay/vpcpay.op';
 
+    /**
+     * Đường dẫn API để truy vấn thông tin giao dịch quốc tế.
+     */
     const QUERY_DR_INTERNATIONAL_URL = '/vpcpay/Vpcdps.op';
 
-    const SANDBOX_MERCHANT_INTERNATIONAL_ID = '__sandboxInternational';
+    /**
+     * Id của client trong môi trường thử nghiệm dùng để giao tiếp với OnePay ở cổng quốc tế.
+     */
+    const SANDBOX_CLIENT_INTERNATIONAL_ID = '__sandboxInternational';
 
-    const SANDBOX_MERCHANT_DOMESTIC_ID = '__sandboxDomestic';
+    /**
+     * Id của client trong môi trường thử nghiệm dùng để giao tiếp với OnePay ở cổng nội địa.
+     */
+    const SANDBOX_CLIENT_DOMESTIC_ID = '__sandboxDomestic';
 
     /**
      * @inheritdoc
      */
-    public $merchantConfig = ['class' => PaymentClient::class];
+    public $clientConfig = ['class' => PaymentClient::class];
 
     /**
      * @inheritdoc
@@ -108,7 +129,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public $verifiedDataConfig = ['class' => Data::class];
+    public $verifiedDataConfig = ['class' => VerifiedData::class];
 
     /**
      * @inheritdoc
@@ -129,7 +150,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public function beforeRequest(\yiiviet\payment\RequestEvent $event)
+    public function beforeRequest(RequestEvent $event)
     {
         if ($event->command === self::RC_PURCHASE_INTERNATIONAL) {
             $this->trigger(self::EVENT_BEFORE_PURCHASE_INTERNATIONAL, $event);
@@ -143,7 +164,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public function afterRequest(\yiiviet\payment\RequestEvent $event)
+    public function afterRequest(RequestEvent $event)
     {
         if ($event->command === self::RC_PURCHASE_INTERNATIONAL) {
             $this->trigger(self::EVENT_AFTER_PURCHASE_INTERNATIONAL, $event);
@@ -157,12 +178,12 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public function verifiedRequest(\yiiviet\payment\VerifiedRequestEvent $event)
+    public function verifiedRequest(VerifiedRequestEvent $event)
     {
-        if ($event->command === self::VC_PURCHASE_SUCCESS_INTERNATIONAL) {
+        if ($event->command === self::VRC_PURCHASE_SUCCESS_INTERNATIONAL) {
             $this->trigger(self::EVENT_VERIFIED_PURCHASE_INTERNATIONAL_SUCCESS_REQUEST, $event);
-        } elseif ($event->command === self::VC_PAYMENT_NOTIFICATION_INTERNATIONAL) {
-            $this->trigger(self::EVENT_VERIFIED_PAYMENT_NOTIFICATION_INTERNATIONAL_REQUEST, $event);
+        } elseif ($event->command === self::VRC_IPN_INTERNATIONAL) {
+            $this->trigger(self::EVENT_VERIFIED_IPN_INTERNATIONAL_REQUEST, $event);
         }
 
         parent::verifiedRequest($event);
@@ -170,14 +191,15 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
+     * @throws \yii\base\InvalidConfigException
      */
     protected function initSandboxEnvironment()
     {
-        $merchantDomesticConfig = require(__DIR__ . '/sandbox-merchant-domestic.php');
-        $merchantInternationalConfig = require(__DIR__ . '/sandbox-merchant-international.php');
+        $clientDomesticConfig = require(__DIR__ . '/sandbox-client-domestic.php');
+        $clientInternationalConfig = require(__DIR__ . '/sandbox-client-international.php');
 
-        $this->setMerchant(static::SANDBOX_MERCHANT_DOMESTIC_ID, $merchantDomesticConfig);
-        $this->setMerchant(static::SANDBOX_MERCHANT_INTERNATIONAL_ID, $merchantInternationalConfig);
+        $this->setClient(static::SANDBOX_CLIENT_DOMESTIC_ID, $clientDomesticConfig);
+        $this->setClient(static::SANDBOX_CLIENT_INTERNATIONAL_ID, $clientInternationalConfig);
     }
 
     /**
@@ -201,96 +223,109 @@ class PaymentGateway extends BasePaymentGateway
      * @return ResponseData|DataInterface
      * @inheritdoc
      */
-    public function purchase(array $data, $merchantId = null): DataInterface
+    public function purchase(array $data, $clientId = null): DataInterface
     {
-        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_DOMESTIC_ID : null);
+        $clientId = $clientId ?? ($this->sandbox ? static::SANDBOX_CLIENT_DOMESTIC_ID : null);
 
-        return parent::purchase($data, $merchantId);
+        return parent::purchase($data, $clientId);
     }
 
     /**
-     * @param array $data
-     * @param null|int|string $merchantId
-     * @return ResponseData|DataInterface
-     * @throws \yii\base\InvalidConfigException
+     * Phương thức này là phương thức ánh xạ của [[request()]] nó sẽ tạo lệnh [[RC_PURCHASE_INTERNATIONAL]],
+     * để tạo yêu cầu giao dịch quốc tế tới OnePay.
+     *
+     * @param array $data Dữ liệu dùng để gửi đến OnePay khởi tạo giao dịch quốc tế
+     * @param null|int|string $clientId Client id dùng để kết nối đến OnePay. Nếu không thiết lập,
+     * [[getDefaultClient()]] sẽ được gọi.
+     * @return ResponseData|DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]],
+     * để lấy thông tin trả về từ cổng thanh toán.
+     * @throws \ReflectionException|\yii\base\InvalidConfigException
      */
-    public function purchaseInternational(array $data, $merchantId = null): DataInterface
+    public function purchaseInternational(array $data, $clientId = null): DataInterface
     {
-        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_INTERNATIONAL_ID : null);
+        $clientId = $clientId ?? ($this->sandbox ? static::SANDBOX_CLIENT_INTERNATIONAL_ID : null);
 
-        return $this->request(self::RC_PURCHASE_INTERNATIONAL, $data, $merchantId);
+        return $this->request(self::RC_PURCHASE_INTERNATIONAL, $data, $clientId);
     }
 
     /**
      * @return ResponseData|DataInterface
      * @inheritdoc
      */
-    public function queryDR(array $data, $merchantId = null): DataInterface
+    public function queryDR(array $data, $clientId = null): DataInterface
     {
-        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_DOMESTIC_ID : null);
+        $clientId = $clientId ?? ($this->sandbox ? static::SANDBOX_CLIENT_DOMESTIC_ID : null);
 
-        return parent::queryDR($data, $merchantId);
+        return parent::queryDR($data, $clientId);
     }
 
     /**
-     * @param array $data
-     * @param null|int|string $merchantId
-     * @return ResponseData|DataInterface
-     * @throws \yii\base\InvalidConfigException
+     * Phương thức này là phương thức ánh xạ của [[request()]] nó sẽ tạo lệnh [[RC_QUERY_DR_INTERNATIONAL]],
+     * để tạo yêu cầu truy vấn giao dịch quốc tế tới OnePay.
+     *
+     * @param array $data Dữ liệu dùng để truy vấn thông tin giao dịch bên trong thường có mã giao dịch từ cổng thanh toán...
+     * @param string|int $clientId Client id dùng để tạo yêu cầu truy vấn giao dịch quốc tế.
+     * @return DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]],
+     * để lấy thông tin trả về từ cổng thanh toán.
+     * @throws \ReflectionException|\yii\base\InvalidConfigException
      */
-    public function queryDRInternational(array $data, $merchantId = null): DataInterface
+    public function queryDRInternational(array $data, $clientId = null): DataInterface
     {
-        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_INTERNATIONAL_ID : null);
+        $clientId = $clientId ?? ($this->sandbox ? static::SANDBOX_CLIENT_INTERNATIONAL_ID : null);
 
-        return $this->request(self::RC_QUERY_DR_INTERNATIONAL, $data, $merchantId);
-    }
-
-    /**
-     * @return bool|VerifiedData
-     * @inheritdoc
-     */
-    public function verifyPaymentNotificationRequest($merchantId = null, \yii\web\Request $request = null)
-    {
-        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_DOMESTIC_ID : null);
-
-        return parent::verifyPaymentNotificationRequest($merchantId, $request);
-    }
-
-    /**
-     * @param null|int|string $merchantId
-     * @param \yii\web\Request|null $request
-     * @return bool|VerifiedData
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function verifyPaymentNotificationInternationalRequest($merchantId = null, \yii\web\Request $request = null)
-    {
-        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_INTERNATIONAL_ID : null);
-
-        return $this->verifyRequest(self::VC_PAYMENT_NOTIFICATION_INTERNATIONAL, $merchantId, $request);
+        return $this->request(self::RC_QUERY_DR_INTERNATIONAL, $data, $clientId);
     }
 
     /**
      * @return bool|VerifiedData
      * @inheritdoc
      */
-    public function verifyPurchaseSuccessRequest($merchantId = null, \yii\web\Request $request = null)
+    public function verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
     {
-        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_DOMESTIC_ID : null);
+        $clientId = $clientId ?? ($this->sandbox ? static::SANDBOX_CLIENT_DOMESTIC_ID : null);
 
-        return parent::verifyPurchaseSuccessRequest($merchantId, $request);
+        return parent::verifyRequestIPN($clientId, $request);
     }
 
     /**
-     * @param null|int|string $merchantId
-     * @param \yii\web\Request|null $request
-     * @return bool|VerifiedData
-     * @throws \yii\base\InvalidConfigException
+     * Phương thức này là phương thức ánh xạ của [[verifyRequest()]] nó sẽ tạo lệnh [[VRC_IPN_INTERNATIONAL]],
+     * để tạo yêu cầu xác minh tính hợp lệ của dữ liệu trả về từ OnePay đến máy chủ, khi khách hàng thanh toán qua cổng quốc tế.
+     *
+     * @param string|int $clientId Client id dùng để xác thực tính hợp lệ của dữ liệu.
+     * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
+     * @return bool|VerifiedData Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
      */
-    public function verifyPurchaseInternationalSuccessRequest($merchantId = null, \yii\web\Request $request = null)
+    public function verifyPaymentNotificationInternationalRequest($clientId = null, \yii\web\Request $request = null)
     {
-        $merchantId = $merchantId ?? ($this->sandbox ? static::SANDBOX_MERCHANT_INTERNATIONAL_ID : null);
+        $clientId = $clientId ?? ($this->sandbox ? static::SANDBOX_CLIENT_INTERNATIONAL_ID : null);
 
-        return $this->verifyRequest(self::VC_PURCHASE_SUCCESS_INTERNATIONAL, $merchantId, $request);
+        return $this->verifyRequest(self::VRC_IPN_INTERNATIONAL, $clientId, $request);
+    }
+
+    /**
+     * @return bool|VerifiedData
+     * @inheritdoc
+     */
+    public function verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
+    {
+        $clientId = $clientId ?? ($this->sandbox ? static::SANDBOX_CLIENT_DOMESTIC_ID : null);
+
+        return parent::verifyRequestPurchaseSuccess($clientId, $request);
+    }
+
+    /**
+     * Phương thức này là phương thức ánh xạ của [[verifyRequest()]] nó sẽ tạo lệnh [[VRC_PURCHASE_SUCCESS_INTERNATIONAL]]
+     * để tạo yêu cầu xác minh tính hợp lệ của dữ liệu trả về từ máy khách đến máy chủ, khi khách hàng thanh toán quốc tế.
+     *
+     * @param string|int $clientId Client id dùng để xác thực tính hợp lệ của dữ liệu.
+     * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
+     * @return bool|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
+     */
+    public function verifyRequestPurchaseInternationalSuccess($clientId = null, \yii\web\Request $request = null)
+    {
+        $clientId = $clientId ?? ($this->sandbox ? static::SANDBOX_CLIENT_INTERNATIONAL_ID : null);
+
+        return $this->verifyRequest(self::VRC_PURCHASE_SUCCESS_INTERNATIONAL, $clientId, $request);
     }
 
 
@@ -298,8 +333,9 @@ class PaymentGateway extends BasePaymentGateway
      * @inheritdoc
      * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
      */
-    protected function requestInternal(int $command, \yiiviet\payment\BasePaymentClient $merchant, \yiiviet\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
+    protected function requestInternal(\vxm\gatewayclients\RequestData $requestData, \yii\httpclient\Client $httpClient): array
     {
+        $command = $requestData->getCommand();
         $commandUrls = [
             self::RC_PURCHASE => self::PURCHASE_URL,
             self::RC_PURCHASE_INTERNATIONAL => self::PURCHASE_INTERNATIONAL_URL,
@@ -310,7 +346,7 @@ class PaymentGateway extends BasePaymentGateway
         $data = $requestData->get();
         $data[0] = $commandUrls[$command];
 
-        if ($command & (self::RC_PURCHASE | self::RC_PURCHASE_INTERNATIONAL)) {
+        if ($command === self::RC_PURCHASE || $command === self::RC_PURCHASE_INTERNATIONAL) {
             return ['location' => $httpClient->createRequest()->setUrl($data)->getFullUrl()];
         } else {
             return $httpClient->get($data)->send()->getData();
@@ -320,14 +356,14 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    protected function getVerifyRequestData(int $command, \yiiviet\payment\BasePaymentClient $merchant, \yii\web\Request $request): array
+    protected function getVerifyRequestData($command, \yii\web\Request $request): array
     {
         $params = [
             'vpc_Command', 'vpc_Locale', 'vpc_MerchTxnRef', 'vpc_Merchant', 'vpc_OrderInfo', 'vpc_Amount',
             'vpc_TxnResponseCode', 'vpc_TransactionNo', 'vcp_Message', 'vpc_SecureHash'
         ];
 
-        if ($command & (self::VC_PURCHASE_SUCCESS_INTERNATIONAL | self::VC_PAYMENT_NOTIFICATION_INTERNATIONAL)) {
+        if ($command === self::VRC_PURCHASE_SUCCESS_INTERNATIONAL || $command === self::VRC_IPN_INTERNATIONAL) {
             $params = array_merge($params, [
                 'vpc_AcqResponseCode', 'vpc_Authorizeld', 'vpc_Card', 'vpc_3DSECI',
                 'vpc_3Dsenrolled', 'vpc_3Dsstatus', 'vpc_CommercialCard'
@@ -337,7 +373,9 @@ class PaymentGateway extends BasePaymentGateway
         $data = [];
 
         foreach ($params as $param) {
-            $data[$param] = $request->get($param);
+            if (($value = $request->get($param)) !== null) {
+                $data[$param] = $value;
+            }
         }
 
         return $data;

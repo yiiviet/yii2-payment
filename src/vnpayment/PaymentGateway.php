@@ -1,84 +1,149 @@
 <?php
 /**
- * @link https://github.com/yii2-vn/payment
- * @copyright Copyright (c) 2017 Yii2VN
+ * @link https://github.com/yiiviet/yii2-payment
+ * @copyright Copyright (c) 2017 Yii Viet
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
 namespace yiiviet\payment\vnpayment;
 
+use vxm\gatewayclients\RequestEvent;
 use yiiviet\payment\BasePaymentGateway;
 
+use vxm\gatewayclients\DataInterface;
+
 /**
- * Class PaymentGateway
+ * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến OnePay.
+ * Hiện tại nó hổ trợ 100% các tính năng từ cổng thanh toán VnPayment v2.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
 class PaymentGateway extends BasePaymentGateway
 {
+    /**
+     * Lệnh `refund` sử dụng cho việc tạo [[request()]] yêu cầu hoàn trả tiền.
+     */
+    const RC_REFUND = 'refund';
 
-    const RC_REFUND = 0x04;
+    /**
+     * @event RequestEvent được gọi trước khi khởi tạo lệnh [[RC_REFUND]] ở phương thức [[request()]].
+     */
+    const EVENT_BEFORE_REFUND = 'beforeRefund';
 
-    const RC_ALL = 0x07;
+    /**
+     * @event RequestEvent được gọi sau khi khởi tạo lệnh [[RC_REFUND]] ở phương thức [[request()]].
+     */
+    const EVENT_AFTER_REFUND = 'afterRefund';
 
+    /**
+     * Đường dẫn API để yêu cầu tạo giao dịch thanh toán.
+     */
     const PURCHASE_URL = '/paymentv2/vpcpay.html';
 
+    /**
+     * Đường dẫn API để truy vấn thông tin giao dịch.
+     */
     const QUERY_DR_URL = '/merchant_webapi/merchant.html';
 
+    /**
+     * Đường dẫn API để yêu cầu hoàn trả tiền.
+     */
     const REFUND_URL = '/merchant_webapi/merchant.html';
 
-    public $merchantConfig = ['class' => Merchant::class];
+    /**
+     * @inheritdoc
+     */
+    public $clientConfig = ['class' => PaymentClient::class];
 
+    /**
+     * @inheritdoc
+     */
     public $requestDataConfig = ['class' => RequestData::class];
 
+    /**
+     * @inheritdoc
+     */
     public $responseDataConfig = ['class' => ResponseData::class];
 
+    /**
+     * @inheritdoc
+     */
     public $verifiedDataConfig = ['class' => VerifiedData::class];
 
     /**
      * @inheritdoc
      */
-    protected static function getBaseUrl(bool $sandbox): string
+    public function getBaseUrl(): string
     {
-        return $sandbox ? 'http://sandbox.vnpayment.vn' : 'http://vnpayment.vn';
+        return $this->sandbox ? 'http://sandbox.vnpayment.vn' : 'http://vnpayment.vn';
     }
 
     /**
      * @inheritdoc
      */
-    public static function version(): string
+    public function getVersion(): string
     {
         return '2.0.0';
     }
 
     /**
-     * @param array $data
-     * @param null $merchantId
-     * @return ResponseData|\yiiviet\payment\ResponseData
-     * @throws \yii\base\InvalidConfigException
+     * Phương thức yêu cầu VnPayment hoàn trả tiền cho đơn hàng chỉ định.
+     * Đây là phương thức ánh xạ của [[request()]] sử dụng lệnh [[RC_REFUND]].
+     *
+     * @param array $data Dữ liệu yêu cầu hoàn trả.
+     * @param null $clientId Client id sử dụng để tạo yêu cầu.
+     * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
+     * @return ResponseData|DataInterface Trả về [[DataInterface]] là dữ liệu tổng hợp từ VnPayment phản hồi.
+     * @throws \ReflectionException|\yii\base\InvalidConfigException|\yii\base\InvalidArgumentException
      */
-    public function refund(array $data, $merchantId = null): ResponseData
+    public function refund(array $data, $clientId = null): DataInterface
     {
-        return $this->request(self::RC_REFUND, $data, $merchantId);
+        return $this->request(self::RC_REFUND, $data, $clientId);
     }
 
     /**
      * @inheritdoc
+     */
+    public function beforeRequest(RequestEvent $event)
+    {
+        if ($event->command === self::RC_REFUND) {
+            $this->trigger(self::EVENT_BEFORE_REFUND, $event);
+        }
+
+        parent::beforeRequest($event);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterRequest(RequestEvent $event)
+    {
+        if ($event->command === self::RC_REFUND) {
+            $this->trigger(self::EVENT_AFTER_REFUND, $event);
+        }
+
+        parent::beforeRequest($event);
+    }
+
+    /**
+     * @inheritdoc
+     * @throws \yii\base\InvalidConfigException
      */
     protected function initSandboxEnvironment()
     {
-        $merchantConfig = require(__DIR__ . '/sandbox-merchant.php');
+        $clientConfig = require(__DIR__ . '/sandbox-client.php');
 
-        $this->setMerchant($merchantConfig);
+        $this->setClient($clientConfig);
     }
 
     /**
      * @inheritdoc
-     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
+     * @throws \yii\base\InvalidConfigException
      */
-    protected function requestInternal(int $command, \yiiviet\payment\BasePaymentClient $merchant, \yiiviet\payment\Data $requestData, \yii\httpclient\Client $httpClient): array
+    protected function requestInternal(\vxm\gatewayclients\RequestData $requestData, \yii\httpclient\Client $httpClient): array
     {
+        $command = $requestData->getCommand();
         $commandUrls = [
             self::RC_PURCHASE => self::PURCHASE_URL,
             self::RC_REFUND => self::REFUND_URL,
@@ -97,7 +162,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    protected function getVerifyRequestData(int $command, \yiiviet\payment\BasePaymentClient $merchant, \yii\web\Request $request): array
+    protected function getVerifyRequestData($command, \yii\web\Request $request): array
     {
         $params = [
             'vnp_TmnCode', 'vnp_Amount', 'vnp_BankCode', 'vnp_BankTranNo', 'vnp_CardType', 'vnp_PayDate', 'vnp_CurrCode',
@@ -106,12 +171,17 @@ class PaymentGateway extends BasePaymentGateway
 
         $data = [];
         foreach ($params as $param) {
-            $data[$param] = $request->get($param);
+            if (($value = $request->get($param)) !== null) {
+                $data[$param] = $value;
+            }
         }
 
         return $data;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getHttpClientConfig(): array
     {
         return [

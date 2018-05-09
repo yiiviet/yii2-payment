@@ -12,7 +12,7 @@ use vxm\gatewayclients\RequestData as BaseRequestData;
 /**
  * Lớp RequestData cung cấp dữ liệu đã được kiểm tra tính trọn vẹn khi tạo [[request()]] ở [[PaymentGateway]].
  *
- * @property PaymentClient $merchant
+ * @property PaymentClient $client
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -47,7 +47,9 @@ class RequestData extends BaseRequestData
 
         if (in_array($command, [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_PURCHASE_PRO, PaymentGateway::RC_GET_MERCHANT_DATA], true)) {
             $attributes['business'] = $attributes['business'] ?? $client->merchantEmail;
-        } elseif ($command === PaymentGateway::RC_QUERY_DR) {
+        }
+
+        if (in_array($command, [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_QUERY_DR], true)) {
             $attributes['merchant_id'] = $client->merchantId;
         }
 

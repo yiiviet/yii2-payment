@@ -14,8 +14,7 @@ return [
     'securePassword' => 'ae543c080ad91c23',
     'apiUser' => 'merchant',
     'apiPassword' => 1234,
-    'privateCertificate' => '
-    -----BEGIN PRIVATE KEY-----
+    'privateCertificate' => '-----BEGIN PRIVATE KEY-----
 MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDZZBAIQz1UZtVm
 p0Jwv0SnoIkGYdHUs7vzdfXYBs1wvznuLp/SfC/MHzHVQw7urN8qv+ZDxzTMgu2Q
 3FhMOQ+LIoqYNnklm+5EFsE8hz01sZzg+uRBbyNEdcTa39I4X88OFr13KoJC6sBE
@@ -42,6 +41,5 @@ tqVHKv72LtrHE7hs8bNtJV+rQkZtxVtZLRA308PhAoGBALVEaYMRm97V+Tnsej6q
 fuT/6oKHPqZpur2rNfEKVn5Aq2kmFrvyUhvXi0IAWQ/XS3XJ7faQnprrWT6pYiSy
 2YQuaghlNG1SATVd5eUadq2pA8DuSzqWFa0Ac1IAyliBO2uLPL7LzuEKmmuQk0vI
 TU2Q8idAb77K7mvVguA3LDhN
------END PRIVATE KEY----- 
-'
+-----END PRIVATE KEY-----'
 ];

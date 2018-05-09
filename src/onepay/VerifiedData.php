@@ -29,29 +29,31 @@ class VerifiedData extends BaseVerifiedData
                 'vpc_Command', 'vpc_Locale', 'vpc_MerchTxnRef', 'vpc_Merchant', 'vpc_OrderInfo', 'vpc_Amount',
                 'vpc_TxnResponseCode', 'vpc_TransactionNo', 'vcp_Message', 'vpc_SecureHash'
             ], 'required', 'on' => [
-                PaymentGateway::VC_PAYMENT_NOTIFICATION_INTERNATIONAL, PaymentGateway::VC_PAYMENT_NOTIFICATION,
-                PaymentGateway::VC_PURCHASE_SUCCESS_INTERNATIONAL, PaymentGateway::VC_PURCHASE_SUCCESS
+                PaymentGateway::VRC_IPN_INTERNATIONAL, PaymentGateway::VRC_IPN,
+                PaymentGateway::VRC_PURCHASE_SUCCESS_INTERNATIONAL, PaymentGateway::VRC_PURCHASE_SUCCESS
             ]],
             [['vpc_SecureHash'], 'validateSecureHash', 'message' => '{attribute} is not valid!', 'on' => [
-                PaymentGateway::VC_PAYMENT_NOTIFICATION_INTERNATIONAL, PaymentGateway::VC_PAYMENT_NOTIFICATION,
-                PaymentGateway::VC_PURCHASE_SUCCESS_INTERNATIONAL, PaymentGateway::VC_PURCHASE_SUCCESS
+                PaymentGateway::VRC_IPN_INTERNATIONAL, PaymentGateway::VRC_IPN,
+                PaymentGateway::VRC_PURCHASE_SUCCESS_INTERNATIONAL, PaymentGateway::VRC_PURCHASE_SUCCESS
             ]],
             [['vpc_AcqResponseCode', 'vpc_Authorizeld', 'vpc_Card', 'vpc_3DSECI', 'vpc_3Dsenrolled', 'vpc_3Dsstatus', 'vpc_CommercialCard'], 'required', 'on' => [
-                PaymentGateway::VC_PURCHASE_SUCCESS_INTERNATIONAL, PaymentGateway::VC_PAYMENT_NOTIFICATION_INTERNATIONAL
+                PaymentGateway::VRC_PURCHASE_SUCCESS_INTERNATIONAL, PaymentGateway::VRC_IPN_INTERNATIONAL
             ]]
         ];
     }
 
     /**
-     * @param $attribute
-     * @param $params
-     * @param \yii\validators\InlineValidator $validator
+     * Phương thức kiểm tra chữ ký dữ liệu nhận từ OnePay.
+     *
+     * @param string $attribute Attribute chứa giá trị chữ ký cần kiểm tra.
+     * @param array $params Mảng các tham trị được thiết lập từ rule.
+     * @param \yii\validators\InlineValidator $validator Đối tượng thực thi kiểm tra.
      * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
      */
     public function validateSecureHash($attribute, $params, \yii\validators\InlineValidator $validator)
     {
         $data = $this->get(false);
-        $expectSignature = ArrayHelper::remove($data, 'vpc_SecureHash');
+        $expectSignature = ArrayHelper::remove($data, $attribute);
         $dataSign = [];
 
         foreach ($data as $param => $value) {
@@ -62,7 +64,10 @@ class VerifiedData extends BaseVerifiedData
 
         ksort($dataSign);
 
-        if (!$this->getMerchant()->validateSignature(http_build_query($dataSign), $expectSignature)) {
+        /** @var PaymentClient $client */
+        $client = $this->getClient();
+
+        if (!$client->validateSignature(http_build_query($dataSign), $expectSignature)) {
             $validator->addError($this, $attribute, $validator->message);
         }
     }

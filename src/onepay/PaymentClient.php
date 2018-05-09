@@ -25,21 +25,21 @@ class PaymentClient extends BasePaymentClient
     /**
      * Mã merchant sẽ được OnePay cấp khi đăng ký tích hợp. Nó luôn được dùng khi khởi tạo [[request()]] ở [[PaymentGateway]].
      *
-     * @var int
+     * @var string
      */
     public $merchantId;
 
     /**
      * Access code sẽ được OnePay cấp khi đăng ký tích hợp. Nó luôn được dùng khi khởi tạo [[request()]] ở [[PaymentGateway]].
      *
-     * @var int
+     * @var string
      */
     public $accessCode;
 
     /**
      * Access code sẽ được OnePay cấp khi đăng ký tích hợp. Nó dùng để tạo, xác minh chữ ký dữ liệu.
      *
-     * @var int
+     * @var string
      */
     public $secureSecret;
 

@@ -186,7 +186,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
             $this->trigger(self::EVENT_BEFORE_QUERY_DR, $event);
         }
 
-        $this->trigger(self::EVENT_BEFORE_REQUEST, $event);
+        parent::beforeRequest($event);
     }
 
     /**
@@ -200,7 +200,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
             $this->trigger(self::EVENT_AFTER_QUERY_DR, $event);
         }
 
-        $this->trigger(self::EVENT_AFTER_REQUEST, $event);
+        parent::afterRequest($event);
     }
 
     /**

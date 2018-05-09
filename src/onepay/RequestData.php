@@ -9,22 +9,27 @@ namespace yiiviet\payment\onepay;
 
 use Yii;
 
-use yiiviet\payment\RequestData as BaseRequestData;
+use vxm\gatewayclients\RequestData as BaseRequestData;
 use yii\helpers\Url;
 
 /**
- * Class RequestData
+ * Lớp RequestData cung cấp dữ liệu để giao tiếp với OnePay như truy vấn giao dịch, yêu cầu thanh toán.
  *
- * @property PaymentClient $merchant
+ * @property PaymentClient $client
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
 class RequestData extends BaseRequestData
 {
-
+    /**
+     * Mảng hằng tập hợp các attributes cần thêm prefix `avs_`
+     */
     const AVS_ATTRIBUTES = ['Street01', 'City', 'StateProv', 'PostCode', 'Country'];
 
+    /**
+     * Mảng hằng tập hợp các attributes cần thêm prefix `vpc_`
+     */
     const VPC_ATTRIBUTES = [
         'Amount', 'Locale', 'TicketNo', 'MerchTxnRef', 'ReturnURL', 'Currency', 'OrderInfo',
         'SHIP_Street01', 'SHIP_Provice', 'SHIP_City', 'SHIP_Country', 'Customer_Phone', 'Customer_Email',
@@ -55,8 +60,8 @@ class RequestData extends BaseRequestData
     protected function ensureAttributes(array &$attributes)
     {
         parent::ensureAttributes($attributes);
-        /** @var PaymentClient $merchant */
-        $merchant = $this->getMerchant();
+        /** @var PaymentClient $client */
+        $client = $this->getClient();
         $command = $this->getCommand();
         $attributesEnsured = [];
 
@@ -70,12 +75,12 @@ class RequestData extends BaseRequestData
             }
         }
 
-        $attributesEnsured['vpc_Merchant'] = $merchant->id;
-        $attributesEnsured['vpc_AccessCode'] = $merchant->accessCode;
+        $attributesEnsured['vpc_Merchant'] = $client->merchantId;
+        $attributesEnsured['vpc_AccessCode'] = $client->accessCode;
         $attributesEnsured['vpc_Command'] = $command === PaymentGateway::RC_QUERY_DR ? 'queryDR' : 'pay';
-        $attributesEnsured['vpc_Version'] = $merchant->getPaymentGateway()->version();
+        $attributesEnsured['vpc_Version'] = $client->getGateway()->getVersion();
 
-        if ($command & (PaymentGateway::RC_QUERY_DR | PaymentGateway::RC_QUERY_DR_INTERNATIONAL)) {
+        if ($command === PaymentGateway::RC_QUERY_DR || $command === PaymentGateway::RC_QUERY_DR_INTERNATIONAL) {
             $attributesEnsured['vpc_Command'] = 'queryDR';
             $attributesEnsured['vpc_User'] = 'op01';
             $attributesEnsured['vpc_Password'] = 'op123456';
@@ -92,8 +97,10 @@ class RequestData extends BaseRequestData
     }
 
     /**
-     * @param array $data
-     * @return string
+     * Phương thức tạo chữ ký dữ liệu
+     *
+     * @param array $data Dữ liệu cần tạo chữ ký
+     * @return string Trả về chuỗi chữ ký của dữ liệu
      * @throws \yii\base\NotSupportedException
      */
     private function signature(array $data): string
@@ -107,7 +114,10 @@ class RequestData extends BaseRequestData
             }
         }
 
-        return strtoupper($this->getMerchant()->signature(http_build_query($dataSign)));
+        /** @var PaymentClient $client */
+        $client = $this->getClient();
+
+        return strtoupper($client->signature(http_build_query($dataSign)));
     }
 
 }

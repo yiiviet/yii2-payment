@@ -13,6 +13,7 @@ use yiiviet\payment\BasePaymentGateway;
 
 /**
  * Lớp PaymentGateway hổ trợ việc kết nối đến Ngân Lượng.
+ * Hiện tại nó hỗ trợ 100% tính năng của Ngân Lượng v3.1
  *
  * @property PaymentClient $client
  * @property PaymentClient $defaultClient

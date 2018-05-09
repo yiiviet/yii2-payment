@@ -8,7 +8,7 @@
  */
 
 return [
-    'class' => 'yiiviet\payment\vnpayment\Merchant',
+    'class' => 'yiiviet\payment\vnpayment\PaymentClient',
     'tmnCode' => 'COCOSIN',
     'secureHash' => 'RAOEXHYVSDDIIENYWSLDIIZTANXUXZFJ'
 ];

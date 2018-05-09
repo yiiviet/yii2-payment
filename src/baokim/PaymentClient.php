@@ -132,17 +132,16 @@ class PaymentClient extends BasePaymentClient
     {
         if ($type === self::SIGNATURE_RSA) {
             $config = ArrayHelper::merge($this->rsaDataSignatureConfig, [
-                'publicCertificate' => $this->publicCertificate,
-                'privateCertificate' => $this->privateCertificate,
+                'publicCertificate' => $this->publicCertificate ?? false,
+                'privateCertificate' => $this->privateCertificate ?? false,
                 'openSSLAlgo' => OPENSSL_ALGO_SHA1
             ]);
             $config['class'] = $config['class'] ?? 'yiiviet\payment\RsaDataSignature';
-
             return Yii::createObject($config, [$data]);
         } elseif ($type === self::SIGNATURE_HMAC) {
             $config = ArrayHelper::merge($this->hmacDataSignatureConfig, [
                 'key' => $this->securePassword,
-                'hmacAlgo' => 'md5'
+                'hmacAlgo' => 'SHA1'
             ]);
             $config['class'] = $config['class'] ?? 'yiiviet\payment\HmacDataSignature';
 

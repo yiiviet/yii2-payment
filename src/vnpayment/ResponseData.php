@@ -9,12 +9,12 @@ namespace yiiviet\payment\vnpayment;
 
 use Yii;
 
-use yiiviet\payment\ResponseData as BaseResponseData;
+use vxm\gatewayclients\ResponseData as BaseResponseData;
 
 /**
- * Class ResponseData
+ * Lớp ResponseData cung cấp dữ liệu phản hồi từ VnPayment sau khi thực hiện hàm [[request()]] ở [[PaymentGateway]].
  *
- * @property Merchant|\yiiviet\payment\PaymentClientInterface $merchant
+ * @property PaymentClient $client
  * @property int|null $responseCode
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
@@ -31,9 +31,9 @@ class ResponseData extends BaseResponseData
     }
 
     /**
-     * Get a response code from response result
+     * Phương thức hổ trợ lấy response code và ép kiểu về int.
      *
-     * @return int|null
+     * @return int|null Trả về NULL nếu như dữ liệu trả về từ VnPayment không có thuộc tính `vnp_ResponseCode` và ngược lại.
      */
     public function getResponseCode(): ?int
     {
@@ -45,9 +45,10 @@ class ResponseData extends BaseResponseData
     }
 
     /**
-     * Check, get and translate a message from response result.
+     * Phương thức hổ trợ lấy và phiên dịch message nhận từ VnPayment (nếu như bạn có thiết lập i18n).
      *
-     * @return null|string
+     * @return null|string Trả về NULL nếu như dữ liệu VnPayment gửi về không tồn tại `vnp_Message`,
+     * và ngược lại sẽ là câu thông báo đã được phiên dịch.
      */
     public function getMessage(): ?string
     {
