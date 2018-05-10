@@ -7,6 +7,7 @@
 
 namespace yiiviet\payment\vnpayment;
 
+use yii\base\InvalidConfigException;
 use yiiviet\payment\DataSignature as BaseDataSignature;
 
 /**
@@ -23,7 +24,7 @@ class DataSignature extends BaseDataSignature
     /**
      * @var string
      */
-    public $secureHash;
+    public $hashSecret;
 
     /**
      * @var string
@@ -31,16 +32,23 @@ class DataSignature extends BaseDataSignature
     public $hashAlgo;
 
     /**
-     * @return string
+     * @inheritdoc
+     * @throws InvalidConfigException
      */
     public function generate(): string
     {
-        return hash($this->hashAlgo, $this->secureHash . $this->getData());
+        if ($this->hashSecret === null) {
+            throw new InvalidConfigException('Property `hashSecret` must be set!');
+        } elseif ($this->hashAlgo === null) {
+            throw new InvalidConfigException('Property `hashAlgo` must be set!');
+        }
+
+        return hash($this->hashAlgo, $this->hashSecret . $this->getData());
     }
 
     /**
-     * @param string $expect
-     * @return bool
+     * @throws InvalidConfigException
+     * @inheritdoc
      */
     public function validate(string $expect): bool
     {

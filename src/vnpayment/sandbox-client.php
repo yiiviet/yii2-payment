@@ -10,5 +10,5 @@
 return [
     'class' => 'yiiviet\payment\vnpayment\PaymentClient',
     'tmnCode' => 'COCOSIN',
-    'secureHash' => 'RAOEXHYVSDDIIENYWSLDIIZTANXUXZFJ'
+    'hashSecret' => 'RAOEXHYVSDDIIENYWSLDIIZTANXUXZFJ'
 ];

@@ -128,7 +128,7 @@ class PaymentClient extends BasePaymentClient
      * @return object|\yiiviet\payment\DataSignature
      * @throws \yii\base\InvalidConfigException
      */
-    protected function initDataSignature(string $data, string $type): ?\yiiviet\payment\DataSignature
+    protected function initDataSignature(string $data, string $type = null): ?\yiiviet\payment\DataSignature
     {
         if ($type === self::SIGNATURE_RSA) {
             $config = ArrayHelper::merge($this->rsaDataSignatureConfig, [

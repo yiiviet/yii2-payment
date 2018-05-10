@@ -32,7 +32,7 @@ class PaymentClient extends BasePaymentClient
      *
      * @var string
      */
-    public $secureHash;
+    public $hashSecret;
 
     /**
      * Mã TMN được dùng để gửi lên VnPayment xác định là yêu cầu từ bạn.
@@ -54,12 +54,12 @@ class PaymentClient extends BasePaymentClient
      * @inheritdoc
      * @throws \yii\base\InvalidConfigException
      */
-    protected function initDataSignature(string $data, string $type): ?\yiiviet\payment\DataSignature
+    protected function initDataSignature(string $data, string $type = null): ?\yiiviet\payment\DataSignature
     {
         return Yii::createObject(array_merge([
             'class' => DataSignature::class,
             'hashAlgo' => $type,
-            'secureHash' => $this->secureHash
+            'hashSecret' => $this->hashSecret
         ], $this->dataSignatureConfig), [$data]);
     }
 }

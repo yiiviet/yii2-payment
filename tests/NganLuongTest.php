@@ -10,6 +10,12 @@ namespace yiiviet\tests\unit\payment;
 
 use Yii;
 
+/**
+ * Class NganLuongTest
+ *
+ * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @since 1.0
+ */
 class NganLuongTest extends TestCase
 {
 

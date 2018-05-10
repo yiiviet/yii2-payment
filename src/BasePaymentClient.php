@@ -55,10 +55,11 @@ abstract class BasePaymentClient extends BaseClient implements PaymentClientInte
      * tính hợp lệ của chữ ký dữ liệu.
      *
      * @param string $data Dữ liệu muốn tạo hoặc kiểm tra tính hợp lệ.
-     * @param string $type Loại chữ ký muốn tạo hoặc sử dụng để kiếm trả tính hợp lệ.
+     * @param string|null $type Loại chữ ký muốn tạo hoặc sử dụng để kiếm trả tính hợp lệ. Nếu không thiết lập
+     * có nghĩa là sử dụng loại chữ ký mặc định của cổng thanh toán.
      * @return null|DataSignature Trả về NULL nếu như loại chữ ký không được hổ trợ và ngược lại là đối tượng [[DataSignature]].
      */
-    abstract protected function initDataSignature(string $data, string $type): ?DataSignature;
+    abstract protected function initDataSignature(string $data, string $type = null): ?DataSignature;
 
 
 }

@@ -77,8 +77,11 @@ class RequestData extends BaseRequestData
 
         $attributesEnsured['vpc_Merchant'] = $client->merchantId;
         $attributesEnsured['vpc_AccessCode'] = $client->accessCode;
-        $attributesEnsured['vpc_Command'] = $command === PaymentGateway::RC_QUERY_DR ? 'queryDR' : 'pay';
         $attributesEnsured['vpc_Version'] = $client->getGateway()->getVersion();
+
+        if ($command === PaymentGateway::RC_PURCHASE) {
+            $attributesEnsured['vpc_Currency'] = $attributesEnsured['vpc_Currency'] ?? 'VND';
+        }
 
         if ($command === PaymentGateway::RC_QUERY_DR || $command === PaymentGateway::RC_QUERY_DR_INTERNATIONAL) {
             $attributesEnsured['vpc_Command'] = 'queryDR';
@@ -86,10 +89,10 @@ class RequestData extends BaseRequestData
             $attributesEnsured['vpc_Password'] = 'op123456';
         } else {
             $attributesEnsured['vpc_Command'] = 'pay';
-            $attributesEnsured['vpc_Locale'] = $data['vpc_Locale'] ?? 'vn';
-            $attributesEnsured['vpc_TicketNo'] = $data['vpc_TicketNo'] ?? Yii::$app->getRequest()->getUserIP();
-            $attributesEnsured['AgainLink'] = $data['AgainLink'] ?? Url::current();
-            $attributesEnsured['Title'] = $data['Title'] ?? (string)Yii::$app->getView()->title;
+            $attributesEnsured['vpc_Locale'] = $attributesEnsured['vpc_Locale'] ?? 'vn';
+            $attributesEnsured['vpc_TicketNo'] = $attributesEnsured['vpc_TicketNo'] ?? Yii::$app->getRequest()->getUserIP();
+            $attributesEnsured['AgainLink'] = $attributesEnsured['AgainLink'] ?? Url::current();
+            $attributesEnsured['Title'] = $attributesEnsured['Title'] ?? (string)Yii::$app->getView()->title;
             $attributesEnsured['vpc_SecureHash'] = $this->signature($attributesEnsured);
         }
 
@@ -116,8 +119,8 @@ class RequestData extends BaseRequestData
 
         /** @var PaymentClient $client */
         $client = $this->getClient();
-
-        return strtoupper($client->signature(http_build_query($dataSign)));
+        $dataSign = urldecode(http_build_query($dataSign));
+        return strtoupper($client->signature($dataSign));
     }
 
 }

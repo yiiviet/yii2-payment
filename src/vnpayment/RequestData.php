@@ -62,6 +62,7 @@ class RequestData extends BaseRequestData
         /** @var PaymentClient $client */
         $client = $this->getClient();
         $command = $this->getCommand();
+        $hashType = ArrayHelper::remove($attributesEnsured, 'vnp_SecureHashType', 'MD5');
         $attributesEnsured['vnp_IpAddr'] = $attributesEnsured['vnp_IpAddr'] ?? Yii::$app->getRequest()->getUserIP();
         $attributesEnsured['vnp_CreateDate'] = $attributesEnsured['vnp_CreateDate'] ?? date('Ymdhis');
         $attributesEnsured['vnp_Version'] = $client->getGateway()->getVersion();
@@ -77,8 +78,9 @@ class RequestData extends BaseRequestData
         }
 
         ksort($attributesEnsured);
-        $hashType = ArrayHelper::remove($attributesEnsured, 'vnp_SecureHashType', 'MD5');
-        $attributesEnsured['vnp_SecureHash'] = $client->signature(http_build_query($attributesEnsured), $hashType);
+
+        $dataSign = urldecode(http_build_query($attributesEnsured));
+        $attributesEnsured['vnp_SecureHash'] = $client->signature($dataSign, $hashType);
         $attributesEnsured['vnp_SecureHashType'] = $hashType;
 
         $attributes = $attributesEnsured;

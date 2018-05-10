@@ -55,7 +55,7 @@ class PaymentClient extends BasePaymentClient
      * @return object|\yiiviet\payment\HmacDataSignature
      * @throws \yii\base\InvalidConfigException
      */
-    public function initDataSignature(string $data, string $type): ?\yiiviet\payment\DataSignature
+    public function initDataSignature(string $data, string $type = null): ?\yiiviet\payment\DataSignature
     {
         $config = ArrayHelper::merge($this->dataSignatureConfig, [
             'key' => pack('H*', $this->secureSecret),

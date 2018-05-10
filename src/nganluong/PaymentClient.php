@@ -43,7 +43,7 @@ class PaymentClient extends BasePaymentClient
     /**
      * @inheritdoc
      */
-    protected function initDataSignature(string $data, string $type): ?\yiiviet\payment\DataSignature
+    protected function initDataSignature(string $data, string $type = null): ?\yiiviet\payment\DataSignature
     {
         return null;
     }

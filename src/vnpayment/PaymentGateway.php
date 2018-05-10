@@ -16,6 +16,11 @@ use vxm\gatewayclients\DataInterface;
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến OnePay.
  * Hiện tại nó hổ trợ 100% các tính năng từ cổng thanh toán VnPayment v2.
  *
+ * @method ResponseData purchase(array $data, $clientId = null)
+ * @method ResponseData queryDR(array $data, $clientId = null)
+ * @method VerifiedData verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
+ * @method VerifiedData verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */

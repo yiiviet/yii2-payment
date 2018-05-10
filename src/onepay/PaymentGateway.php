@@ -134,7 +134,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public static function version(): string
+    public function getVersion(): string
     {
         return '2';
     }
@@ -142,9 +142,9 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    protected static function getBaseUrl(bool $sandbox): string
+    public function getBaseUrl(): string
     {
-        return $sandbox ? 'https://mtf.onepay.vn' : 'https://onepay.vn';
+        return $this->sandbox ? 'https://mtf.onepay.vn' : 'https://onepay.vn';
     }
 
     /**
@@ -265,7 +265,7 @@ class PaymentGateway extends BasePaymentGateway
      *
      * @param array $data Dữ liệu dùng để truy vấn thông tin giao dịch bên trong thường có mã giao dịch từ cổng thanh toán...
      * @param string|int $clientId Client id dùng để tạo yêu cầu truy vấn giao dịch quốc tế.
-     * @return DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]],
+     * @return ResponseData|DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]],
      * để lấy thông tin trả về từ cổng thanh toán.
      * @throws \ReflectionException|\yii\base\InvalidConfigException
      */
@@ -295,7 +295,7 @@ class PaymentGateway extends BasePaymentGateway
      * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
      * @return bool|VerifiedData Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
      */
-    public function verifyPaymentNotificationInternationalRequest($clientId = null, \yii\web\Request $request = null)
+    public function verifyIPNInternationalRequest($clientId = null, \yii\web\Request $request = null)
     {
         $clientId = $clientId ?? ($this->sandbox ? static::SANDBOX_CLIENT_INTERNATIONAL_ID : null);
 
