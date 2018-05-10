@@ -1,6 +1,6 @@
 BSD 3-Clause License
 
-Copyright (c) 2017, yii2vn
+Copyright (c) 2017, Yii Viet
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
