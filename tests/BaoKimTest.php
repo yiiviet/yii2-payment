@@ -9,11 +9,6 @@ namespace yiiviet\tests\unit\payment;
 
 use Yii;
 
-use yii\helpers\Url;
-
-use yiiviet\payment\baokim\PaymentGateway;
-use yiiviet\payment\baokim\ResponseData;
-
 /**
  * Class BaoKimTest
  *
@@ -22,33 +17,24 @@ use yiiviet\payment\baokim\ResponseData;
  */
 class BaoKimTest extends TestCase
 {
+    /**
+     * @var \yiiviet\payment\baokim\PaymentGateway
+     */
+    public $gateway;
 
-    public function testEnsureInstance()
+    public static function gatewayId(): string
     {
-        /** @var PaymentGateway $bk */
-
-        $bk = Yii::$app->paymentGateways->BK;
-        $this->assertInstanceOf(PaymentGateway::class, $bk);
-        $this->assertTrue($bk->sandbox);
+        return 'BK';
     }
 
     /**
      * @expectedException \yii\base\InvalidConfigException
      * @expectedExceptionMessage cannot be blank
-     * @depends testEnsureInstance
-     * @throws \yii\base\InvalidConfigException
      */
     public function testPurchase()
     {
-        /**
-         * @var PaymentGateway $bk
-         * @var ResponseData $responseData
-         */
-
-        $bk = Yii::$app->paymentGateways->BK;
-
         // valid
-        $responseData = $bk->purchase([
+        $responseData = $this->gateway->purchase([
             'order_id' => 2,
             'total_amount' => 500000,
             'url_success' => '/'
@@ -58,7 +44,7 @@ class BaoKimTest extends TestCase
         $this->assertEquals($responseData->location, 'https://sandbox.baokim.vn/payment/order/version11?business=dev.baokim%40bk.vn&checksum=c96f01e3fdb4ba665304e70c04d58ba8917f31fe&merchant_id=647&order_id=2&total_amount=500000&url_success=%2F');
 
         // throws
-        $bk->purchase([
+        $this->gateway->purchase([
             'order_id' => 1,
             'url_success' => '/'
         ]);
@@ -68,19 +54,11 @@ class BaoKimTest extends TestCase
     /**
      * @expectedException \yii\base\InvalidConfigException
      * @expectedExceptionMessage cannot be blank
-     * @depends testEnsureInstance
-     * @throws \yii\base\InvalidConfigException
      */
     public function testPurchasePro()
     {
-        /**
-         * @var PaymentGateway $bk
-         * @var ResponseData $responseData
-         */
-        $bk = Yii::$app->paymentGateways->BK;
-
         // Valid
-        $responseData = $bk->purchasePro([
+        $responseData = $this->gateway->purchasePro([
             'bank_payment_method_id' => '128',
             'payer_name' => 'vxm',
             'payer_email' => 'vxm@gmail.com',
@@ -92,7 +70,7 @@ class BaoKimTest extends TestCase
         $this->assertTrue($responseData->next_action === 'redirect');
 
         // Throws
-        $bk->purchasePro([
+        $this->gateway->purchasePro([
             'bank_payment_method_id' => '128',
             'payer_name' => 'vxm',
             'payer_email' => 'vxm@gmail.com',
@@ -104,25 +82,64 @@ class BaoKimTest extends TestCase
     }
 
     /**
-     * @depends testEnsureInstance
      * @expectedException \yii\base\InvalidConfigException
      * @expectedExceptionMessage cannot be blank
      */
     public function testQueryDR()
     {
-        /**
-         * @var PaymentGateway $bk
-         * @var ResponseData $responseData
-         */
-        $bk = Yii::$app->paymentGateways->BK;
-
         // Valid
-        $responseData = $bk->queryDR(['transaction_id' => 1]);
+        $responseData = $this->gateway->queryDR(['transaction_id' => 1]);
         $this->assertTrue($responseData->getIsOk());
 
         // Throws
-        $bk->queryDR([]);
+        $this->gateway->queryDR([]);
     }
 
+    public function testGetMerchantData()
+    {
+        $merchantData = $this->gateway->getMerchantData();
+        $this->assertTrue($merchantData->getIsOk());
+    }
 
+    public function testVerifyIPN()
+    {
+        $_POST = [
+            'business' => 'dev.baokim@bk.vn',
+            'order_id' => 2,
+            'total_amount' => 500000,
+            'checksum' => 'c96f01e3fdb4ba665304e70c04d58ba8917f31fe',
+            'merchant_id' => 647,
+            'url_success' => '/'
+        ];
+        $responseData = $this->gateway->verifyIPN();
+        $this->assertFalse($responseData->getIsOk());
+    }
+
+    public function testVerifyRequestIPN()
+    {
+        $_POST = [
+            'business' => 'dev.baokim@bk.vn',
+            'order_id' => 2,
+            'total_amount' => 500000,
+            'checksum' => 'c96f01e3fdb4ba665304e70c04d58ba8917f31fe',
+            'merchant_id' => 647,
+            'url_success' => '/'
+        ];
+        $responseData = $this->gateway->verifyRequestIPN();
+        $this->assertFalse($responseData);
+    }
+
+    public function testVerifyRequestPurchaseSuccess()
+    {
+        $_GET = [
+            'business' => 'dev.baokim@bk.vn',
+            'order_id' => 2,
+            'total_amount' => 500000,
+            'checksum' => 'c96f01e3fdb4ba665304e70c04d58ba8917f31fe',
+            'merchant_id' => 647,
+            'url_success' => '/'
+        ];
+        $responseData = $this->gateway->verifyRequestPurchaseSuccess();
+        $this->assertFalse($responseData);
+    }
 }

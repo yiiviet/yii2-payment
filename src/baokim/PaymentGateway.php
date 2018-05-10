@@ -7,12 +7,15 @@
 
 namespace yiiviet\payment\baokim;
 
+use Yii;
+
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
 use yiiviet\payment\BasePaymentGateway;
 
 use vxm\gatewayclients\RequestEvent;
+use vxm\gatewayclients\DataInterface;
 
 /**
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến Bảo Kim.
@@ -32,6 +35,12 @@ class PaymentGateway extends BasePaymentGateway
      * Lệnh `getMerchantData` sử dụng cho việc tạo [[request()]] yêu cầu thông tin merchant.
      */
     const RC_GET_MERCHANT_DATA = 'getMerchantData';
+
+    /**
+     * Lệnh `verifyIPN` sử dụng cho việc tạo [[request()]] yêu cầu Bảo Kim kiểm tra dữ liệu Bảo Kim bắn sang IPN có hợp lệ hay không.
+     * Chống giả mạo.
+     */
+    const RC_VERIFY_IPN = 'verifyIPN';
 
     /**
      * @event RequestEvent được gọi trước khi tạo yêu câu thanh toán PRO.
@@ -54,7 +63,17 @@ class PaymentGateway extends BasePaymentGateway
     const EVENT_AFTER_GET_MERCHANT_DATA = 'afterGetMerchantData';
 
     /**
-     * Đường dẫn API của thanh toán bảo kim.
+     * @event RequestEvent được gọi trước khi tạo yêu cầu cập nhật trạng thái đơn hàng từ IPN.
+     */
+    const EVENT_BEFORE_VERIFY_IPN = 'beforeVerifyIPN';
+
+    /**
+     * @event RequestEvent được gọi sau khi tạo yêu cầu cập nhật trạng thái đơn hàng từ IPN.
+     */
+    const EVENT_AFTER_VERIFY_IPN = 'afterVerifyIPN';
+
+    /**
+     * Đường dẫn API của thanh toán Bảo Kim.
      */
     const PURCHASE_URL = '/payment/order/version11';
 
@@ -74,6 +93,12 @@ class PaymentGateway extends BasePaymentGateway
     const QUERY_DR_URL = '/payment/order/queryTransaction';
 
     /**
+     * Đường dẫn API IPN của Bảo Kim để cập nhật và xác minh dữ liệu từ IPN request từ Bảo Kim bắn sang.
+     * Nói cách khác là sẽ có 2 IPN, 1 cái nằm trên server của bạn và 1 cái là của Bảo Kim để cập nhật đơn hàng của họ.
+     */
+    const VERIFY_IPN_URL = '/bpn/verify';
+
+    /**
      * MUI thuộc tính trong mảng data khi tạo thanh toán PRO, cho phép chỉ định giao diện hiển thị charge.
      */
     const MUI_CHARGE = 'charge';
@@ -89,12 +114,12 @@ class PaymentGateway extends BasePaymentGateway
     const MUI_IFRAME = 'iframe';
 
     /**
-     * Transaction mode direct là thuộc tính khi tạo thanh toán bảo kim và PRO, cho phép chỉ định giao dịch trực tiếp.
+     * Transaction mode direct là thuộc tính khi tạo thanh toán Bảo Kim và PRO, cho phép chỉ định giao dịch trực tiếp.
      */
     const DIRECT_TRANSACTION = 1;
 
     /**
-     * Transaction mode safe là thuộc tính khi tạo thanh toán bảo kim và PRO, cho phép chỉ định giao dịch tạm giữ.
+     * Transaction mode safe là thuộc tính khi tạo thanh toán Bảo Kim và PRO, cho phép chỉ định giao dịch tạm giữ.
      */
     const SAFE_TRANSACTION = 2;
 
@@ -166,16 +191,16 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
-     * Phương thức thanh toán pro (payment pro) hổ trợ tạo thanh toán với phương thức PRO của bảo kim.
+     * Phương thức thanh toán pro (payment pro) hổ trợ tạo thanh toán với phương thức PRO của Bảo Kim.
      * Đây là phương thức ánh xạ của [[request()]] sử dụng lệnh [[RC_PURCHASE_PRO]].
      *
      * @param array $data Dữ liệu yêu cầu khởi tạo thanh toán PRO
      * @param null $clientId PaymentClient id sử dụng để tạo yêu cầu thanh toán.
      * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
-     * @return ResponseData|\vxm\gatewayclients\DataInterface Trả về [[ResponseData]] là dữ liệu từ Bảo Kim phản hồi.
+     * @return ResponseData|DataInterface Trả về [[ResponseData]] là dữ liệu từ Bảo Kim phản hồi.
      * @throws \ReflectionException|\yii\base\InvalidConfigException|\yii\base\InvalidArgumentException
      */
-    public function purchasePro(array $data, $clientId = null)
+    public function purchasePro(array $data, $clientId = null): DataInterface
     {
         return $this->request(self::RC_PURCHASE_PRO, $data, $clientId);
     }
@@ -201,14 +226,15 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * Phương thức hổ trợ lấy thông tin merchant thông qua email business.
+     * Đây là phương thức ánh xạ của [[request()]] sử dụng lệnh [[RC_GET_MERCHANT_DATA]].
      *
      * @param string $emailBusiness Email muốn lấy thông tin từ Bảo Kim.
      * @param int|string|null $clientId PaymentClient id sử dụng để lấy thông tin.
      * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
      * @throws \ReflectionException|\yii\base\InvalidConfigException
-     * @return ResponseData Trả về [[ResponseData]] là dữ liệu của emailBusiness từ Bảo Kim phản hồi.
+     * @return ResponseData|DataInterface Trả về [[ResponseData]] là dữ liệu của emailBusiness từ Bảo Kim phản hồi.
      */
-    public function getMerchantData(string $emailBusiness = null, $clientId = null): ResponseData
+    public function getMerchantData(string $emailBusiness = null, $clientId = null): DataInterface
     {
         /** @var PaymentClient $client */
         $client = $this->getClient($clientId);
@@ -233,6 +259,27 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
+     * Phương thức tạo lệnh yêu cầu Bảo Kim kiểm tra tính hợp lệ của dữ liệu mà IPN nhận được nhầm chống giả mạo.
+     * Đây là phương thức ánh xạ của [[request()]] sử dụng lệnh [[RC_IPN]].
+     *
+     * @param \yii\web\Request $request Đối tượng request chứa thông tin mà Bảo Kim bắn sang IPN,
+     * nó được dùng để tổng hợp dữ liệu yêu cầu Bảo Kim xác minh và cập nhật.
+     * Nếu không thiết lập đối tượng `request` của `Yii::$app` sẽ được sử dụng.
+     * @param null $clientId Client id sử dụng để tạo yêu cầu cập nhật.
+     * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
+     * @return ResponseData|DataInterface Trả về [[ResponseData]] là dữ liệu từ Bảo Kim phản hồi.
+     * @throws \ReflectionException|\yii\base\InvalidConfigException|\yii\base\InvalidArgumentException
+     */
+    public function verifyIPN(\yii\web\Request $request = null, $clientId = null): DataInterface
+    {
+        if ($request === null) {
+            $request = Instance::ensure('request', '\yii\web\Request');
+        }
+
+        return $this->request(self::RC_VERIFY_IPN, $request->post(), $clientId);
+    }
+
+    /**
      * @inheritdoc
      */
     public function beforeRequest(RequestEvent $event)
@@ -241,6 +288,8 @@ class PaymentGateway extends BasePaymentGateway
             $this->trigger(self::EVENT_BEFORE_PURCHASE_PRO, $event);
         } elseif ($event->command === self::RC_GET_MERCHANT_DATA) {
             $this->trigger(self::EVENT_BEFORE_GET_MERCHANT_DATA, $event);
+        } elseif ($event->command === self::RC_VERIFY_IPN) {
+            $this->trigger(self::EVENT_BEFORE_VERIFY_IPN, $event);
         }
 
         parent::beforeRequest($event);
@@ -255,6 +304,8 @@ class PaymentGateway extends BasePaymentGateway
             $this->trigger(self::EVENT_AFTER_PURCHASE_PRO, $event);
         } elseif ($event->command === self::RC_GET_MERCHANT_DATA) {
             $this->trigger(self::EVENT_AFTER_GET_MERCHANT_DATA, $event);
+        } elseif ($event->command === self::RC_VERIFY_IPN) {
+            $this->trigger(self::EVENT_AFTER_VERIFY_IPN, $event);
         }
 
         parent::afterRequest($event);
@@ -271,6 +322,8 @@ class PaymentGateway extends BasePaymentGateway
         $command = $requestData->getCommand();
         $data = $requestData->get();
         $httpMethod = 'POST';
+        $options = [CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword];
+        $responseFormat = null;
 
         if (in_array($command, [self::RC_GET_MERCHANT_DATA, self::RC_QUERY_DR], true)) {
             if ($command === self::RC_GET_MERCHANT_DATA) {
@@ -282,19 +335,24 @@ class PaymentGateway extends BasePaymentGateway
             $url = $data;
             $data = null;
             $httpMethod = 'GET';
+        } elseif ($command === self::RC_PURCHASE) {
+            $data[0] = self::PURCHASE_URL;
+            return ['location' => $httpClient->get($data)->getFullUrl()];
         } elseif ($command === self::RC_PURCHASE_PRO) {
             $url = [self::PURCHASE_PRO_URL, 'signature' => ArrayHelper::remove($data, 'signature')];
         } else {
-            $data[0] = self::PURCHASE_URL;
-            return ['location' => $httpClient->get($data)->getFullUrl()];
+            $url = self::VERIFY_IPN_URL;
+            $responseFormat = 'urlencoded';
+            $options = [];
         }
 
         return $httpClient->createRequest()
             ->setUrl($url)
             ->setMethod($httpMethod)
-            ->addOptions([CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword])
+            ->addOptions($options)
             ->addData($data)
             ->send()
+            ->setFormat($responseFormat)
             ->getData();
     }
 

@@ -19,6 +19,7 @@ use yii\httpclient\Client as HttpClient;
 use vxm\gatewayclients\BaseGateway;
 use vxm\gatewayclients\DataInterface;
 use vxm\gatewayclients\RequestEvent;
+use vxm\gatewayclients\ResponseData;
 
 /**
  * Lớp BasePaymentGateway thực thi mẫu trừu tượng [[PaymentGatewayInterface]] giúp cho việc xây dựng các lợp thực thi được tối giản.
@@ -156,7 +157,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      *
      * @param array $data Dữ liệu dùng để yêu cầu tạo giao dịch thanh toán bên trong thường có giá tiền, địa chỉ giao hàng...
      * @param string|int $clientId PaymentClient id dùng để tạo yêu cầu thanh toán.
-     * @return DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]] để lấy thông tin trả về từ cổng thanh toán.
+     * @return ResponseData|DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]] để lấy thông tin trả về từ cổng thanh toán.
      */
     public function purchase(array $data, $clientId = null): DataInterface
     {
@@ -168,7 +169,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      *
      * @param array $data Dữ liệu dùng để truy vấn thông tin giao dịch bên trong thường có mã giao dịch từ cổng thanh toán...
      * @param string|int $clientId PaymentClient id dùng để tạo yêu cầu truy vấn giao dịch.
-     * @return DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]] để lấy thông tin trả về từ cổng thanh toán.
+     * @return ResponseData|DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]] để lấy thông tin trả về từ cổng thanh toán.
      */
     public function queryDR(array $data, $clientId = null): DataInterface
     {
@@ -209,7 +210,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      *
      * @param string|int $clientId PaymentClient id dùng để xác thực tính hợp lệ của dữ liệu.
      * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
-     * @return bool|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
+     * @return bool|VerifiedData|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
      */
     public function verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
     {
@@ -222,7 +223,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      *
      * @param string|int $clientId PaymentClient id dùng để xác thực tính hợp lệ của dữ liệu.
      * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
-     * @return bool|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
+     * @return bool|VerifiedData|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
      */
     public function verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
     {

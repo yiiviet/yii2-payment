@@ -23,6 +23,9 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
 class ResponseData extends BaseResponseData
 {
 
+    /**
+     * @inheritdoc
+     */
     public function ensureAttributes(array &$attributes)
     {
         parent::ensureAttributes($attributes);
@@ -40,19 +43,22 @@ class ResponseData extends BaseResponseData
      */
     public function getIsOk(): bool
     {
-        return !$this->canGetProperty('error_code') && !$this->canGetProperty('error');
+        if ($this->command === PaymentGateway::RC_VERIFY_IPN) {
+            return !isset($this['INVALID']);
+        } else {
+            return !isset($this['error_code'], $this['error']);
+        }
     }
 
     /**
-     * Phương thức hổ trợ lấy và phiên dịch mã báo lỗi nhận từ Bảo Kim (nếu như bạn có thiết lập i18n).
+     * Phương thức hổ trợ lấy câu báo lỗi nhận từ Bảo Kim.
      *
-     * @return null|string Trả về NULL nếu như dữ liệu Bảo Kim gửi về không tồn tại `error_code`,
-     * và ngược lại sẽ là câu thông báo đã được phiên dịch.
+     * @return null|string Trả về NULL nếu như dữ liệu Bảo Kim gửi về không tồn tại `error` và ngược lại.
      */
     public function getErrorMessage(): ?string
     {
-        if ($this->canGetProperty('error')) {
-            return Yii::t('yii2vn/payment/baokim', $this->error);
+        if (isset($this['error'])) {
+            return $this['error'];
         } else {
             return null;
         }

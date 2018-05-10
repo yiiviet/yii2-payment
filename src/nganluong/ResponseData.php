@@ -76,23 +76,23 @@ class ResponseData extends BaseResponseData
      */
     public function getIsOk(): bool
     {
-        if ($this->canGetProperty('error_code')) {
-            return $this->error_code === PaymentGateway::TRANSACTION_STATUS_SUCCESS;
+        if (isset($this['error_code'])) {
+            return $this['error_code'] === PaymentGateway::TRANSACTION_STATUS_SUCCESS;
         } else {
             return false;
         }
     }
 
     /**
-     * Phương thức hổ trợ lấy và phiên dịch message nhận từ Ngân Lượng (nếu như bạn có thiết lập i18n).
+     * Phương thức hổ trợ lấy câu thông báo `message` nhận từ Ngân Lượng.
      *
      * @return null|string Trả về NULL nếu như dữ liệu Ngân Lượng gửi về không tồn tại `error_code`,
-     * và ngược lại sẽ là câu thông báo đã được phiên dịch.
+     * và ngược lại sẽ là câu thông báo dịch từ `error_code`.
      */
     public function getMessage(): ?string
     {
-        if ($this->canGetProperty('error_code')) {
-            return Yii::t('yii2vn/payment/nganluong', static::$responseMessages[$this->error_code]);
+        if (isset($this['error_code'])) {
+            return static::$responseMessages[$this['error_code']];
         } else {
             return null;
         }

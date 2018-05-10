@@ -62,7 +62,7 @@ class RequestData extends BaseRequestData
                 $strSign = 'GET' . '&' . urlencode(PaymentGateway::PRO_SELLER_INFO_URL) . '&' . urlencode(http_build_query($attributes)) . '&';
             }
             $signature = $client->signature($strSign, PaymentClient::SIGNATURE_RSA);
-            $attributes['signature'] = urlencode(base64_encode($signature));
+            $attributes['signature'] = base64_encode($signature);
         } elseif (in_array($command, [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_QUERY_DR], true)) {
             $strSign = implode("", $attributes);
             $attributes['checksum'] = $client->signature($strSign, PaymentClient::SIGNATURE_HMAC);

@@ -37,23 +37,22 @@ class ResponseData extends BaseResponseData
      */
     public function getResponseCode(): ?int
     {
-        if ($this->canGetProperty('vnp_ResponseCode')) {
-            return (int)$this->vnp_ResponseCode;
+        if (isset($this['vnp_ResponseCode'])) {
+            return (int)$this['vnp_ResponseCode'];
         } else {
             return null;
         }
     }
 
     /**
-     * Phương thức hổ trợ lấy và phiên dịch message nhận từ VnPayment (nếu như bạn có thiết lập i18n).
+     * Phương thức hổ trợ lấy câu thông báo từ `vnp_Message` nhận từ VnPayment.
      *
-     * @return null|string Trả về NULL nếu như dữ liệu VnPayment gửi về không tồn tại `vnp_Message`,
-     * và ngược lại sẽ là câu thông báo đã được phiên dịch.
+     * @return null|string Trả về NULL nếu như dữ liệu VnPayment gửi về không tồn tại `vnp_Message` và ngược lại.
      */
     public function getMessage(): ?string
     {
-        if ($this->canGetProperty('vnp_Message')) {
-            return Yii::t('yii2vn/payment/vnpayment', $this->vnp_Message);
+        if (isset($this['vnp_Message'])) {
+            return $this['vnp_Message'];
         } else {
             return null;
         }

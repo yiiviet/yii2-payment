@@ -19,14 +19,19 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
-class TestCase extends BaseTestCase
+abstract class TestCase extends BaseTestCase
 {
+    /**
+     * @var \yiiviet\payment\BasePaymentGateway
+     */
+    public $gateway;
 
     public function setUp()
     {
         parent::setUp();
 
         $this->mockApplication();
+        $this->gateway = Yii::$app->get('paymentGateways')->getGateway(static::gatewayId());
     }
 
     public function tearDown()
@@ -34,6 +39,16 @@ class TestCase extends BaseTestCase
         parent::tearDown();
 
         $this->destroyApplication();
+        $this->gateway = null;
+    }
+
+    abstract public static function gatewayId(): string;
+
+
+    public function testEnsureInstance()
+    {
+        $this->assertInstanceOf('\yiiviet\payment\BasePaymentGateway', $this->gateway);
+        $this->assertTrue($this->gateway->sandbox);
     }
 
     /**
@@ -64,7 +79,7 @@ class TestCase extends BaseTestCase
                     ],
                     'gateways' => [
                         'BK' => 'yiiviet\payment\baokim\PaymentGateway',
-                        'NL' => 'yiiviet\payment\baokim\PaymentGateway',
+                        'NL' => 'yiiviet\payment\nganluong\PaymentGateway',
                         'OP' => 'yiiviet\payment\onepay\PaymentGateway',
                         'VNP' => 'yiiviet\payment\vnpayment\PaymentGateway'
                     ]
