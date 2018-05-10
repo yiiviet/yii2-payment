@@ -132,8 +132,8 @@ class PaymentClient extends BasePaymentClient
     {
         if ($type === self::SIGNATURE_RSA) {
             $config = ArrayHelper::merge($this->rsaDataSignatureConfig, [
-                'publicCertificate' => $this->publicCertificate ?? false,
-                'privateCertificate' => $this->privateCertificate ?? false,
+                'publicCertificate' => $this->publicCertificate,
+                'privateCertificate' => $this->privateCertificate,
                 'openSSLAlgo' => OPENSSL_ALGO_SHA1
             ]);
             $config['class'] = $config['class'] ?? 'yiiviet\payment\RsaDataSignature';

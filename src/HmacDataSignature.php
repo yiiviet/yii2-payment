@@ -37,11 +37,18 @@ class HmacDataSignature extends DataSignature
      */
     public function generate(): string
     {
+        if ($this->key === null) {
+            throw new InvalidConfigException('Property `key` must be set for generate signature!');
+        } elseif ($this->hmacAlgo === null) {
+            throw new InvalidConfigException('Property `hmacAlgo` must be set for generate signature!');
+        }
+
         return hash_hmac($this->hmacAlgo, $this->getData(), $this->key);
     }
 
     /**
      * @inheritdoc
+     * @throws InvalidConfigException
      */
     public function validate(string $expect): bool
     {
