@@ -90,8 +90,8 @@ vào phần `require` trong file composer.json.
 
 ## Tài liệu
 
-* [Cổng thanh toán Bảo Kim](/docs/baokim.md)
-* [Cổng thanh toán Ngân Lượng](/docs/nganluong.md)
-* [Cổng thanh toán OnePay](/docs/onepay.md)
-* [Cổng thanh toán VnPayment](/docs/vnpayment.md)
-* [Tích hợp đồng thời nhiều cổng thanh toán](/docs/multi.md)
+* [Cổng thanh toán Bảo Kim](/docs/baokim.md).
+* [Cổng thanh toán Ngân Lượng](/docs/nganluong.md).
+* [Cổng thanh toán OnePay](/docs/onepay.md).
+* [Cổng thanh toán VnPayment](/docs/vnpayment.md).
+* [Tích hợp đồng thời nhiều cổng thanh toán](/docs/multi.md).
