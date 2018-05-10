@@ -128,7 +128,7 @@ class PaymentGateway extends BasePaymentGateway
             $this->trigger(self::EVENT_AFTER_REFUND, $event);
         }
 
-        parent::beforeRequest($event);
+        parent::afterRequest($event);
     }
 
     /**
