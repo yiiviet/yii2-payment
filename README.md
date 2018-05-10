@@ -73,10 +73,11 @@ Các cổng thanh toán hiện extension hổ trợ:
 
 ## Cài đặt
 
-Cách tốt nhất để cài đặt `yii2-extension` là thông qua [composer](http://getcomposer.org/download/).
+Cài đặt thông qua `composer` nếu như đó là một khái niệm mới với bạn xin click vào 
+[đây](http://getcomposer.org/download/) để tìm hiểu nó.
 
 ```sh
-composer require "vxm/yii2-gateway-clients"
+composer require "yiiviet/payment"
 ```
 
 hoặc thêm
