@@ -9,14 +9,14 @@
 [![Dependency Status](https://www.versioneye.com/user/projects/5aec90130fb24f5450e02d9e/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/5aec90130fb24f5450e02d9e)
 [![Yii2](https://img.shields.io/badge/Powered_by-Yii_Framework-green.svg?style=flat)](http://www.yiiframework.com/)
 
-Hiện các cổng thanh toán trong nước ta có cấu trúc API rất đa dạng và ít có điểm chung,
-khiến cho việc chúng ta xây dựng `api-client` cũng gặp nhiều khó khăn chính vì vậy 
-extension này được sinh ra nhằm `đồng bộ các phương thức của các cổng thanh toán` giúp 
-cho việc bạn tích hợp sẽ dễ dàng hơn và nó được thiết kê theo nguyên tắc 
+Hiện nay các cổng thanh toán trong nước có cấu trúc API rất đa dạng và ít có điểm chung,
+khiến cho việc chúng ta xây dựng các `api-client` cũng gặp nhiều khó khăn, chính vì vậy 
+extension này được sinh ra nhằm `đồng bộ các phương thức của các cổng thanh toán`, giúp 
+cho việc tích hợp sẽ dễ dàng hơn, nó được thiết kê theo nguyên tắc 
 [DRY](https://www.codehub.vn/Nguyen-Ly-DRY-Dont-Repeat-Yourself) giúp bạn tối giản lại
-các tham trị khi tạo `request` lên các cổng thanh toán và chính vì tất cả các cổng thanh
+các tham trị khi tạo `request` gửi lên các cổng thanh toán, chính vì tất cả các cổng thanh
 toán đều có phương thức chung nên nó sẽ giúp cho việc chuyển tiếp từ cổng thanh toán 
-này sang cổng thanh toán khác sẽ đơn giản hóa đối với bạn.
+này sang cổng thanh toán khác sẽ đơn giản hơn đối với bạn.
 
 Ví dụ:
 
@@ -57,7 +57,7 @@ $vnPayment->purchase([
 ]);
 ```
 
-Các cổng thanh toán hiện extension hổ trợ:
+Các cổng thanh toán được hổ trợ:
 
 * [Bảo Kim](https://baokim.vn)
 * [Ngân Lượng](https://nganluong.vn)
