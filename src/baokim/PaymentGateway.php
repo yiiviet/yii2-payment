@@ -7,15 +7,15 @@
 
 namespace yiiviet\payment\baokim;
 
-use Yii;
-
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
 use yiiviet\payment\BasePaymentGateway;
+use yiiviet\payment\VerifiedRequestEvent;
 
 use vxm\gatewayclients\RequestEvent;
 use vxm\gatewayclients\DataInterface;
+
 
 /**
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến Bảo Kim.
@@ -51,6 +51,12 @@ class PaymentGateway extends BasePaymentGateway
     const RC_VERIFY_IPN = 'verifyIPN';
 
     /**
+     * Lệnh `purchaseProSuccess` sử dụng cho việc yêu cấu xác thực tính hợp lệ
+     * của dữ liệu khi khách hàng thanh toán thành công bằng phương thức PRO (cổng thanh toán redirect khách hàng về server).
+     */
+    const VRC_PURCHASE_PRO_SUCCESS = 'purchaseProSuccess';
+
+    /**
      * @event RequestEvent được gọi trước khi tạo yêu câu thanh toán PRO.
      */
     const EVENT_BEFORE_PURCHASE_PRO = 'beforePurchasePro';
@@ -59,6 +65,11 @@ class PaymentGateway extends BasePaymentGateway
      * @event RequestEvent được gọi sau khi tạo yêu câu thanh toán PRO.
      */
     const EVENT_AFTER_PURCHASE_PRO = 'afterPurchasePro';
+
+    /**
+     * @event RequestEvent được gọi sau khi tạo yêu câu thanh toán PRO.
+     */
+    const EVENT_VERIFIED_REQUEST_PURCHASE_PRO_SUCCESS = 'verifiedRequestPurchaseProSuccess';
 
     /**
      * @event RequestEvent được gọi trước khi tạo yêu câu lấy thông tin merchant.
@@ -214,6 +225,19 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
+     * Phương thức này là phương thức ánh xạ của [[verifyRequest()]] nó sẽ tạo lệnh [[VRC_PURCHASE_PRO_SUCCESS]]
+     * để tạo yêu cầu xác minh tính hợp lệ của dữ liệu trả về từ máy khách đến máy chủ.
+     *
+     * @param string|int $clientId PaymentClient id dùng để xác thực tính hợp lệ của dữ liệu.
+     * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
+     * @return bool|VerifiedData|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
+     */
+    public function verifyRequestPurchaseProSuccess($clientId = null, \yii\web\Request $request = null)
+    {
+        return $this->verifyRequest(self::VRC_PURCHASE_PRO_SUCCESS, $clientId, $request);
+    }
+
+    /**
      * @inheritdoc
      */
     protected function getHttpClientConfig(): array
@@ -321,6 +345,18 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
+     */
+    public function verifiedRequest(VerifiedRequestEvent $event)
+    {
+        if ($event->command === self::VRC_PURCHASE_PRO_SUCCESS) {
+            $this->trigger(self::EVENT_VERIFIED_REQUEST_PURCHASE_PRO_SUCCESS, $event);
+        }
+
+        parent::verifiedRequest($event);
+    }
+
+    /**
+     * @inheritdoc
      * @throws \yii\base\InvalidConfigException
      */
     protected function requestInternal(\vxm\gatewayclients\RequestData $requestData, \yii\httpclient\Client $httpClient): array
@@ -345,7 +381,7 @@ class PaymentGateway extends BasePaymentGateway
             $httpMethod = 'GET';
         } elseif ($command === self::RC_PURCHASE) {
             $data[0] = self::PURCHASE_URL;
-            return ['location' => $httpClient->get($data)->getFullUrl()];
+            return ['redirect_url' => $httpClient->get($data)->getFullUrl()];
         } elseif ($command === self::RC_PURCHASE_PRO) {
             $url = [self::PURCHASE_PRO_URL, 'signature' => ArrayHelper::remove($data, 'signature')];
         } else {

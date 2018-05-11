@@ -9,7 +9,6 @@ namespace yiiviet\payment;
 
 use Yii;
 use ReflectionClass;
-use ReflectionException;
 
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
@@ -64,13 +63,13 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      * @event VerifiedRequestEvent được gọi khi dữ liệu truy vấn sau khi khách hàng thanh toán thành công,
      * được cổng thanh toán dẫn về hệ thống đã xác thực.
      */
-    const EVENT_VERIFIED_PURCHASE_SUCCESS_REQUEST = 'verifiedPurchaseSuccessRequest';
+    const EVENT_VERIFIED_REQUEST_PURCHASE_SUCCESS = 'verifiedRequestPurchaseSuccess';
 
     /**
      * @event VerifiedRequestEvent được gọi khi dữ liệu truy vấn sau khi khách hàng thanh toán thành công,
      * được cổng thanh toán bắn `request` sang hệ thống đã xác thực.
      */
-    const EVENT_VERIFIED_IPN_REQUEST = 'verifiedIPNRequest';
+    const EVENT_VERIFIED_REQUEST_IPN = 'verifiedRequestIPN';
 
     /**
      * @event RequestEvent được gọi trước khi khởi tạo lệnh [[RC_PURCHASE]] ở phương thức [[request()]].
@@ -132,7 +131,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      * `VRC` có nghĩa là Verify Request Command.
      *
      * @inheritdoc
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function verifyRequestCommands(): array
     {
@@ -284,9 +283,9 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
     public function verifiedRequest(VerifiedRequestEvent $event)
     {
         if ($event->command === self::VRC_IPN) {
-            $this->trigger(self::EVENT_VERIFIED_IPN_REQUEST, $event);
+            $this->trigger(self::EVENT_VERIFIED_REQUEST_IPN, $event);
         } elseif ($event->command === self::VRC_PURCHASE_SUCCESS) {
-            $this->trigger(self::EVENT_VERIFIED_PURCHASE_SUCCESS_REQUEST, $event);
+            $this->trigger(self::EVENT_VERIFIED_REQUEST_PURCHASE_SUCCESS, $event);
         }
 
         $this->trigger(self::EVENT_VERIFIED_REQUEST, $event);

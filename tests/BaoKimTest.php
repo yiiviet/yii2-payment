@@ -41,7 +41,7 @@ class BaoKimTest extends TestCase
         ]);
 
         $this->assertTrue($responseData->getIsOk());
-        $this->assertEquals($responseData->location, 'https://sandbox.baokim.vn/payment/order/version11?business=dev.baokim%40bk.vn&checksum=c96f01e3fdb4ba665304e70c04d58ba8917f31fe&merchant_id=647&order_id=2&total_amount=500000&url_success=%2F');
+        $this->assertTrue(isset($responseData['redirect_url']));
 
         // throws
         $this->gateway->purchase([

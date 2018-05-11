@@ -73,13 +73,13 @@ class PaymentGateway extends BasePaymentGateway
      * @event VerifiedRequestEvent được gọi khi dữ liệu truy vấn sau khi khách hàng thanh toán thành công bằng cổng quốc tế,
      * được OnePay dẫn về hệ thống đã xác thực.
      */
-    const EVENT_VERIFIED_PURCHASE_INTERNATIONAL_SUCCESS_REQUEST = 'verifiedPurchaseInternationalSuccessRequest';
+    const EVENT_VERIFIED_REQUEST_PURCHASE_INTERNATIONAL_SUCCESS = 'verifiedPurchaseInternationalSuccessRequest';
 
     /**
      * @event VerifiedRequestEvent được gọi khi dữ liệu truy vấn sau khi khách hàng thanh toán thành công bằng cổng quốc tế,
      * được OnePay bắn `request` sang hệ thống đã xác thực.
      */
-    const EVENT_VERIFIED_IPN_INTERNATIONAL_REQUEST = 'verifiedIPNInternationalRequest';
+    const EVENT_VERIFIED_REQUEST_IPN_INTERNATIONAL = 'verifiedIPNInternationalRequest';
 
     /**
      * Đường dẫn API của thanh toán nội địa.
@@ -181,9 +181,9 @@ class PaymentGateway extends BasePaymentGateway
     public function verifiedRequest(VerifiedRequestEvent $event)
     {
         if ($event->command === self::VRC_PURCHASE_SUCCESS_INTERNATIONAL) {
-            $this->trigger(self::EVENT_VERIFIED_PURCHASE_INTERNATIONAL_SUCCESS_REQUEST, $event);
+            $this->trigger(self::EVENT_VERIFIED_REQUEST_PURCHASE_INTERNATIONAL_SUCCESS, $event);
         } elseif ($event->command === self::VRC_IPN_INTERNATIONAL) {
-            $this->trigger(self::EVENT_VERIFIED_IPN_INTERNATIONAL_REQUEST, $event);
+            $this->trigger(self::EVENT_VERIFIED_REQUEST_IPN_INTERNATIONAL, $event);
         }
 
         parent::verifiedRequest($event);
