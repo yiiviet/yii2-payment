@@ -52,9 +52,9 @@ bằng cú pháp `Yii::$app->NLGateway`.
 
 | Tên phương thức | Mục đích |
 | :-----------:  | :----: |
-| **purchase** | Tạo lệnh thanh toán thông qua Bảo Kim (di chuyển đến website Bảo Kim để chọn hình thức thanh toán).|
+| **purchase** | Tạo lệnh thanh toán thông qua Ngân Lượng.|
 | **queryDR** | Tạo lệnh yêu cầu truy vấn thông tin giao dịch. |
-| **verifyRequestPurchaseSuccess** | Kiểm tra tính hợp lệ của dữ liệu mà Bảo Kim gửi sang khi khách hàng thanh toán thành công (Client to Server). |
+| **verifyRequestPurchaseSuccess** | Kiểm tra tính hợp lệ của dữ liệu mà Ngân Lượng gửi sang khi khách hàng thanh toán thành công (Client to Server). |
 | **authenticate** | Tạo lệnh yêu cầu Ngân Lượng kiểm tra tính hợp lệ của `OTP` nó được sử dụng với `seamless checkout` version `3.2`.
 
 
@@ -83,7 +83,6 @@ bạn sẽ phải `redirect` khách hàng sang Ngân Lượng để thực hiệ
 | :-----------: | :----: | :----: | ------ |
 | order_code | **có** | mixed | Mã đơn hàng do website bạn sinh ra thường thì nó chính là `primary key` của `order row`. Dùng để đối chứng khi khách hàng giao dịch thành công. |
 | total_amount | **có** | int | Số tiền của đơn hàng. |
-| url_success | **có** | string | Đường dẫn Bảo Kim sẽ dãn khách về sau khi thanh toán thành công. Bạn có thể sử dụng `\yii\helpers\Url` để giúp bạn tạo đường dẫn. |
 | buyer_fullname | **có** | string | Họ và tên người mua hàng. |
 | buyer_email | **có** | string | Email người mua hàng. |
 | buyer_mobile | **có** | string | Số điện thoại người mua hàng. |
@@ -167,7 +166,6 @@ toán bạn sẽ phải tự xây dựng. Ngân Lượng cấp phương thức `
 | :-----------: | :----: | :----: | ------ |
 | order_code | **có** | mixed | Mã đơn hàng do website bạn sinh ra thường thì nó chính là `primary key` của `order row`. Dùng để đối chứng khi khách hàng giao dịch thành công. |
 | total_amount | **có** | int | Số tiền của đơn hàng. |
-| url_success | **có** | string | Đường dẫn Bảo Kim sẽ dãn khách về sau khi thanh toán thành công. Bạn có thể sử dụng `\yii\helpers\Url` để giúp bạn tạo đường dẫn. |
 | buyer_fullname | **có** | string | Họ và tên người mua hàng. |
 | buyer_email | **có** | string | Email người mua hàng. |
 | buyer_mobile | **có** | string | Số điện thoại người mua hàng. |
@@ -388,7 +386,7 @@ Cách sử dụng:
 ``` 
 
 Khi gọi phương thức sẽ trả về `FALSE` nếu như dữ liệu không hợp lệ (không phải Ngân Lượng)
-và ngược lại sẽ là một đối tượng chứa các thuộc tính dữ liệu hợp lệ gửi từ Bảo Kim,
+và ngược lại sẽ là một đối tượng chứa các thuộc tính dữ liệu hợp lệ gửi từ Ngân Lượng,
 bảng thuộc tính:
 
 * Đối với đơn hàng tạo bằng phương thức `purchase`:
