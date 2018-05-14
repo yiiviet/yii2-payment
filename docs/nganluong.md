@@ -142,8 +142,8 @@ tượng `response` với các thuộc tính sau:
 
 ## Phương thức `purchase` (version 3.2)
 
-Hình thức này ở version `3.2` thanh toán đơn hàng không dựa trên hệ thống của Ngân Lượng `seamless checkout`,
-bạn sẽ không cần phải `redirect` khách hàng sang Ngân Lượng để thực hiện thanh toán, mà nghiệp vụ thanh
+Ở version `3.2` thanh toán đơn hàng sẽ không dựa trên hệ thống của Ngân Lượng (`seamless checkout`),
+bạn sẽ không cần phải `redirect` khách hàng sang Ngân Lượng để thực hiện thanh toán mà nghiệp vụ thanh
 toán bạn sẽ phải tự xây dựng. Ngân Lượng cấp phương thức `authenticate` để bạn xác minh mã `OTP` của khách.
 
 * Cách sử dụng cơ bản:
@@ -156,7 +156,11 @@ toán bạn sẽ phải tự xây dựng. Ngân Lượng cấp phương thức `
         'buyer_mobile' => '0909113911',
         'total_amount' => 10000000,
         'order_code' => microtime(),
-        'return_url' => \yii\helpers\Url::to(['order/success'])
+        'return_url' => \yii\helpers\Url::to(['order/success']),
+        'card_fullname' => 'vxm',
+        'card_number' => '123123123123',
+        'card_month' => 12,
+        'card_year' => 2012
     ]);
 ``` 
 
