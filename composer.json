@@ -13,7 +13,7 @@
     "require": {
         "php": ">=7.1.0",
         "yiisoft/yii2": ">=2.0.13",
-        "vxm/yii2-gateway-clients": ">=1.0.2"
+        "vxm/yii2-gateway-clients": ">=1.0.9"
     },
     "autoload": {
         "psr-4": {
