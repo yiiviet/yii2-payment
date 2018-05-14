@@ -218,6 +218,30 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
+     */
+    public function beforeRequest(RequestEvent $event)
+    {
+        if ($event->command === self::RC_AUTHENTICATE) {
+            $this->trigger(self::EVENT_BEFORE_AUTHENTICATE, $event);
+        }
+
+        parent::beforeRequest($event);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterRequest(RequestEvent $event)
+    {
+        if ($event->command === self::RC_AUTHENTICATE) {
+            $this->trigger(self::EVENT_AFTER_AUTHENTICATE, $event);
+        }
+
+        parent::afterRequest($event);
+    }
+
+    /**
+     * @inheritdoc
      * @throws NotSupportedException
      */
     public function verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
