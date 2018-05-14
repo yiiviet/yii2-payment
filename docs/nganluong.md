@@ -32,7 +32,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 
 ```php
 'components' => [
-    'BKGateway' => [
+    'NLGateway' => [
         'class' => 'yiiviet\payment\baokim\PaymentGateway',
         'client' => [
             'version' => '3.2', `3.1` sử dụng thanh toán redirect về Ngân Lượng, `3.2` khách thanh toán trực tiếp trên trang của bạn không cần `redirect` (seamless checkout).
@@ -66,7 +66,7 @@ bạn sẽ phải `redirect` khách hàng sang Ngân Lượng để thực hiệ
 * Cách sử dụng cơ bản:
 
 ```php
-    $result = Yii::$app->BKGateway->purchase([
+    $result = Yii::$app->NLGateway->purchase([
         'bank_code' => 'VCB',
         'buyer_fullname' => 'vxm',
         'buyer_email' => 'admin@test.app',
@@ -149,7 +149,7 @@ toán bạn sẽ phải tự xây dựng. Ngân Lượng cấp phương thức `
 * Cách sử dụng cơ bản:
 
 ```php
-    $result = Yii::$app->BKGateway->purchase([
+    $result = Yii::$app->NLGateway->purchase([
         'bank_code' => 'VCB',
         'buyer_fullname' => 'vxm',
         'buyer_email' => 'admin@test.app',
@@ -301,7 +301,7 @@ Cách truy vấn thông tin:
 
 ```php
 
-    $responseData = Yii::$app->BKGateway->queryDR([
+    $responseData = Yii::$app->NLGateway->queryDR([
         'token' => 'abc'
     ]);    
 
