@@ -1,6 +1,6 @@
 # Cổng thanh toán Bảo Kim
 
-Nếu như bạn đang muốn **test** thử thì xin vui lòng bỏ qua bước bên dưới và đi tới phần thiết lập.
+**Nếu như bạn đang muốn test thử thì xin vui lòng bỏ qua bước bên dưới và đi tới phần thiết lập.**
 
 Đầu tiên mời bạn đăng ký tích hợp tại cổng thanh toán [Bảo Kim](https://www.baokim.vn/developers/).
 Sau khi tích hợp xong bạn sẽ được Bảo Kim cấp các dữ liệu sau đây.
@@ -98,10 +98,10 @@ bằng cú pháp `Yii::$app->BKGateway`.
 * Sau khi gọi phương thức với các tham trị được yêu cầu nó sẽ trả về đối
 tượng `response` với các thuộc tính sau:
 
-| Thuộc tính | Kiểu | Mô tả |
-| :-----------: | :----: | ------ |
-| isOk | bool | Thuộc tính cho biết tiến trình yêu cầu diễn ra tốt đẹp hay không. Nếu có là `TRUE` và ngược lại. |
-| redirect_url | string | Đường dẫn thanh toán Bảo Kim, bạn sẽ dãn khách di chuyển đến nó để khách thực hiện thanh toán. |
+| Thuộc tính | Bắt buộc | Kiểu | Mô tả |
+| :-----------: | :----: | :------: | ---- |
+| isOk | **có** | bool | Thuộc tính cho biết tiến trình yêu cầu diễn ra tốt đẹp hay không. Nếu có là `TRUE` và ngược lại. |
+| redirect_url | **có** | string | Đường dẫn thanh toán Bảo Kim, bạn sẽ dãn khách di chuyển đến nó để khách thực hiện thanh toán. |
 
 
 * Code hoàn chỉnh:
@@ -160,19 +160,19 @@ tượng `response` với các thuộc tính sau:
 * Sau khi gọi phương thức với các tham trị được yêu cầu nó sẽ trả về đối
 tượng `response` với các thuộc tính sau:
 
-| Thuộc tính | Kiểu | Mô tả |
-| ----------- | :----: | ------ |
-| isOk | bool | Thuộc tính cho biết tiến trình yêu cầu diễn ra tốt đẹp hay không. Nếu có là `TRUE` và ngược lại. |
-| next_action | string | Hướng dẫn từ Bảo Kim phản hồi. Nó sẽ là `redirect` hoặc `display_guide` |
-| rv_id | int | Mã phiếu thu của Bảo Kim. Bạn nên lưu lại mã này cho đơn hàng của bạn để đối soát sau này. |
-| redirect_url | string | Đường dẫn thanh toán Bảo Kim, bạn sẽ dãn khách di chuyển đến nó để khách thực hiện thanh toán. Thuộc tính này chỉ tồn tại khi `next_action` có giá trị là `redirect`.|
-| guide_url | string | Đường dẫn hướng dẫn thanh toán Bảo Kim, bạn sẽ dãn khách di chuyển đến nó để khách thực hiện thanh toán. Thuộc tính này chỉ tồn tại khi `next_action` có giá trị là `display_guide`.|
+| Thuộc tính | Bắt buộc | Kiểu | Mô tả |
+| ----------- | :----: | :------: | ----- |
+| isOk | **có** | bool | Thuộc tính cho biết tiến trình yêu cầu diễn ra tốt đẹp hay không. Nếu có là `TRUE` và ngược lại. |
+| next_action | **có** | string | Hướng dẫn từ Bảo Kim phản hồi. Nó sẽ là `redirect` hoặc `display_guide` |
+| rv_id | **có** | int | Mã phiếu thu của Bảo Kim. Bạn nên lưu lại mã này cho đơn hàng của bạn để đối soát sau này. |
+| redirect_url | không | string | Đường dẫn thanh toán Bảo Kim, bạn sẽ dãn khách di chuyển đến nó để khách thực hiện thanh toán. Thuộc tính này chỉ tồn tại khi `next_action` có giá trị là `redirect`.|
+| guide_url | không | string | Đường dẫn hướng dẫn thanh toán Bảo Kim, bạn sẽ dãn khách di chuyển đến nó để khách thực hiện thanh toán. Thuộc tính này chỉ tồn tại khi `next_action` có giá trị là `display_guide`.|
 
 
 * Code hoàn chỉnh:
 
 ```php
-    $result = Yii::$app->BKGateway->purchase([
+    $result = Yii::$app->BKGateway->purchasePro([
         'bank_payment_method_id' => xxx,
         'payer_name' => 'vxm',
         'payer_email' => 'vxm@gmail.com',
@@ -193,24 +193,235 @@ tượng `response` với các thuộc tính sau:
 Phương thức này cho phép bạn kiểm tra tính hợp lệ của các dữ liệu từ
 Bảo Kim gửi sang tránh trường hợp giả mạo. Nó phải được gọi trong `action`
 mà bạn đã thiết lập ở `url_success` trong `purchase` và `purchasePro`, sau
-khi phương thức này kiểm tra dữ liệu hợp lệ thì bạn mới hiển thị thông báo
-thành công.
+khi phương thức này kiểm tra dữ liệu hợp lệ thì bạn mới tiến hành kiểm tra
+trạng thái giao dịch, từ đó hiển thị thông báo thành công hoặc thất bại...
 
-Cách sử dụng cơ bản:
+Cách sử dụng:
 
 ```php
     if ($verifiedData = Yii::$app->BKGateway->verifyRequestPurchaseSuccess()) {
         $order = Order::findOne($verifiedData->order_id);
         
-        return $this->render('purchase_success', [
-          'order' => $order
-        ]);
+        if ($verifiedData->transaction_status == 4) {
+            return $this->render('order_completed', [
+              'order' => $order
+            ]);
+         } else {
+            return $this->render('order_error', [
+              'order' => $order
+            ]);         
+         }
     
     }
 ``` 
 
-Khi gọi phương thức sẽ trả về `FALSE` nếu như dữ liệu không hợp lệ và ngược
-lại sẽ là một đối tượng chứa các thuộc tính dữ liệu hợp lệ gửi từ Bảo Kim,
+Khi gọi phương thức sẽ trả về `FALSE` nếu như dữ liệu không hợp lệ (không phải Bảo Kim)
+và ngược lại sẽ là một đối tượng chứa các thuộc tính dữ liệu hợp lệ gửi từ Bảo Kim,
 bảng thuộc tính:
 
-* Đối với đon
+* Đối với đơn hàng tạo bằng phương thức `purchase`:
+
+| Khóa | Bắt buộc | Kiểu | Chi tiết |
+| :-----------: | :----: | :----: | ------ |
+| order_id | **có** | mixed | Mã đơn hàng do website bạn sinh ra thường thì nó chính là `primary key` của `order row`. Dùng để đối chứng khi khách hàng giao dịch thành công. |
+| created_on | **có** | timestamp | Thời gian tạo giao dịch trên Bảo Kim. |
+| payment_type | **có** | int | Hình thức khách giao dịch (`1` Trực tiếp, `2` Tạm giữ). |
+| transaction_status | **có** | int | Trạng thái giao dịch. |
+| total_amount | **có** | int | Tổng số tiền khách trả. |
+| net_amount | **có** | int | Số tiền bạn thực nhận. |
+| fee_amount | **có** | int | Phí dịch vụ của Bảo Kim. |
+| merchant_id | **có** | int | Mã website tích hợp. |
+| transaction_id | **có** | string | Mã đơn hàng trên Bảo Kim |
+| payer_name | **có** | string | Tên người mua. |
+| payer_email | **có** | string | Email người mua. |
+| payer_phone_no | **có** | string | Số điện thoại người mua. |
+| shipping_address | không | string | Địa chỉ giao hàng. |
+
+* Đối với đơn hàng tạo bằng phương thức `purchasePro`:
+
+| Khóa | Bắt buộc | Kiểu | Chi tiết |
+| :-----------: | :----: | :----: | ------ |
+| order_id | **có** | mixed | Mã đơn hàng do website bạn sinh ra thường thì nó chính là `primary key` của `order row`. Dùng để đối chứng khi khách hàng giao dịch thành công. |
+| created_on | **có** | timestamp | Thời gian tạo giao dịch trên Bảo Kim. |
+| payment_type | **có** | int | Hình thức khách giao dịch (`1` Trực tiếp, `2` Tạm giữ). |
+| transaction_status | **có** | int | Trạng thái giao dịch. |
+| total_amount | **có** | int | Tổng số tiền khách trả. |
+| net_amount | **có** | int | Số tiền bạn thực nhận. |
+| fee_amount | **có** | int | Phí dịch vụ của Bảo Kim. |
+| merchant_id | **có** | int | Mã website tích hợp. |
+| transaction_id | **có** | string | Mã đơn hàng trên Bảo Kim |
+| customer_name | **có** | string | Tên người mua. |
+| customer_email | **có** | string | Email người mua. |
+| customer_phone | **có** | string | Số điện thoại người mua. |
+| customer_address | không | string | Địa chỉ giao hàng. |
+
+
+* Bảng trạng thái giao dịch:
+
+| Gía trị | Mô tả |
+| :-------: | ----- |
+| 1 | giao dịch chưa xác minh OTP |
+| 2 | giao dịch đã xác minh OTP |
+| **4** | giao dịch hoàn thành |
+| 5 | giao dịch bị hủy |
+| 6 | giao dịch bị từ chối nhận tiền |
+| 7 | giao dịch hết hạn |
+| 8 | giao dịch thất bại |
+| 12 | giao dịch bị đóng băng |
+| **13** | giao dịch bị tạm giữ (thanh toán an toàn) |
+| X | các trạng thái giao dịch khác |
+
+Như bạn thấy thì chúng ta chỉ quan tâm đến `4` và `13` vì 2 trạng thái này cho ta biết
+ khách đã thanh toán thành công.
+
+## Phương thức `verifyRequestIPN`
+
+Phương thức này cho phép bạn kiểm tra tính hợp lệ của các dữ liệu từ
+Bảo Kim gửi sang, tránh trường hợp giả mạo. Nó phải được gọi trong `action`
+mà bạn đã thiết lập ở Bảo Kim mục `BPN`, sau khi phương thức này kiểm tra dữ liệu 
+hợp lệ  thì bạn mới kiểm tra giao dịch có hoàn thành hay không, nếu hợp lệ thì lưu trạng
+ thái trên DB.
+
+Cách sử dụng:
+
+```php
+    if ($verifiedData = Yii::$app->BKGateway->verifyRequestIPN()) {
+        $order = Order::findOne($verifiedData->order_id);
+        
+        if ($verifiedData->transaction_status == 4 && $order->status == 0) {
+        
+            $order->status = 1;
+            $order->save();
+        } 
+    
+    }
+``` 
+
+Khi gọi phương thức sẽ trả về `FALSE` nếu như dữ liệu không hợp lệ (không phải Bảo Kim)
+và ngược lại sẽ là một đối tượng chứa các thuộc tính dữ liệu hợp lệ gửi từ Bảo Kim,
+bảng thuộc tính:
+
+| Khóa | Bắt buộc | Kiểu | Chi tiết |
+| :-----------: | :----: | :----: | ------ |
+| order_id | **có** | mixed | Mã đơn hàng do website bạn sinh ra thường thì nó chính là `primary key` của `order row`. Dùng để đối chứng khi khách hàng giao dịch thành công. |
+| created_on | **có** | timestamp | Thời gian tạo giao dịch trên Bảo Kim. |
+| payment_type | **có** | int | Hình thức khách giao dịch (`1` Trực tiếp, `2` Tạm giữ). |
+| transaction_status | **có** | int | Trạng thái giao dịch. |
+| total_amount | **có** | int | Tổng số tiền khách trả. |
+| net_amount | **có** | int | Số tiền bạn thực nhận. |
+| fee_amount | **có** | int | Phí dịch vụ của Bảo Kim. |
+| merchant_id | **có** | int | Mã website tích hợp. |
+| transaction_id | **có** | string | Mã đơn hàng trên Bảo Kim |
+| customer_name | **có** | string | Tên người mua. |
+| customer_email | **có** | string | Email người mua. |
+| customer_phone | **có** | string | Số điện thoại người mua. |
+| customer_address | không | string | Địa chỉ giao hàng. |
+
+* Bảng trạng thái giao dịch:
+
+| Gía trị | Mô tả |
+| :-------: | ----- |
+| 1 | giao dịch chưa xác minh OTP |
+| 2 | giao dịch đã xác minh OTP |
+| **4** | giao dịch hoàn thành |
+| 5 | giao dịch bị hủy |
+| 6 | giao dịch bị từ chối nhận tiền |
+| 7 | giao dịch hết hạn |
+| 8 | giao dịch thất bại |
+| 12 | giao dịch bị đóng băng |
+| **13** | giao dịch bị tạm giữ (thanh toán an toàn) |
+| X | các trạng thái giao dịch khác |
+
+Như bạn thấy thì chúng ta chỉ quan tâm đến `4` và `13` vì 2 trạng thái này cho ta biết
+ khách đã thanh toán thành công.
+ 
+## Phương thức `queryDR`
+
+Phương thức này cho bạn truy vấn thông tin giao dịch từ Bảo Kim thông qua 
+`transaction_id` mà bạn nhận được từ `verifyRequestPurchaseSuccess` hoặc 
+`verifyRequestIPN` ở trên.
+
+Cách truy vấn thông tin:
+
+```php
+
+    $responseData = Yii::$app->BKGateway->queryDR([
+        'transaction_id' => 'abc'
+    ]);    
+
+    if ($responseData->isOk) {
+        // code thêm vào đây tùy theo mục đích của bạn.
+    }
+    
+```
+
+* Giới thiệu các thành phần trong mảng khi tạo lệnh:
+
+| Khóa | Bắt buộc | Kiểu | Chi tiết |
+| ----------- | :----: | :----: | ------ |
+| transaction_id | **có** | string | Mã đơn hàng trên hệ thống Bảo Kim |
+
+
+* Sau khi gọi phương thức với các tham trị được yêu cầu nó sẽ trả về đối
+tượng `response` với các thuộc tính sau:
+
+| Thuộc tính | Bắt buộc | Kiểu | Mô tả |
+| ----------- | :----: | :------: | ----- |
+| isOk | **có** | bool | Thuộc tính cho biết tiến trình yêu cầu diễn ra tốt đẹp hay không. Nếu có là `TRUE` và ngược lại. |
+| order_id | **có** | mixed | Mã đơn hàng do website bạn sinh ra thường thì nó chính là `primary key` của `order row`. Dùng để đối chứng khi khách hàng giao dịch thành công. |
+| created_on | **có** | timestamp | Thời gian tạo giao dịch trên Bảo Kim. |
+| payment_type | **có** | int | Hình thức khách giao dịch (`1` Trực tiếp, `2` Tạm giữ). |
+| transaction_status | **có** | int | Trạng thái giao dịch. |
+| total_amount | **có** | int | Tổng số tiền khách trả. |
+| net_amount | **có** | int | Số tiền bạn thực nhận. |
+| fee_amount | **có** | int | Phí dịch vụ của Bảo Kim. |
+| merchant_id | **có** | int | Mã website tích hợp. |
+| transaction_id | **có** | string | Mã đơn hàng trên Bảo Kim |
+| customer_name | **có** | string | Tên người mua. |
+| customer_email | **có** | string | Email người mua. |
+| customer_phone | **có** | string | Số điện thoại người mua. |
+| customer_address | không | string | Địa chỉ giao hàng. |
+
+* Bảng trạng thái giao dịch:
+
+| Gía trị | Mô tả |
+| :-------: | ----- |
+| 1 | giao dịch chưa xác minh OTP |
+| 2 | giao dịch đã xác minh OTP |
+| **4** | giao dịch hoàn thành |
+| 5 | giao dịch bị hủy |
+| 6 | giao dịch bị từ chối nhận tiền |
+| 7 | giao dịch hết hạn |
+| 8 | giao dịch thất bại |
+| 12 | giao dịch bị đóng băng |
+| **13** | giao dịch bị tạm giữ (thanh toán an toàn) |
+| X | các trạng thái giao dịch khác |
+
+Như bạn thấy thì chúng ta chỉ quan tâm đến `4` và `13` vì 2 trạng thái này cho ta biết
+ khách đã thanh toán thành công.
+
+
+## Câu hỏi thương gặp
+
++ Câu hỏi: Vì sao có đến 2 phương thức nhận và xác minh dữ liệu 
+(`verifyRequestPurchaseSuccess`, `verifyRequestIPN`)?
+    - Trả lời: vì cổng thanh toán muốn tăng sử đảm bảo cho giao dịch,
+    do nếu chỉ cung cấp phương thức `verifyRequestPurchaseSuccess` thì sẽ có
+    trường hợp khách hàng rớt mạng không thể `redirect` về `success_url` được cho
+    nên phương thức `verifyRequestIPN` được cung cấp để đảm bảo hơn do lúc này
+    connection sẽ là Bảo Kim với máy chủ của bạn tính ổn định sẽ là `99.99%`.
+    
++ Câu hỏi: Vậy thì luồn xử lý sẽ ra sao nếu như có đến 2 điểm nhận thông báo 
+(BPN và success_url)?
+    - Trả lời: với chúng tôi `action` của `success_url` chỉ dùng để xác minh tính 
+    hợp lệ của dữ liệu Bảo Kim từ đó hiển thị thanh toán thành công hoặc thất bại
+    KHÔNG đụng đến phần cập nhật database và các nghiệp vụ liên quan đến cập nhật
+    trạng thái đơn hàng. Phần cập nhật trạng thái và xử lý nghiệp vụ liên quan sẽ
+    nằm ở `action` của `BPN`.
+    
++ Câu hỏi: `BPN` là viết tắt của cụm từ gì?
+    - Trả lời: `Bảo Kim Payment Notification`, nó đóng vai trò như các `IPN` của các
+    cổng thanh toán khác.
+    
+
+

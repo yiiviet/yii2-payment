@@ -33,7 +33,7 @@ abstract class BasePaymentClient extends BaseClient implements PaymentClientInte
         if ($dataSignature = $this->initDataSignature($data, $type)) {
             return $dataSignature->generate();
         } else {
-            throw new NotSupportedException("Signature data with type: '$type' is not supported!");
+            throw new NotSupportedException("Signature data with type: `$type` is not supported!");
         }
     }
 
@@ -46,7 +46,7 @@ abstract class BasePaymentClient extends BaseClient implements PaymentClientInte
         if ($dataSignature = $this->initDataSignature($data, $type)) {
             return $dataSignature->validate($expectSignature);
         } else {
-            throw new NotSupportedException("Validate signature with type: '$type' is not supported!");
+            throw new NotSupportedException("Validate signature with type: `$type` is not supported!");
         }
     }
 

@@ -98,21 +98,8 @@ class BaoKimTest extends TestCase
     public function testGetMerchantData()
     {
         $merchantData = $this->gateway->getMerchantData();
+        var_dump(array_keys($merchantData->get())); die;
         $this->assertTrue($merchantData->getIsOk());
-    }
-
-    public function testVerifyIPN()
-    {
-        $_POST = [
-            'business' => 'dev.baokim@bk.vn',
-            'order_id' => 2,
-            'total_amount' => 500000,
-            'checksum' => 'c96f01e3fdb4ba665304e70c04d58ba8917f31fe',
-            'merchant_id' => 647,
-            'url_success' => '/'
-        ];
-        $responseData = $this->gateway->verifyIPN();
-        $this->assertFalse($responseData->getIsOk());
     }
 
     public function testVerifyRequestIPN()

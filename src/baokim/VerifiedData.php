@@ -26,11 +26,7 @@ class VerifiedData extends BaseVerifiedData
     public function rules()
     {
         return [
-            [[
-                'order_id', 'transaction_id', 'created_on', 'payment_type', 'transaction_status', 'checksum',
-                'total_amount', 'net_amount', 'fee_amount', 'merchant_id', 'customer_name', 'customer_email', 'customer_phone'
-            ], 'required', 'on' => [PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN]],
-            [['checksum'], 'verifyChecksum', 'message' => '{attribute} not match', 'on' => [PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN]]
+            [['checksum'], 'verifyChecksum', 'message' => '{attribute} not match', 'on' => PaymentGateway::VRC_PURCHASE_SUCCESS]
         ];
     }
 

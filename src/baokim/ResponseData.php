@@ -26,28 +26,9 @@ class ResponseData extends BaseResponseData
     /**
      * @inheritdoc
      */
-    public function ensureAttributes(array &$attributes)
-    {
-        parent::ensureAttributes($attributes);
-        $ensuredAttributes = [];
-
-        foreach ($attributes as $attribute => $value) {
-            $ensuredAttributes[trim($attribute)] = $value;
-        }
-
-        $attributes = $ensuredAttributes;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getIsOk(): bool
     {
-        if ($this->command === PaymentGateway::RC_VERIFY_IPN) {
-            return !isset($this['INVALID']);
-        } else {
-            return !isset($this['error_code'], $this['error']);
-        }
+        return !isset($this['error_code'], $this['error']);
     }
 
     /**

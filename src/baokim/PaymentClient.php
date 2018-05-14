@@ -9,8 +9,6 @@ namespace yiiviet\payment\baokim;
 
 use Yii;
 
-use yii\helpers\ArrayHelper;
-
 use yiiviet\payment\BasePaymentClient;
 
 /**
@@ -86,20 +84,6 @@ class PaymentClient extends BasePaymentClient
     public $publicCertificate;
 
     /**
-     * Mảng thiết lập cấu hình mặc định của [[HmacDataSignature]] khi khởi tạo.
-     *
-     * @var array
-     */
-    public $hmacDataSignatureConfig = [];
-
-    /**
-     * Mảng thiết lập cấu hình mặc định của [[RsaDataSignature]] khi khởi tạo.
-     *
-     * @var array
-     */
-    public $rsaDataSignatureConfig = [];
-
-    /**
      * @param $file
      * @return bool
      */
@@ -131,19 +115,20 @@ class PaymentClient extends BasePaymentClient
     protected function initDataSignature(string $data, string $type = null): ?\yiiviet\payment\DataSignature
     {
         if ($type === self::SIGNATURE_RSA) {
-            $config = ArrayHelper::merge($this->rsaDataSignatureConfig, [
+            $config = [
+                'class' => 'yiiviet\payment\RsaDataSignature',
                 'publicCertificate' => $this->publicCertificate,
                 'privateCertificate' => $this->privateCertificate,
                 'openSSLAlgo' => OPENSSL_ALGO_SHA1
-            ]);
-            $config['class'] = $config['class'] ?? 'yiiviet\payment\RsaDataSignature';
+            ];
+
             return Yii::createObject($config, [$data]);
         } elseif ($type === self::SIGNATURE_HMAC) {
-            $config = ArrayHelper::merge($this->hmacDataSignatureConfig, [
+            $config = [
+                'class' => 'yiiviet\payment\HmacDataSignature',
                 'key' => $this->securePassword,
                 'hmacAlgo' => 'SHA1'
-            ]);
-            $config['class'] = $config['class'] ?? 'yiiviet\payment\HmacDataSignature';
+            ];
 
             return Yii::createObject($config, [$data]);
         } else {

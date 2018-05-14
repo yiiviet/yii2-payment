@@ -11,7 +11,6 @@ use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
 use yiiviet\payment\BasePaymentGateway;
-use yiiviet\payment\VerifiedRequestEvent;
 
 use vxm\gatewayclients\RequestEvent;
 use vxm\gatewayclients\DataInterface;
@@ -21,10 +20,9 @@ use vxm\gatewayclients\DataInterface;
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến Bảo Kim.
  * Hiện tại nó hổ trợ 100% các tính năng từ cổng thanh toán Bảo Kim.
  *
- * @method ResponseData purchase(array $data, $clientId = null)
- * @method ResponseData queryDR(array $data, $clientId = null)
- * @method VerifiedData verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
- * @method VerifiedData verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
+ * @method ResponseData|DataInterface purchase(array $data, $clientId = null)
+ * @method ResponseData|DataInterface queryDR(array $data, $clientId = null)
+ * @method bool|VerifiedData verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
  *
  * @property PaymentClient $client
  * @property PaymentClient $defaultClient
@@ -43,18 +41,6 @@ class PaymentGateway extends BasePaymentGateway
      * Lệnh `getMerchantData` sử dụng cho việc tạo [[request()]] yêu cầu thông tin merchant.
      */
     const RC_GET_MERCHANT_DATA = 'getMerchantData';
-
-    /**
-     * Lệnh `verifyIPN` sử dụng cho việc tạo [[request()]] yêu cầu Bảo Kim kiểm tra dữ liệu Bảo Kim bắn sang IPN có hợp lệ hay không.
-     * Chống giả mạo.
-     */
-    const RC_VERIFY_IPN = 'verifyIPN';
-
-    /**
-     * Lệnh `purchaseProSuccess` sử dụng cho việc yêu cấu xác thực tính hợp lệ
-     * của dữ liệu khi khách hàng thanh toán thành công bằng phương thức PRO (cổng thanh toán redirect khách hàng về server).
-     */
-    const VRC_PURCHASE_PRO_SUCCESS = 'purchaseProSuccess';
 
     /**
      * @event RequestEvent được gọi trước khi tạo yêu câu thanh toán PRO.
@@ -80,16 +66,6 @@ class PaymentGateway extends BasePaymentGateway
      * @event RequestEvent được gọi sau khi tạo yêu câu lấy thông tin merchant.
      */
     const EVENT_AFTER_GET_MERCHANT_DATA = 'afterGetMerchantData';
-
-    /**
-     * @event RequestEvent được gọi trước khi tạo yêu cầu cập nhật trạng thái đơn hàng từ IPN.
-     */
-    const EVENT_BEFORE_VERIFY_IPN = 'beforeVerifyIPN';
-
-    /**
-     * @event RequestEvent được gọi sau khi tạo yêu cầu cập nhật trạng thái đơn hàng từ IPN.
-     */
-    const EVENT_AFTER_VERIFY_IPN = 'afterVerifyIPN';
 
     /**
      * Đường dẫn API của thanh toán Bảo Kim.
@@ -143,18 +119,14 @@ class PaymentGateway extends BasePaymentGateway
     const SAFE_TRANSACTION = 2;
 
     /**
-     * Cache component hổ trợ cho việc cache lại dữ liệu merchant lấy từ Bảo Kim nhầm tối ưu hóa hệ thống
-     * do dữ liệu này ít khi bị thay đổi.
-     *
      * @see getMerchantData
-     * @var bool|string|array|\yii\caching\Cache
+     * @var bool|string|array|\yii\caching\Cache Hổ trợ cho việc cache lại dữ liệu merchant lấy từ Bảo Kim nhầm tối ưu hóa hệ thống
+     * do dữ liệu này ít khi bị thay đổi.
      */
     public $merchantDataCache = 'cache';
 
     /**
-     * Cache duration quy định thời gian cache dữ liệu của merchant lấy từ Bảo Kim.
-     *
-     * @var int
+     * @var int Thời gian cache dữ liệu của merchant lấy từ Bảo Kim.
      */
     public $merchantDataCacheDuration = 86400;
 
@@ -217,24 +189,11 @@ class PaymentGateway extends BasePaymentGateway
      * @param null $clientId PaymentClient id sử dụng để tạo yêu cầu thanh toán.
      * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
      * @return ResponseData|DataInterface Trả về [[ResponseData]] là dữ liệu từ Bảo Kim phản hồi.
-     * @throws \ReflectionException|\yii\base\InvalidConfigException|\yii\base\InvalidArgumentException
+     * @throws \ReflectionException|\yii\base\InvalidConfigException
      */
     public function purchasePro(array $data, $clientId = null): DataInterface
     {
         return $this->request(self::RC_PURCHASE_PRO, $data, $clientId);
-    }
-
-    /**
-     * Phương thức này là phương thức ánh xạ của [[verifyRequest()]] nó sẽ tạo lệnh [[VRC_PURCHASE_PRO_SUCCESS]]
-     * để tạo yêu cầu xác minh tính hợp lệ của dữ liệu trả về từ máy khách đến máy chủ.
-     *
-     * @param string|int $clientId PaymentClient id dùng để xác thực tính hợp lệ của dữ liệu.
-     * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
-     * @return bool|VerifiedData|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
-     */
-    public function verifyRequestPurchaseProSuccess($clientId = null, \yii\web\Request $request = null)
-    {
-        return $this->verifyRequest(self::VRC_PURCHASE_PRO_SUCCESS, $clientId, $request);
     }
 
     /**
@@ -247,14 +206,12 @@ class PaymentGateway extends BasePaymentGateway
             'requestConfig' => [
                 'format' => 'json',
                 'options' => [
-                    CURLOPT_HTTPAUTH => CURLAUTH_DIGEST | CURLAUTH_BASIC,
                     CURLOPT_SSL_VERIFYHOST => false,
                     CURLOPT_SSL_VERIFYPEER => false
                 ]
             ]
         ];
     }
-
 
     /**
      * Phương thức hổ trợ lấy thông tin merchant thông qua email business.
@@ -291,27 +248,6 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
-     * Phương thức tạo lệnh yêu cầu Bảo Kim kiểm tra tính hợp lệ của dữ liệu mà IPN nhận được nhầm chống giả mạo.
-     * Đây là phương thức ánh xạ của [[request()]] sử dụng lệnh [[RC_IPN]].
-     *
-     * @param \yii\web\Request $request Đối tượng request chứa thông tin mà Bảo Kim bắn sang IPN,
-     * nó được dùng để tổng hợp dữ liệu yêu cầu Bảo Kim xác minh và cập nhật.
-     * Nếu không thiết lập đối tượng `request` của `Yii::$app` sẽ được sử dụng.
-     * @param null $clientId Client id sử dụng để tạo yêu cầu cập nhật.
-     * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
-     * @return ResponseData|DataInterface Trả về [[ResponseData]] là dữ liệu từ Bảo Kim phản hồi.
-     * @throws \ReflectionException|\yii\base\InvalidConfigException|\yii\base\InvalidArgumentException
-     */
-    public function verifyIPN(\yii\web\Request $request = null, $clientId = null): DataInterface
-    {
-        if ($request === null) {
-            $request = Instance::ensure('request', '\yii\web\Request');
-        }
-
-        return $this->request(self::RC_VERIFY_IPN, $request->post(), $clientId);
-    }
-
-    /**
      * @inheritdoc
      */
     public function beforeRequest(RequestEvent $event)
@@ -320,8 +256,6 @@ class PaymentGateway extends BasePaymentGateway
             $this->trigger(self::EVENT_BEFORE_PURCHASE_PRO, $event);
         } elseif ($event->command === self::RC_GET_MERCHANT_DATA) {
             $this->trigger(self::EVENT_BEFORE_GET_MERCHANT_DATA, $event);
-        } elseif ($event->command === self::RC_VERIFY_IPN) {
-            $this->trigger(self::EVENT_BEFORE_VERIFY_IPN, $event);
         }
 
         parent::beforeRequest($event);
@@ -336,23 +270,9 @@ class PaymentGateway extends BasePaymentGateway
             $this->trigger(self::EVENT_AFTER_PURCHASE_PRO, $event);
         } elseif ($event->command === self::RC_GET_MERCHANT_DATA) {
             $this->trigger(self::EVENT_AFTER_GET_MERCHANT_DATA, $event);
-        } elseif ($event->command === self::RC_VERIFY_IPN) {
-            $this->trigger(self::EVENT_AFTER_VERIFY_IPN, $event);
         }
 
         parent::afterRequest($event);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function verifiedRequest(VerifiedRequestEvent $event)
-    {
-        if ($event->command === self::VRC_PURCHASE_PRO_SUCCESS) {
-            $this->trigger(self::EVENT_VERIFIED_REQUEST_PURCHASE_PRO_SUCCESS, $event);
-        }
-
-        parent::verifiedRequest($event);
     }
 
     /**
@@ -366,8 +286,10 @@ class PaymentGateway extends BasePaymentGateway
         $command = $requestData->getCommand();
         $data = $requestData->get();
         $httpMethod = 'POST';
-        $options = [CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword];
-        $responseFormat = null;
+        $options = [
+            CURLOPT_HTTPAUTH => CURLAUTH_DIGEST | CURLAUTH_BASIC,
+            CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword
+        ];
 
         if (in_array($command, [self::RC_GET_MERCHANT_DATA, self::RC_QUERY_DR], true)) {
             if ($command === self::RC_GET_MERCHANT_DATA) {
@@ -379,15 +301,11 @@ class PaymentGateway extends BasePaymentGateway
             $url = $data;
             $data = null;
             $httpMethod = 'GET';
-        } elseif ($command === self::RC_PURCHASE) {
-            $data[0] = self::PURCHASE_URL;
-            return ['redirect_url' => $httpClient->get($data)->getFullUrl()];
         } elseif ($command === self::RC_PURCHASE_PRO) {
             $url = [self::PURCHASE_PRO_URL, 'signature' => ArrayHelper::remove($data, 'signature')];
         } else {
-            $url = self::VERIFY_IPN_URL;
-            $responseFormat = 'urlencoded';
-            $options = [];
+            $data[0] = self::PURCHASE_URL;
+            return ['redirect_url' => $httpClient->get($data)->getFullUrl()];
         }
 
         return $httpClient->createRequest()
@@ -396,8 +314,26 @@ class PaymentGateway extends BasePaymentGateway
             ->addOptions($options)
             ->addData($data)
             ->send()
-            ->setFormat($responseFormat)
             ->getData();
+    }
+
+    /**
+     * @inheritdoc
+     * @return bool|VerifiedData|DataInterface
+     */
+    public function verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
+    {
+        if ($request === null) {
+            $request = Instance::ensure('request', '\yii\web\Request');
+        }
+
+        $content = $this->getHttpClient()->post(self::VERIFY_IPN_URL, $request->post())->send()->getContent();
+
+        if (strpos($content, 'VERIFIED') !== false) {
+            return parent::verifyRequestIPN($clientId, $request);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -407,7 +343,8 @@ class PaymentGateway extends BasePaymentGateway
     {
         $params = [
             'order_id', 'transaction_id', 'created_on', 'payment_type', 'transaction_status', 'total_amount', 'net_amount',
-            'fee_amount', 'merchant_id', 'customer_name', 'customer_email', 'customer_phone', 'customer_address', 'checksum'
+            'fee_amount', 'merchant_id', 'customer_name', 'customer_email', 'customer_phone', 'customer_address', 'checksum',
+            'payer_name', 'payer_email', 'payer_phone_no', 'shipping_address', 'verify_sign', 'resend'
         ];
         $commandRequestMethods = [self::VRC_PURCHASE_SUCCESS => 'get', self::VRC_IPN => 'post'];
         $requestMethod = $commandRequestMethods[$command];
@@ -421,4 +358,5 @@ class PaymentGateway extends BasePaymentGateway
 
         return $data;
     }
+
 }

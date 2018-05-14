@@ -92,9 +92,10 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
     const EVENT_AFTER_QUERY_DR = 'afterQueryDR';
 
     /**
-     * @var bool
+     * @var bool nếu là môi trường test thì thiết lập là TRUE và ngược lại.
      */
     public $sandbox = false;
+
     /**
      * @var array
      */
@@ -157,6 +158,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      * @param array $data Dữ liệu dùng để yêu cầu tạo giao dịch thanh toán bên trong thường có giá tiền, địa chỉ giao hàng...
      * @param string|int $clientId PaymentClient id dùng để tạo yêu cầu thanh toán.
      * @return ResponseData|DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]] để lấy thông tin trả về từ cổng thanh toán.
+     * @throws InvalidConfigException|\ReflectionException
      */
     public function purchase(array $data, $clientId = null): DataInterface
     {
@@ -169,6 +171,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      * @param array $data Dữ liệu dùng để truy vấn thông tin giao dịch bên trong thường có mã giao dịch từ cổng thanh toán...
      * @param string|int $clientId PaymentClient id dùng để tạo yêu cầu truy vấn giao dịch.
      * @return ResponseData|DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]] để lấy thông tin trả về từ cổng thanh toán.
+     * @throws InvalidConfigException|\ReflectionException
      */
     public function queryDR(array $data, $clientId = null): DataInterface
     {
@@ -210,6 +213,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      * @param string|int $clientId PaymentClient id dùng để xác thực tính hợp lệ của dữ liệu.
      * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
      * @return bool|VerifiedData|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
+     * @throws InvalidConfigException|\ReflectionException
      */
     public function verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
     {
@@ -223,6 +227,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      * @param string|int $clientId PaymentClient id dùng để xác thực tính hợp lệ của dữ liệu.
      * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
      * @return bool|VerifiedData|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
+     * @throws InvalidConfigException|\ReflectionException
      */
     public function verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
     {
@@ -231,7 +236,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
 
     /**
      * @inheritdoc
-     * @throws InvalidConfigException|InvalidArgumentException
+     * @throws InvalidConfigException|\ReflectionException
      */
     public function verifyRequest($command, $clientId = null, \yii\web\Request $request = null)
     {
@@ -248,6 +253,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
             /** @var VerifiedData $requestData */
             $verifyData = Yii::createObject($this->verifiedDataConfig, [$command, $data, $client]);
             if ($verifyData->validate()) {
+                /** @var VerifiedRequestEvent $event */
                 $event = Yii::createObject([
                     'class' => VerifiedRequestEvent::class,
                     'verifiedData' => $verifyData,
