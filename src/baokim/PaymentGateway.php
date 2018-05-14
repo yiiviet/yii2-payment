@@ -20,8 +20,8 @@ use vxm\gatewayclients\DataInterface;
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến Bảo Kim.
  * Hiện tại nó hổ trợ 100% các tính năng từ cổng thanh toán Bảo Kim.
  *
- * @method ResponseData|DataInterface purchase(array $data, $clientId = null)
- * @method ResponseData|DataInterface queryDR(array $data, $clientId = null)
+ * @method ResponseData purchase(array $data, $clientId = null)
+ * @method ResponseData queryDR(array $data, $clientId = null)
  * @method bool|VerifiedData verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
  *
  * @property PaymentClient $client
