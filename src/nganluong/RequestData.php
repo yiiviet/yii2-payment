@@ -41,7 +41,6 @@ class RequestData extends BaseRequestData
      */
     protected function ensureAttributes(array &$attributes)
     {
-        parent::ensureAttributes($attributes);
         /** @var PaymentClient $client */
         $client = $this->getClient();
         $command = $this->getCommand();
@@ -49,7 +48,7 @@ class RequestData extends BaseRequestData
         $attributes = array_merge($attributes, [
             'merchant_id' => $client->merchantId,
             'merchant_password' => md5($client->merchantPassword),
-            'version' => $attributes['version'] ?? $client->getGateway()->getVersion()
+            'version' => $client->getGateway()->getVersion()
         ]);
 
         if ($command === PaymentGateway::RC_PURCHASE) {
@@ -69,6 +68,8 @@ class RequestData extends BaseRequestData
         } else {
             $attributes['function'] = 'GetTransactionDetail';
         }
+
+        parent::ensureAttributes($attributes);
     }
 
 }

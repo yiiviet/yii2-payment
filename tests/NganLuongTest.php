@@ -74,6 +74,28 @@ class NganLuongTest extends TestCase
         $this->gateway->queryDR([]);
     }
 
+    /**
+     * @expectedException \yii\base\InvalidConfigException
+     * @expectedExceptionMessage cannot be blank
+     */
+    public function testAuthenticate()
+    {
+        // Valid
+        $this->gateway->setVersion('3.2');
+        $responseData = $this->gateway->authenticate([
+            'token' => self::TOKEN,
+            'otp' => '123321',
+            'auth_url' => 'http://localhost'
+        ]);
+        $this->assertFalse($responseData->getIsOk());
+
+        // Throws
+        $this->gateway->authenticate([
+            'token' => self::TOKEN,
+            'otp' => '123321'
+        ]);
+    }
+
     public function testVerifyRequestPurchaseSuccess()
     {
         $_GET['token'] = self::TOKEN;
@@ -84,5 +106,39 @@ class NganLuongTest extends TestCase
         $_GET = [];
         $result = $this->gateway->verifyRequestPurchaseSuccess();
         $this->assertFalse($result);
+    }
+
+    /**
+     * @expectedException \yii\base\InvalidConfigException
+     * @expectedExceptionMessage cannot be blank
+     */
+    public function testPurchase32()
+    {
+        // Valid
+        $this->gateway->setVersion('3.2');
+        $responseData = $this->gateway->purchase([
+            'bank_code' => 'VCB',
+            'buyer_fullname' => 'vxm',
+            'buyer_email' => 'admin@test.app',
+            'buyer_mobile' => '0909113911',
+            'total_amount' => 10000000,
+            'order_code' => microtime(),
+            'card_number' => '123123123',
+            'card_fullname' => 'vxm',
+            'card_month' => '01',
+            'card_year' => '2012'
+        ]);
+
+        $this->assertFalse($responseData->getIsOk());
+
+        // Throws
+        $this->gateway->purchase([
+            'bank_code' => 'VCB',
+            'buyer_fullname' => 'vxm',
+            'buyer_email' => 'admin@test.app',
+            'buyer_mobile' => '0909113911',
+            'total_amount' => 10000000,
+            'order_code' => microtime()
+        ]);
     }
 }
