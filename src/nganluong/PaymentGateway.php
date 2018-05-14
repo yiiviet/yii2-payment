@@ -11,13 +11,15 @@ use yii\base\NotSupportedException;
 
 use yiiviet\payment\BasePaymentGateway;
 
+use vxm\gatewayclients\RequestEvent;
+
 /**
  * Lớp PaymentGateway hổ trợ việc kết nối đến Ngân Lượng.
  * Hiện tại nó hỗ trợ 100% tính năng của Ngân Lượng v3.1
  *
  * @method ResponseData purchase(array $data, $clientId = null)
  * @method ResponseData queryDR(array $data, $clientId = null)
- * @method VerifiedData verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
+ * @method bool|VerifiedData verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
  *
  * @property PaymentClient $client
  * @property PaymentClient $defaultClient
@@ -27,6 +29,22 @@ use yiiviet\payment\BasePaymentGateway;
  */
 class PaymentGateway extends BasePaymentGateway
 {
+    /**
+     * Lệnh `authenticate` yêu cầu Ngân Lượng xác minh OTP của khách có hợp lệ hay không.
+     * Nó được sử dụng ở version 3.2 phương thức seamless checkout.
+     */
+    const RC_AUTHENTICATE = 'authenticate';
+
+    /**
+     * @event RequestEvent được gọi trước khi thực hiện yêu cầu Ngân Lượng xác minh OTP của khách.
+     */
+    const EVENT_BEFORE_AUTHENTICATE = 'beforeAuthenticate';
+
+    /**
+     * @event RequestEvent được gọi sau khi thực hiện yêu cầu Ngân Lượng xác minh OTP của khách.
+     */
+    const EVENT_AFTER_AUTHENTICATE = 'afterAuthenticate';
+
     /**
      * Hằng khai báo giúp Ngân Lượng xác định phương thức thanh toán là Ngân Lượng,
      * khi khởi tạo lệnh [[RC_PURCHASE]] tại phương thức [[request()]].
@@ -105,6 +123,16 @@ class PaymentGateway extends BasePaymentGateway
     const TRANSACTION_STATUS_ERROR = '02';
 
     /**
+     * Hằng cho biết gateway ở version 3.1
+     */
+    const VERSION_3_1 = '3.1';
+
+    /**
+     * Hằng cho biết gateway ở version 3.2
+     */
+    const VERSION_3_2 = '3.2';
+
+    /**
      * @inheritdoc
      */
     public $clientConfig = ['class' => PaymentClient::class];
@@ -135,9 +163,31 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public function getVersion(): string
+    public function getSupportedVersions(): array
     {
-        return '3.1';
+        return [self::VERSION_3_1, self::VERSION_3_2];
+    }
+
+    /**
+     * Phương thức yêu cầu Ngân Lượng xác minh OTP.
+     * Đây là phương thức ánh xạ của [[request()]] sử dụng lệnh [[RC_AUTHENTICATE]]. Nó chỉ được hổ trợ ở version 3.2.
+     *
+     * @param array $data Dữ liệu yêu cầu xác minh.
+     * @param null $clientId Client id sử dụng để tạo yêu. Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
+     * @return ResponseData|\vxm\gatewayclients\DataInterface Trả về [[ResponseData]] là dữ liệu từ Ngân Lượng phản hồi.
+     * @throws \yii\base\InvalidConfigException|\ReflectionException
+     */
+    public function authenticate(array $data, $merchantId = null)
+    {
+        return $this->request(self::RC_AUTHENTICATE, $data, $merchantId);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defaultVersion(): string
+    {
+        return self::VERSION_3_1;
     }
 
     /**
@@ -181,6 +231,10 @@ class PaymentGateway extends BasePaymentGateway
      */
     protected function requestInternal(\vxm\gatewayclients\RequestData $requestData, \yii\httpclient\Client $httpClient): array
     {
+        if ($requestData->command === self::RC_AUTHENTICATE && $this->getVersion() !== self::VERSION_3_2) {
+            throw new NotSupportedException('Lệnh authenticate chỉ hổ trợ ở phiên bản ' . self::VERSION_3_2);
+        }
+
         $data = $requestData->get();
 
         return $httpClient->post('', $data)->send()->getData();

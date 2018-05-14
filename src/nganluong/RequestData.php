@@ -26,12 +26,13 @@ class RequestData extends BaseRequestData
     public function rules()
     {
         return [
-            [['merchant_id', 'merchant_password', 'version', 'function'], 'required', 'on' => [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_QUERY_DR]],
-            [['token'], 'required', 'on' => PaymentGateway::RC_QUERY_DR],
+            [['merchant_id', 'merchant_password', 'version', 'function'], 'required'],
             [[
                 'bank_code', 'buyer_fullname', 'buyer_email', 'buyer_mobile',
                 'total_amount', 'order_code', 'receiver_email', 'payment_method'
-            ], 'required', 'on' => PaymentGateway::RC_PURCHASE]
+            ], 'required', 'on' => PaymentGateway::RC_PURCHASE],
+            [['otp', 'auth_url'], 'required', 'on' => PaymentGateway::RC_AUTHENTICATE],
+            [['token'], 'required', 'on' => [PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_AUTHENTICATE]]
         ];
     }
 
@@ -48,13 +49,23 @@ class RequestData extends BaseRequestData
         $attributes = array_merge($attributes, [
             'merchant_id' => $client->merchantId,
             'merchant_password' => md5($client->merchantPassword),
-            'version' => $client->getGateway()->getVersion()
+            'version' => $attributes['version'] ?? $client->getGateway()->getVersion()
         ]);
 
         if ($command === PaymentGateway::RC_PURCHASE) {
             $attributes['function'] = 'SetExpressCheckout';
             $attributes['receiver_email'] = $attributes['receiver_email'] ?? $client->email;
-            $attributes['payment_method'] = $attributes['payment_method'] ?? PaymentGateway::PAYMENT_METHOD_NL;
+
+            if ($attributes['version'] === PaymentGateway::VERSION_3_2) {
+                $attributes['payment_method'] = $attributes['payment_method'] ?? PaymentGateway::PAYMENT_METHOD_ATM_ONLINE;
+                $this->addRule(['card_number', 'card_fullname', 'card_month', 'card_year'], 'required', [
+                    'on' => $command
+                ]);
+            } else {
+                $attributes['payment_method'] = $attributes['payment_method'] ?? PaymentGateway::PAYMENT_METHOD_NL;
+            }
+        } elseif ($command === PaymentGateway::RC_AUTHENTICATE) {
+            $attributes['function'] = 'AuthenTransaction';
         } else {
             $attributes['function'] = 'GetTransactionDetail';
         }
