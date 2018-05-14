@@ -45,7 +45,8 @@ class NganLuongTest extends TestCase
             'buyer_email' => 'admin@test.app',
             'buyer_mobile' => '0909113911',
             'total_amount' => 10000000,
-            'order_code' => microtime()
+            'order_code' => microtime(),
+            'return_url' => 'http://localhost'
         ]);
 
         $this->assertTrue($responseData->getIsOk());

@@ -28,7 +28,7 @@ class RequestData extends BaseRequestData
         return [
             [['merchant_id', 'merchant_password', 'version', 'function'], 'required'],
             [[
-                'bank_code', 'buyer_fullname', 'buyer_email', 'buyer_mobile',
+                'bank_code', 'buyer_fullname', 'buyer_email', 'buyer_mobile', 'return_url',
                 'total_amount', 'order_code', 'receiver_email', 'payment_method'
             ], 'required', 'on' => PaymentGateway::RC_PURCHASE],
             [['otp', 'auth_url'], 'required', 'on' => PaymentGateway::RC_AUTHENTICATE],

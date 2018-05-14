@@ -123,6 +123,18 @@ class PaymentGateway extends BasePaymentGateway
     const TRANSACTION_STATUS_ERROR = '02';
 
     /**
+     * Hằng khai báo giúp xác nhận thuộc tính `auth_site` trong kết quả nhận được từ `purchase` version 3.2 là xác nhận OTP thông qua
+     * phương thức [[authenticate()]].
+     */
+    const AUTH_NL = 'NL';
+
+    /**
+     * Hằng khai báo giúp xác nhận thuộc tính `auth_site` trong kết quả nhận được từ `purchase` version 3.2 là xác nhận OTP thông qua
+     * ngân hàng, bạn phải `redirect` khách đến trang `auth_url` để xác minh `OTP`.
+     */
+    const AUTH_BANK = 'BANK';
+
+    /**
      * Hằng cho biết gateway ở version 3.1
      */
     const VERSION_3_1 = '3.1';
