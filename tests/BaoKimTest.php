@@ -98,8 +98,7 @@ class BaoKimTest extends TestCase
     public function testGetMerchantData()
     {
         $merchantData = $this->gateway->getMerchantData();
-        var_dump(array_keys($merchantData->get())); die;
-        $this->assertTrue($merchantData->getIsOk());
+        $this->assertTrue(isset($merchantData['bank_payment_methods'], $merchantData['seller_account']));
     }
 
     public function testVerifyRequestIPN()
