@@ -23,6 +23,8 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
 class VerifiedData extends BaseVerifiedData
 {
 
+    use MagicPropertiesTrait;
+
     /**
      * @inheritdoc
      */
@@ -31,7 +33,7 @@ class VerifiedData extends BaseVerifiedData
         return [
             [['vpc_SecureHash'], 'validateSecureHash', 'message' => '{attribute} is not valid!', 'on' => [
                 PaymentGateway::VRC_IPN, PaymentGateway::VRC_PURCHASE_SUCCESS
-            ]]
+            ], 'skipOnEmpty' => false]
         ];
     }
 
@@ -46,7 +48,7 @@ class VerifiedData extends BaseVerifiedData
     public function validateSecureHash($attribute, $params, \yii\validators\InlineValidator $validator)
     {
         $data = $this->get(false);
-        $expectSignature = ArrayHelper::remove($data, $attribute, '');
+        $expectSignature = ArrayHelper::remove($data, $attribute, false);
         $dataSign = [];
 
         foreach ($data as $param => $value) {
@@ -58,7 +60,7 @@ class VerifiedData extends BaseVerifiedData
         ksort($dataSign);
         $data = urldecode(http_build_query($dataSign));
 
-        if (!$this->getClient()->validateSignature($data, $expectSignature)) {
+        if (!$expectSignature || !$this->getClient()->validateSignature($data, $expectSignature)) {
             $validator->addError($this, $attribute, $validator->message);
         }
     }

@@ -193,7 +193,7 @@ tượng `response` với các thuộc tính sau:
 
 Phương thức này cho phép bạn kiểm tra tính hợp lệ của các dữ liệu từ
 Bảo Kim gửi sang tránh trường hợp giả mạo. Nó phải được gọi trong `action`
-mà bạn đã thiết lập ở `url_success` trong `purchase` và `purchasePro`, sau
+mà bạn đã thiết lập ở `url_success` trong `purchase`, sau
 khi phương thức này kiểm tra dữ liệu hợp lệ thì bạn mới tiến hành kiểm tra
 trạng thái giao dịch, từ đó hiển thị thông báo thành công hoặc thất bại...
 

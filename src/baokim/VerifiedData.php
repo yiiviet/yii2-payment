@@ -8,6 +8,7 @@
 namespace yiiviet\payment\baokim;
 
 use yii\base\InvalidConfigException;
+use yii\helpers\ArrayHelper;
 
 use yiiviet\payment\VerifiedData as BaseVerifiedData;
 
@@ -30,7 +31,7 @@ class VerifiedData extends BaseVerifiedData
     public function rules()
     {
         return [
-            [['checksum'], 'verifyChecksum', 'message' => '{attribute} not match', 'on' => PaymentGateway::VRC_PURCHASE_SUCCESS]
+            [['checksum'], 'verifyChecksum', 'message' => '{attribute} not match', 'on' => PaymentGateway::VRC_PURCHASE_SUCCESS, 'skipOnEmpty' => false]
         ];
     }
 
@@ -47,9 +48,11 @@ class VerifiedData extends BaseVerifiedData
         /** @var PaymentClient $client */
         $client = $this->getClient();
         $data = $this->get(false);
+        $expectSignature = ArrayHelper::remove($data, $attribute, false);
+        $dataSign = implode('', $data);
         ksort($data);
 
-        if (!$client->validateSignature(implode("", $data), $data['checksum'], PaymentClient::SIGNATURE_HMAC)) {
+        if (!$expectSignature || !$client->validateSignature($dataSign, $expectSignature, PaymentClient::SIGNATURE_HMAC)) {
             $validator->addError($this, $attribute, $validator->message);
         }
     }

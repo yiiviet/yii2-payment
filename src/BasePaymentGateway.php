@@ -210,35 +210,35 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      * Phương thức này là phương thức ánh xạ của [[verifyRequest()]] nó sẽ tạo lệnh [[VRC_PURCHASE_SUCCESS]]
      * để tạo yêu cầu xác minh tính hợp lệ của dữ liệu trả về từ máy khách đến máy chủ.
      *
-     * @param string|int $clientId PaymentClient id dùng để xác thực tính hợp lệ của dữ liệu.
      * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
+     * @param null|int|string $clientId PaymentClient id dùng để xác thực tính hợp lệ của dữ liệu.
      * @return bool|VerifiedData|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
      * @throws InvalidConfigException|\ReflectionException
      */
-    public function verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
+    public function verifyRequestPurchaseSuccess(\yii\web\Request $request = null, $clientId = null)
     {
-        return $this->verifyRequest(self::VRC_PURCHASE_SUCCESS, $clientId, $request);
+        return $this->verifyRequest(self::VRC_PURCHASE_SUCCESS, $request, $clientId);
     }
 
     /**
      * Phương thức này là phương thức ánh xạ của [[verifyRequest()]] nó sẽ tạo lệnh [[VRC_IPN]]
      * để tạo yêu cầu xác minh tính hợp lệ của dữ liệu trả về từ cổng thanh toán đến máy chủ.
      *
-     * @param string|int $clientId PaymentClient id dùng để xác thực tính hợp lệ của dữ liệu.
      * @param \yii\web\Request|null $request Đối tượng `request` thực hiện truy cập hệ thống.
+     * @param null|int|string $clientId PaymentClient id dùng để xác thực tính hợp lệ của dữ liệu.
      * @return bool|VerifiedData|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
      * @throws InvalidConfigException|\ReflectionException
      */
-    public function verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
+    public function verifyRequestIPN(\yii\web\Request $request = null, $clientId = null)
     {
-        return $this->verifyRequest(self::VRC_IPN, $clientId, $request);
+        return $this->verifyRequest(self::VRC_IPN, $request, $clientId);
     }
 
     /**
      * @inheritdoc
      * @throws InvalidConfigException|\ReflectionException
      */
-    public function verifyRequest($command, $clientId = null, \yii\web\Request $request = null)
+    public function verifyRequest($command, \yii\web\Request $request = null, $clientId = null)
     {
         if (in_array($command, $this->verifyRequestCommands(), true)) {
             $client = $this->getClient($clientId);

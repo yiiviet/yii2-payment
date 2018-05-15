@@ -19,7 +19,7 @@ use vxm\gatewayclients\RequestEvent;
  *
  * @method ResponseData purchase(array $data, $clientId = null)
  * @method ResponseData queryDR(array $data, $clientId = null)
- * @method bool|VerifiedData verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
+ * @method VerifiedData verifyRequestPurchaseSuccess(\yii\web\Request $request = null, $clientId = null)
  * @method PaymentClient getClient($id = null)
  * @method PaymentClient getDefaultClient()
  *
@@ -281,7 +281,7 @@ class PaymentGateway extends BasePaymentGateway
      * @inheritdoc
      * @throws NotSupportedException
      */
-    public function verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
+    public function verifyRequestIPN(\yii\web\Request $request = null, $clientId = null)
     {
         throw new NotSupportedException(__METHOD__ . " doesn't supported in Ngan Luong gateway");
     }

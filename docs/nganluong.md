@@ -33,7 +33,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```php
 'components' => [
     'NLGateway' => [
-        'class' => 'yiiviet\payment\baokim\PaymentGateway',
+        'class' => 'yiiviet\payment\nganluong\PaymentGateway',
         'seamless' => FALSE, // Sử dụng phương thức thanh toán redirect về Ngân Lượng (FALSE) hoặc khách thanh toán trực tiếp trên trang của bạn không cần `redirect` (TRUE).
         'client' => [
             'email' => 'Email tài khoản ngân lượng của bạn',
@@ -58,9 +58,9 @@ bằng cú pháp `Yii::$app->NLGateway`.
 | **authenticate** | Tạo lệnh yêu cầu Ngân Lượng kiểm tra tính hợp lệ của `OTP` nó được sử dụng với `seamless checkout` version `3.2`.
 
 
-## Phương thức `purchase` (version 3.1)
+## Phương thức `purchase` (`seamless` = FALSE)
 
-Hình thức này ở version `3.1` thanh toán đơn hàng dựa trên hệ thống của Ngân Lượng
+Phương thức này khi `seamless = FALSE` thanh toán đơn hàng dựa trên hệ thống của Ngân Lượng
 bạn sẽ phải `redirect` khách hàng sang Ngân Lượng để thực hiện thanh toán.
 
 * Cách sử dụng cơ bản:
@@ -140,9 +140,9 @@ tượng `response` với các thuộc tính sau:
     }
 ``` 
 
-## Phương thức `purchase` (version 3.2)
+## Phương thức `purchase` (`seamless` = TRUE)
 
-Ở version `3.2` thanh toán đơn hàng sẽ không dựa trên hệ thống của Ngân Lượng (`seamless checkout`),
+Phương thức này khi `seamless = TRUE` thanh toán đơn hàng sẽ không dựa trên hệ thống của Ngân Lượng (`seamless checkout`),
 bạn sẽ không cần phải `redirect` khách hàng sang Ngân Lượng để thực hiện thanh toán mà nghiệp vụ thanh
 toán bạn sẽ phải tự xây dựng. Ngân Lượng cấp phương thức `authenticate` để bạn xác minh mã `OTP` của khách.
 
@@ -363,7 +363,7 @@ Như bạn thấy thì chúng ta chỉ quan tâm đến `00` vì trạng thái n
 
 Phương thức này cho phép bạn kiểm tra tính hợp lệ của các dữ liệu từ
 Ngân Lượng gửi sang tránh trường hợp giả mạo. Nó phải được gọi trong `action`
-mà bạn đã thiết lập ở `url_success` trong `purchase` và `purchasePro`, sau
+mà bạn đã thiết lập ở `return_url` trong `purchase``, sau
 khi phương thức này kiểm tra dữ liệu hợp lệ thì bạn mới tiến hành kiểm tra
 trạng thái giao dịch, từ đó hiển thị thông báo thành công hoặc thất bại...
 

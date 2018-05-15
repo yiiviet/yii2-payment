@@ -291,7 +291,7 @@ class PaymentGateway extends BasePaymentGateway
      * @inheritdoc
      * @return bool|VerifiedData|DataInterface
      */
-    public function verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
+    public function verifyRequestIPN(\yii\web\Request $request = null, $clientId = null)
     {
         if ($request === null) {
             $request = Instance::ensure('request', '\yii\web\Request');
@@ -300,7 +300,7 @@ class PaymentGateway extends BasePaymentGateway
         $content = $this->getHttpClient()->post(self::VERIFY_IPN_URL, $request->post())->send()->getContent();
 
         if (strpos($content, 'VERIFIED') !== false) {
-            return parent::verifyRequestIPN($clientId, $request);
+            return parent::verifyRequestIPN($request, $clientId);
         } else {
             return false;
         }

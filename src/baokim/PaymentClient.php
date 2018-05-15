@@ -124,18 +124,16 @@ class PaymentClient extends BasePaymentClient
                 'privateCertificate' => $this->privateCertificate,
                 'openSSLAlgo' => OPENSSL_ALGO_SHA1
             ];
-
-            return Yii::createObject($config, [$data]);
         } elseif ($type === self::SIGNATURE_HMAC) {
             $config = [
                 'class' => 'yiiviet\payment\HmacDataSignature',
                 'key' => $this->securePassword,
                 'hmacAlgo' => 'SHA1'
             ];
-
-            return Yii::createObject($config, [$data]);
         } else {
             return null;
         }
+
+        return Yii::createObject($config, [$data]);
     }
 }

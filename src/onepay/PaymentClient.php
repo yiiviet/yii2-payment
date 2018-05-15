@@ -17,6 +17,7 @@ use yiiviet\payment\BasePaymentClient;
  * Lớp PaymentClient là lớp cung cấp các thông tin cần thiết để kết nối đến cổng thanh toán OnePay.
  *
  * @method PaymentGateway getGateway()
+ *
  * @property PaymentGateway $gateway
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
@@ -46,12 +47,6 @@ class PaymentClient extends BasePaymentClient
      */
     public $secureSecret;
 
-    /**
-     * Mảng cấu hình thiết lập mặc định của đối tượng [[DataSignature]].
-     *
-     * @var array
-     */
-    public $dataSignatureConfig = [];
 
     /**
      * @inheritdoc
@@ -60,14 +55,11 @@ class PaymentClient extends BasePaymentClient
      */
     public function initDataSignature(string $data, string $type = null): ?\yiiviet\payment\DataSignature
     {
-        $config = ArrayHelper::merge($this->dataSignatureConfig, [
+        return Yii::createObject([
+            'class' => 'yiiviet\payment\HmacDataSignature',
             'key' => pack('H*', $this->secureSecret),
             'hmacAlgo' => 'sha256'
-        ]);
-
-        $config['class'] = $config['class'] ?? 'yiiviet\payment\HmacDataSignature';
-
-        return Yii::createObject($config, [$data]);
+        ], [$data]);
     }
 
 }

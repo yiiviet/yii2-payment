@@ -14,39 +14,31 @@ use yiiviet\payment\BasePaymentClient;
 /**
  * Lớp PaymentClient hổ trợ tạo và kiểm tra chữ ký dữ liệu và có các thuộc tính kết nối đến cổng thanh toán VnPayment
  *
+ * @method PaymentGateway getGateway()
+ *
+ * @property PaymentGateway $gateway
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
 class PaymentClient extends BasePaymentClient
 {
-    /**
-     * Mảng thiết lập cấu hình mặc định của [[DataSignature]] khi được khởi tạo.
-     *
-     * @var array
-     */
-    public $dataSignatureConfig = [];
 
     /**
-     * Thuộc tính dùng để tạo và kiểm tra chữ ký dữ liệu.
+     * @var string Thuộc tính dùng để tạo và kiểm tra chữ ký dữ liệu.
      * Nó do VnPayment cấp khi thực hiện tích hợp website của bạn.
-     *
-     * @var string
      */
     public $hashSecret;
 
     /**
-     * Mã TMN được dùng để gửi lên VnPayment xác định là yêu cầu từ bạn.
+     * @var string Mã TMN được dùng để gửi lên VnPayment xác định là yêu cầu từ bạn.
      * Nó thường được dùng khi gọi [[request()]] ở [[PaymentGateway]].
      * Nó do VnPayment cấp khi thực hiện tích hợp website của bạn.
-     *
-     * @var string
      */
     public $tmnCode;
 
     /**
-     * Mã loại hàng mặc định của website bạn bán.
-     *
-     * @var int
+     * @var int Mã loại hàng mặc định của website bạn bán.
      */
     public $defaultOrderType;
 
@@ -56,10 +48,10 @@ class PaymentClient extends BasePaymentClient
      */
     protected function initDataSignature(string $data, string $type = null): ?\yiiviet\payment\DataSignature
     {
-        return Yii::createObject(array_merge([
+        return Yii::createObject([
             'class' => DataSignature::class,
             'hashAlgo' => $type,
             'hashSecret' => $this->hashSecret
-        ], $this->dataSignatureConfig), [$data]);
+        ], [$data]);
     }
 }

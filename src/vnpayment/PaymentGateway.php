@@ -7,10 +7,10 @@
 
 namespace yiiviet\payment\vnpayment;
 
-use vxm\gatewayclients\RequestEvent;
 use yiiviet\payment\BasePaymentGateway;
 
 use vxm\gatewayclients\DataInterface;
+use vxm\gatewayclients\RequestEvent;
 
 /**
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến OnePay.
@@ -18,8 +18,13 @@ use vxm\gatewayclients\DataInterface;
  *
  * @method ResponseData purchase(array $data, $clientId = null)
  * @method ResponseData queryDR(array $data, $clientId = null)
- * @method VerifiedData verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
- * @method VerifiedData verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
+ * @method VerifiedData verifyRequestIPN(\yii\web\Request $request = null, $clientId = null)
+ * @method VerifiedData verifyRequestPurchaseSuccess(\yii\web\Request $request = null, $clientId = null)
+ * @method PaymentClient getClient($id = null)
+ * @method PaymentClient getDefaultClient()
+ *
+ * @property PaymentClient $client
+ * @property PaymentClient $defaultClient
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -87,7 +92,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    public function getVersion(): string
+    protected function defaultVersion(): string
     {
         return '2.0.0';
     }
@@ -158,7 +163,7 @@ class PaymentGateway extends BasePaymentGateway
         $data[0] = $commandUrls[$command];
 
         if ($command === self::RC_PURCHASE) {
-            return ['location' => $httpClient->createRequest()->setUrl($data)->getFullUrl()];
+            return ['redirect_url' => $httpClient->createRequest()->setUrl($data)->getFullUrl()];
         } else {
             return $httpClient->get($data)->send()->getData();
         }

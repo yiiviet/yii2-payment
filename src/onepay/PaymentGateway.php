@@ -7,15 +7,9 @@
 
 namespace yiiviet\payment\onepay;
 
-use Yii;
-
-use yii\httpclient\Client as HttpClient;
-
 use yiiviet\payment\BasePaymentGateway;
-use yiiviet\payment\VerifiedRequestEvent;
 
 use vxm\gatewayclients\DataInterface;
-use vxm\gatewayclients\RequestEvent;
 
 
 /**
@@ -123,7 +117,6 @@ class PaymentGateway extends BasePaymentGateway
     protected function getHttpClientConfig(): array
     {
         return [
-            'class' => HttpClient::class,
             'transport' => 'yii\httpclient\CurlTransport',
             'requestConfig' => [
                 'options' => [
@@ -164,26 +157,26 @@ class PaymentGateway extends BasePaymentGateway
      * @return bool|VerifiedData
      * @inheritdoc
      */
-    public function verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
+    public function verifyRequestIPN(\yii\web\Request $request = null, $clientId = null)
     {
         if ($this->sandbox && $clientId === null) {
             $clientId = $this->international ? self::ID_CLIENT_SANDBOX_INTERNATIONAL : self::ID_CLIENT_SANDBOX_DOMESTIC;
         }
 
-        return parent::verifyRequestIPN($clientId, $request);
+        return parent::verifyRequestIPN($request, $clientId);
     }
 
     /**
      * @return bool|VerifiedData
      * @inheritdoc
      */
-    public function verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
+    public function verifyRequestPurchaseSuccess(\yii\web\Request $request = null, $clientId = null)
     {
         if ($this->sandbox && $clientId === null) {
             $clientId = $this->international ? self::ID_CLIENT_SANDBOX_INTERNATIONAL : self::ID_CLIENT_SANDBOX_DOMESTIC;
         }
 
-        return parent::verifyRequestPurchaseSuccess($clientId, $request);
+        return parent::verifyRequestPurchaseSuccess($request, $clientId);
     }
 
 

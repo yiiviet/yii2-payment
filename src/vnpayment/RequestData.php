@@ -17,6 +17,8 @@ use vxm\gatewayclients\RequestData as BaseRequestData;
  * Lớp RequestData cung cấp dữ liệu để truy vấn đến VnPayment tạo lệnh thanh toán,
  * kiểm tra giao dịch, hoàn trả hóa đơn....
  *
+ * @method PaymentClient getClient()
+ *
  * @property PaymentClient $client
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
@@ -59,11 +61,14 @@ class RequestData extends BaseRequestData
             }
         }
 
-        /** @var PaymentClient $client */
         $client = $this->getClient();
         $command = $this->getCommand();
         $hashType = ArrayHelper::remove($attributesEnsured, 'vnp_SecureHashType', 'MD5');
-        $attributesEnsured['vnp_IpAddr'] = $attributesEnsured['vnp_IpAddr'] ?? Yii::$app->getRequest()->getUserIP();
+
+        if (Yii::$app instanceof \yii\web\Application) {
+            $attributesEnsured['vnp_IpAddr'] = $attributesEnsured['vnp_IpAddr'] ?? Yii::$app->getRequest()->getUserIP();
+        }
+
         $attributesEnsured['vnp_CreateDate'] = $attributesEnsured['vnp_CreateDate'] ?? date('Ymdhis');
         $attributesEnsured['vnp_Version'] = $client->getGateway()->getVersion();
         $attributesEnsured['vnp_TmnCode'] = $client->tmnCode;

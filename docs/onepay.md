@@ -33,7 +33,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```php
 'components' => [
     'OPGateway' => [
-        'class' => 'yiiviet\payment\baokim\PaymentGateway',
+        'class' => 'yiiviet\payment\onepay\PaymentGateway',
         'international' => false, //Thiết lập `FALSE` để sử dụng cổng nội địa và ngược lại là cổng quốc tế. Mặc định là `FALSE`.        
         'client' => [
             'accessCode' => 'Access code bạn vừa đăng ký',
@@ -195,7 +195,7 @@ Phương thức này cho bạn truy vấn thông tin giao dịch từ OnePay th�
  phương thức `purchase` phía trên. Lưu ý `MerchTxnRef` của cổng quốc tế và cổng nội địa không thể dùng chung,
  tất là nếu giao dịch tạo bằng cổng nội địa thì khi check ở cổng quốc tế giá trị sẽ không tồn tại.
 
-Cách truy vấn thông tin:
+Cách truy vấn thông tin cơ bản:
 
 ```php
 
@@ -222,59 +222,47 @@ tượng `response` với các thuộc tính sau:
 | Thuộc tính | Bắt buộc | Kiểu | Mô tả |
 | ----------- | :----: | :------: | ----- |
 | isOk | **có** | bool | Thuộc tính cho biết tiến trình yêu cầu diễn ra tốt đẹp hay không. Nếu có là `TRUE` và ngược lại. |
-| error_code | **có** | string | Mã báo lỗi `00` nghĩa là giao dịch thành công. |
-| token | **có** | string | Token của đơn hàng nó sẽ giống như token dùng để truy vấn. |
-| order_code | không | string | Mã đơn hàng trên hệ thống của bạn. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| total_amount | không | string |Tổng số tiền của đơn hàng. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| payment_method | không | string | Phương thức thanh toán. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| bank_code | không | string | Mã ngân hàng khách dùng để thanh toán. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| payment_type | không | int | Hình thức thanh toán `1` là trực tiếp, `2` là tạm giữ an toàn. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| order_description | không | string | Mô tả đơn hàng. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| tax_amount | không | int | Tiền thuế. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| discount_amount | không | int | Tiền khuyến mãi, giảm giá. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| fee_shipping | không | int | Tiền thuế. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| return_url | không | string | Đường dẫn OnePay `redirect` khách về sau khi họ thực hiện thanh toán, được thiết lập ở phương thức `purchase`. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| cancel_url | không | string | Đường dẫn OnePay `redirect` khách về khi họ thực hiện hủy đơn hàng, được thiết lập ở phương thức `purchase`. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| notify_url | không | string | Đường dẫn OnePay gọi về sau khi khách thực hiện thanh toán được thiết lập ở phương thức `purchase`. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| time_limit | không | int | Số phút còn lại để khách thực hiện giao dịch. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| buyer_fullname | không | string | Tên người mua. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| buyer_email | không | string | Email người mua. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| buyer_mobile | không | string | Số điện thoại người mua. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| buyer_address | không | string | Địa chỉ người mua. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| affiliate_code | không | string | Mã đối tác của OnePay. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| transaction_status | không | string | Trạng thái đơn hàng. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| transaction_id | không | string | Mã giao dịch tại hệ thống OnePay. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
-| description | không | string | Mô tả đơn hàng. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| AdditionData | không | string | Thông tin từ OnePay. Nó chỉ tồn tại khi `isOk` là TRUE |
+| Amount | không | float | Số tiền đơn hàng. Nó chỉ tồn tại khi `isOk` là TRUE |
+| MerchTxnRef | không | mixed | Mã đơn hàng trên hệ thống của bạn. Nó chỉ tồn tại khi `isOk` là TRUE |
+| OrderInfo | không | mixed | Mô tả đơn hàng trên hệ thống của bạn. Nó chỉ tồn tại khi `isOk` là TRUE |
+| TransactionNo | không | mixed | Mã giao dịch tại OnePay. Nó chỉ tồn tại khi `isOk` là TRUE và đơn hàng giao dịch thành công |
+| ResponseCode | không | mixed | Trạng thái giao dịch. Nó chỉ tồn tại khi `isOk` là TRUE |
 
 * Bảng trạng thái giao dịch:
 
 | Gía trị | Mô tả |
 | :-------: | ----- |
-| **00** | giao dịch thành công|
-| 01 | đã thanh toán, chờ xử lý |
-| 02 | giao dịch chưa thanh toán |
+| **0** | giao dịch thành công, tất cả các giá trị còn lại là thất bại |
 
-Như bạn thấy thì chúng ta chỉ quan tâm đến `00` vì trạng thái này cho ta biết
- khách đã thanh toán thành công.
+Cách truy vấn thông tin hoàn chỉnh:
+
+```php
+
+    $responseData = Yii::$app->OPGateway->queryDR([
+        'MerchTxnRef' => 'abc'
+    ]);    
+
+    if ($responseData->isOk && $responseData->ResponseCode === 0) {
+        // code thêm vào đây tùy theo mục đích của bạn khi giao dịch thành công.
+    }
+    
+```
  
 ## Phương thức `verifyRequestPurchaseSuccess`
 
 Phương thức này cho phép bạn kiểm tra tính hợp lệ của các dữ liệu từ
 OnePay gửi sang tránh trường hợp giả mạo. Nó phải được gọi trong `action`
-mà bạn đã thiết lập ở `url_success` trong `purchase` và `purchasePro`, sau
-khi phương thức này kiểm tra dữ liệu hợp lệ thì bạn mới tiến hành kiểm tra
-trạng thái giao dịch, từ đó hiển thị thông báo thành công hoặc thất bại...
+mà bạn đã thiết lập ở `ReturnURL` trong `purchase`, sau khi phương thức
+ này kiểm tra dữ liệu hợp lệ thì bạn mới tiến hành kiểm tra trạng thái 
+ giao dịch, từ đó hiển thị thông báo thành công hoặc thất bại...
 
 Cách sử dụng:
 
 ```php
     if ($verifiedData = Yii::$app->OPGateway->verifyRequestPurchaseSuccess()) {
-        $token = $verifiedData->token;
-        $result =  Yii::$app->OPGateway->queryDR(['token' => $token]);
         
-        if ($result->isOk && $result->transaction_status == '00') {
-            // processing update database...
-            
+        if ($result->isOk && $result->ResponseCode === 0) {            
             return $this->render('order_completed', [
               'message' => 'success'
             ]);
@@ -293,21 +281,108 @@ bảng thuộc tính:
 
 | Khóa | Bắt buộc | Kiểu | Chi tiết |
 | :-----------: | :----: | :----: | ------ |
-| token | **có** | mixed | Mã token dùng để lấy thông tin đơn hàng thông qua phương thức `queryDR`. |
+| OrderInfo | **có** | mixed | Mô tả đơn hàng của bạn. |
+| MerchTxnRef | **có** | mixed | Mã đơn hàng trên hệ thống của bạn. |
+| ResponseCode | **có** | int | Trạng thái đơn hàng. |
+| Amount | **có** | float | Số tiền của đơn hàng. |
+| Locale | **có** | string | Loại ngôn ngữ mà khách sử dụng để thanh toán. |
+| CurrencyCode | **có** | string | Loại tiền mà khách chọn để thanh toán. Có 2 giá trị `VND` và `USD`. |
+| Merchant | **có** | string | Merchant Id dùng để thanh toán. |
+| TransactionNo | không | string | Mã giao dịch trên OnePay. Nó chỉ tồn tại khi `ResponseCode` là `0` |
+| Message | không | string | Thông báo lỗi. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
 
+* Bảng trạng thái giao dịch:
+
+| Gía trị | Mô tả |
+| :-------: | ----- |
+| **0** | giao dịch thành công, tất cả các giá trị còn lại là thất bại |
+
+
+## Phương thức `verifyRequestIPN`
+
+Phương thức này cho phép bạn kiểm tra tính hợp lệ của các dữ liệu từ
+OnePay gửi sang tránh trường hợp giả mạo. Nó phải được gọi trong `action`
+mà bạn đã thiết lập ở `IPN` trên hệ thống OnePay, sau khi phương thức
+ này kiểm tra dữ liệu hợp lệ thì bạn mới tiến hành kiểm tra trạng thái 
+ giao dịch, từ đó cập nhật database và xử lý nghiệp vụ...
+
+Cách sử dụng:
+
+```php
+    Yii::$app->response->format = 'urlencoded';
+      
+    if ($verifiedData = Yii::$app->OPGateway->verifyRequestIPN()) {
+        
+        if ($result->isOk) {  
+            if ($result->ResponseCode === 0) {
+                // update database             
+            }          
+            return [
+                'responsecode' => 1,
+                'desc' => 'confirm-success'
+            ];
+         } 
+    }
+    
+    return [
+        'responsecode' => 0,
+        'desc' => 'confirm-fail'
+    ];
+``` 
+
+Khi gọi phương thức sẽ trả về `FALSE` nếu như dữ liệu không hợp lệ (không phải OnePay)
+và ngược lại sẽ là một đối tượng chứa các thuộc tính dữ liệu hợp lệ gửi từ OnePay,
+bảng thuộc tính:
+
+| Khóa | Bắt buộc | Kiểu | Chi tiết |
+| :-----------: | :----: | :----: | ------ |
+| OrderInfo | **có** | mixed | Mô tả đơn hàng của bạn. |
+| MerchTxnRef | **có** | mixed | Mã đơn hàng trên hệ thống của bạn. |
+| ResponseCode | **có** | int | Trạng thái đơn hàng. |
+| Amount | **có** | float | Số tiền của đơn hàng. |
+| Locale | **có** | string | Loại ngôn ngữ mà khách sử dụng để thanh toán. |
+| CurrencyCode | **có** | string | Loại tiền mà khách chọn để thanh toán. Có 2 giá trị `VND` và `USD`. |
+| Merchant | **có** | string | Merchant Id dùng để thanh toán. |
+| TransactionNo | không | string | Mã giao dịch trên OnePay. Nó chỉ tồn tại khi `ResponseCode` là `0` |
+| Message | không | string | Thông báo lỗi. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
+
+Bảng trạng thái giao dịch:
+
+| Gía trị | Mô tả |
+| :-------: | ----- |
+| **0** | giao dịch thành công, tất cả các giá trị còn lại là thất bại |
+
+Sau khi xử lý nghiệm vụ tại `action` của `IPN` bạn cần phải trả về dữ liệu
+cho OnePay biết là bạn đã cập nhật đơn hàng, giúp cho OnePay đồng bộ
+trạng thái với hệ thống của bạn.
+
+Bảng thông tin cần trả về:
+
+| Gía trị | Mô tả |
+| :-------: | ----- |
+| responsecode | Trạng thái xử lý tại hệ thống của bạn. Có 2 giá trị là `1` mọi thứ tốt đẹp, `0` có lỗi xảy ra. |
+| desc | Mô tả lỗi xảy ra cho OnePay biết khi `responsecode` là `0` có lỗi xảy ra. |
+
+Kiểu dữ liệu trả về có định dạng: `form-format-urlencoded`
 
 ## Câu hỏi thương gặp
 
-+ Câu hỏi: OnePay không có hổ trợ `verifyRequestIPN`?
-    - Trả lời: Đúng! OnePay không hổ trợ. Cập nhật trạng thái và xử lý nghiệp vụ
-    khi đơn hàng thanh toán thành công đều nằm ở `action` mà bạn thiết lập `return_url` 
-    trong phương thức `purchase`.
++ Câu hỏi: Vì sao có đến 2 phương thức nhận và xác minh dữ liệu 
+(`verifyRequestPurchaseSuccess`, `verifyRequestIPN`)?
+    - Trả lời: vì cổng thanh toán muốn tăng sử đảm bảo cho giao dịch,
+    do nếu chỉ cung cấp phương thức `verifyRequestPurchaseSuccess` thì sẽ có
+    trường hợp khách hàng rớt mạng không thể `redirect` về `ReturnURL` được cho
+    nên phương thức `verifyRequestIPN` được cung cấp để đảm bảo hơn do lúc này
+    connection sẽ là OnePay với máy chủ của bạn tính ổn định sẽ là `99.99%`.
     
-+ Câu hỏi: Vậy thì luồng xử lý sẽ ra sao khách rớt mạng?
-    - Trả lời: với chúng tôi `action` của `return_url` chỉ dùng để xác minh tính 
++ Câu hỏi: Vậy thì luồn xử lý sẽ ra sao nếu như có đến 2 điểm nhận thông báo 
+(IPN và ReturnURL)?
+    - Trả lời: với chúng tôi `action` của `ReturnURL` chỉ dùng để xác minh tính 
     hợp lệ của dữ liệu OnePay từ đó hiển thị thanh toán thành công hoặc thất bại
     KHÔNG đụng đến phần cập nhật database và các nghiệp vụ liên quan đến cập nhật
     trạng thái đơn hàng. Phần cập nhật trạng thái và xử lý nghiệp vụ liên quan sẽ
-    nằm ở `cron task`, `cron task` sẽ gọi `queryDR` để cập nhật trạng thái và xử lý
-    nghiệp vụ.
+    nằm ở `action` của `IPN`.
+    
++ Câu hỏi: `IPN` là viết tắt của cụm từ gì?
+    - Trả lời: `Instance Payment Notification`.
     

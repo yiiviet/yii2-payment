@@ -14,8 +14,9 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
 /**
  * Lớp VerifiedData tổng hợp dữ liệu đã được xác minh từ VnPayment.
  *
+ * @method PaymentClient getClient()
+ *
  * @property PaymentClient $client
- * @property PaymentClient $defaultClient
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -23,17 +24,17 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
 class VerifiedData extends BaseVerifiedData
 {
 
+    use MagicPropertiesTrait;
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [[
-                'vnp_TmnCode', 'vnp_Amount', 'vnp_BankCode', 'vnp_BankTranNo', 'vnp_CardType', 'vnp_PayDate', 'vnp_CurrCode',
-                'vnp_OrderInfo', 'vnp_TransactionNo', 'vnp_ResponseCode', 'vnp_TxnRef', 'vnp_SecureHashType', 'vnp_SecureHash'
-            ], 'required', 'on' => [PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN]],
-            [['vnp_SecureHash'], 'validateSecureHash', 'message' => '{attribute} is not valid!', 'on' => [PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN]]
+            [['vnp_SecureHash'], 'validateSecureHash', 'message' => '{attribute} is not valid!', 'on' => [
+                PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN
+            ], 'skipOnEmpty' => false]
         ];
     }
 
@@ -48,14 +49,14 @@ class VerifiedData extends BaseVerifiedData
     public function validateSecureHash($attribute, $params, \yii\validators\InlineValidator $validator)
     {
         $data = $this->get(false);
-        $expectSignature = ArrayHelper::remove($data, $attribute);
+        $expectSignature = ArrayHelper::remove($data, $attribute, false);
         $hashType = ArrayHelper::remove($data, 'vnp_SecureHashType', 'MD5');
         ksort($data);
 
-        /** @var PaymentClient $client */
         $client = $this->getClient();
+        $dataSign = urldecode(http_build_query($data));
 
-        if (!$client->validateSignature(http_build_query($data), $expectSignature, $hashType)) {
+        if (!$expectSignature || !$client->validateSignature($dataSign, $expectSignature, $hashType)) {
             $validator->addError($this, $attribute, $validator->message);
         }
     }

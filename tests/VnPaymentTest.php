@@ -43,7 +43,7 @@ class VnPaymentTest extends TestCase
         ]);
 
         $this->assertTrue($responseData->getIsOk());
-        $this->assertTrue(isset($responseData['location']));
+        $this->assertTrue(isset($responseData['redirect_url']));
 
         // Throws
         $this->gateway->purchase([

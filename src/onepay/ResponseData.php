@@ -26,6 +26,8 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
 class ResponseData extends BaseResponseData
 {
 
+    use MagicPropertiesTrait;
+
     /**
      * @inheritdoc
      */

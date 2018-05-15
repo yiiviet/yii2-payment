@@ -44,7 +44,7 @@ class OnePayTest extends TestCase
         ]);
 
         $this->assertTrue($responseData->getIsOk());
-        $this->assertTrue(isset($responseData['location']));
+        $this->assertTrue(isset($responseData['redirect_url']));
 
         // Throws
         $this->gateway->purchase([
@@ -73,7 +73,7 @@ class OnePayTest extends TestCase
         ]);
 
         $this->assertTrue($responseData->getIsOk());
-        $this->assertTrue(isset($responseData['location']));
+        $this->assertTrue(isset($responseData['redirect_url']));
 
         // Throws
         $this->gateway->purchase([
@@ -121,7 +121,6 @@ class OnePayTest extends TestCase
     public function testVerifyRequestPurchaseSuccess()
     {
         $result = $this->gateway->verifyRequestPurchaseSuccess();
-
         $this->assertFalse($result);
     }
 
