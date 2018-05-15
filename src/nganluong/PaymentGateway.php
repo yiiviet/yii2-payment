@@ -20,9 +20,12 @@ use vxm\gatewayclients\RequestEvent;
  * @method ResponseData purchase(array $data, $clientId = null)
  * @method ResponseData queryDR(array $data, $clientId = null)
  * @method bool|VerifiedData verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
+ * @method PaymentClient getClient($id = null)
+ * @method PaymentClient getDefaultClient()
  *
  * @property PaymentClient $client
  * @property PaymentClient $defaultClient
+ * @property bool $seamless
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -189,9 +192,31 @@ class PaymentGateway extends BasePaymentGateway
      * @return ResponseData|\vxm\gatewayclients\DataInterface Trả về [[ResponseData]] là dữ liệu từ Ngân Lượng phản hồi.
      * @throws \yii\base\InvalidConfigException|\ReflectionException
      */
-    public function authenticate(array $data, $merchantId = null)
+    public function authenticate(array $data, $clientId = null)
     {
-        return $this->request(self::RC_AUTHENTICATE, $data, $merchantId);
+        return $this->request(self::RC_AUTHENTICATE, $data, $clientId);
+    }
+
+    /**
+     * This method checking gateway mode is seamless or not.
+     *
+     * @return bool Return TRUE if current mode is seamless.
+     */
+    public function getSeamless(): bool
+    {
+        return $this->getVersion() === self::VERSION_3_2;
+    }
+
+    /**
+     * This method is an alias of `setVersion` to detect gateway mode is seamless or origin.
+     *
+     * @param bool $seamless Mode seamless or not.
+     * @return bool Return TRUE if seamless mode is turn on.
+     * @throws NotSupportedException
+     */
+    public function setSeamless(bool $seamless): bool
+    {
+        return $this->setVersion($seamless ? self::VERSION_3_2 : self::VERSION_3_1);
     }
 
     /**
@@ -263,14 +288,10 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
-     * @throws \yii\base\InvalidConfigException|NotSupportedException
+     * @throws \yii\base\InvalidConfigException
      */
     protected function requestInternal(\vxm\gatewayclients\RequestData $requestData, \yii\httpclient\Client $httpClient): array
     {
-        if ($requestData->command === self::RC_AUTHENTICATE && $this->getVersion() !== self::VERSION_3_2) {
-            throw new NotSupportedException('Lệnh authenticate chỉ hổ trợ ở phiên bản ' . self::VERSION_3_2);
-        }
-
         $data = $requestData->get();
 
         return $httpClient->post('', $data)->send()->getData();

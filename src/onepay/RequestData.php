@@ -9,11 +9,14 @@ namespace yiiviet\payment\onepay;
 
 use Yii;
 
-use vxm\gatewayclients\RequestData as BaseRequestData;
 use yii\helpers\Url;
+
+use vxm\gatewayclients\RequestData as BaseRequestData;
 
 /**
  * Lớp RequestData cung cấp dữ liệu để giao tiếp với OnePay như truy vấn giao dịch, yêu cầu thanh toán.
+ *
+ * @method PaymentClient getClient()
  *
  * @property PaymentClient $client
  *
@@ -41,16 +44,23 @@ class RequestData extends BaseRequestData
      */
     public function rules()
     {
-        return [
+        $rules = [
             [['vpc_Version', 'vpc_Command', 'vpc_AccessCode', 'vpc_Merchant', 'vpc_MerchTxnRef'], 'required', 'on' => [
-                PaymentGateway::RC_PURCHASE, PaymentGateway::RC_PURCHASE_INTERNATIONAL, PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_DR_INTERNATIONAL
+                PaymentGateway::RC_PURCHASE, PaymentGateway::RC_QUERY_DR
             ]],
             [[
                 'vpc_Locale', 'vpc_ReturnURL', 'vpc_OrderInfo', 'vpc_Amount',
                 'vpc_TicketNo', 'AgainLink', 'Title', 'vpc_SecureHash'
-            ], 'required', 'on' => [PaymentGateway::RC_PURCHASE_INTERNATIONAL, PaymentGateway::RC_PURCHASE]],
-            [['vpc_Currency'], 'required', 'on' => [PaymentGateway::RC_PURCHASE]]
+            ], 'required', 'on' => PaymentGateway::RC_PURCHASE]
         ];
+
+        if (!$this->getClient()->getGateway()->international) {
+            return array_merge($rules, [
+                [['vpc_Currency'], 'required', 'on' => [PaymentGateway::RC_PURCHASE]]
+            ]);
+        } else {
+            return $rules;
+        }
     }
 
     /**
@@ -59,8 +69,6 @@ class RequestData extends BaseRequestData
      */
     protected function ensureAttributes(array &$attributes)
     {
-        parent::ensureAttributes($attributes);
-        /** @var PaymentClient $client */
         $client = $this->getClient();
         $command = $this->getCommand();
         $attributesEnsured = [];
@@ -79,24 +87,28 @@ class RequestData extends BaseRequestData
         $attributesEnsured['vpc_AccessCode'] = $client->accessCode;
         $attributesEnsured['vpc_Version'] = $client->getGateway()->getVersion();
 
-        if ($command === PaymentGateway::RC_PURCHASE) {
+        if (!$client->getGateway()->international && $command === PaymentGateway::RC_PURCHASE) {
             $attributesEnsured['vpc_Currency'] = $attributesEnsured['vpc_Currency'] ?? 'VND';
         }
 
-        if ($command === PaymentGateway::RC_QUERY_DR || $command === PaymentGateway::RC_QUERY_DR_INTERNATIONAL) {
+        if ($command === PaymentGateway::RC_QUERY_DR) {
             $attributesEnsured['vpc_Command'] = 'queryDR';
             $attributesEnsured['vpc_User'] = 'op01';
             $attributesEnsured['vpc_Password'] = 'op123456';
         } else {
             $attributesEnsured['vpc_Command'] = 'pay';
             $attributesEnsured['vpc_Locale'] = $attributesEnsured['vpc_Locale'] ?? 'vn';
-            $attributesEnsured['vpc_TicketNo'] = $attributesEnsured['vpc_TicketNo'] ?? Yii::$app->getRequest()->getUserIP();
-            $attributesEnsured['AgainLink'] = $attributesEnsured['AgainLink'] ?? Url::current();
-            $attributesEnsured['Title'] = $attributesEnsured['Title'] ?? (string)Yii::$app->getView()->title;
             $attributesEnsured['vpc_SecureHash'] = $this->signature($attributesEnsured);
+
+            if (Yii::$app instanceof \yii\web\Application) {
+                $attributesEnsured['vpc_TicketNo'] = $attributesEnsured['vpc_TicketNo'] ?? Yii::$app->getRequest()->getUserIP();
+                $attributesEnsured['AgainLink'] = $attributesEnsured['AgainLink'] ?? Url::current();
+                $attributesEnsured['Title'] = $attributesEnsured['Title'] ?? (string)Yii::$app->getView()->title;
+            }
         }
 
         $attributes = $attributesEnsured;
+        parent::ensureAttributes($attributes);
     }
 
     /**

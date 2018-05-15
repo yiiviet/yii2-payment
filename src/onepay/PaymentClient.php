@@ -16,6 +16,9 @@ use yiiviet\payment\BasePaymentClient;
 /**
  * Lớp PaymentClient là lớp cung cấp các thông tin cần thiết để kết nối đến cổng thanh toán OnePay.
  *
+ * @method PaymentGateway getGateway()
+ * @property PaymentGateway $gateway
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */

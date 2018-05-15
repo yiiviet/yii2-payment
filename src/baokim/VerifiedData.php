@@ -14,6 +14,10 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
 /**
  * Lớp VerifiedData cung cấp dữ liệu đã được xác minh từ các truy vấn IPN, success url.
  *
+ * @method PaymentClient getClient()
+ *
+ * @property PaymentClient $client
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */

@@ -12,6 +12,8 @@ use vxm\gatewayclients\RequestData as BaseRequestData;
 /**
  * Lớp RequestData cung cấp dữ liệu đã được kiểm tra tính trọn vẹn khi tạo [[request()]] ở [[PaymentGateway]].
  *
+ * @method PaymentClient getClient()
+ *
  * @property PaymentClient $client
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
@@ -25,13 +27,20 @@ class RequestData extends BaseRequestData
      */
     public function rules(): array
     {
-        return [
-            [['business'], 'required', 'on' => [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_PURCHASE_PRO, PaymentGateway::RC_GET_MERCHANT_DATA]],
+        $rules = [
+            [['business'], 'required', 'on' => [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_GET_MERCHANT_DATA]],
             [['merchant_id', 'transaction_id'], 'required', 'on' => PaymentGateway::RC_QUERY_DR],
             [['checksum'], 'required', 'on' => [PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_PURCHASE]],
-            [['payer_name', 'payer_email', 'payer_phone_no', 'bank_payment_method_id'], 'required', 'on' => PaymentGateway::RC_PURCHASE_PRO],
-            [['order_id', 'total_amount', 'url_success'], 'required', 'on' => [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_PURCHASE_PRO]]
+            [['order_id', 'total_amount', 'url_success'], 'required', 'on' => [PaymentGateway::RC_PURCHASE]]
         ];
+
+        if ($this->getClient()->getGateway()->pro && $this->getCommand() === PaymentGateway::RC_PURCHASE) {
+            return array_merge($rules, [
+                [['payer_name', 'payer_email', 'payer_phone_no', 'bank_payment_method_id'], 'required', 'on' => PaymentGateway::RC_PURCHASE]
+            ]);
+        } else {
+            return $rules;
+        }
     }
 
     /**
@@ -40,23 +49,16 @@ class RequestData extends BaseRequestData
      */
     protected function ensureAttributes(array &$attributes)
     {
-        parent::ensureAttributes($attributes);
-        /** @var PaymentClient $client */
         $client = $this->getClient();
         $command = $this->getCommand();
 
-        if (in_array($command, [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_PURCHASE_PRO, PaymentGateway::RC_GET_MERCHANT_DATA], true)) {
+        if (in_array($command, [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_GET_MERCHANT_DATA], true)) {
             $attributes['business'] = $attributes['business'] ?? $client->merchantEmail;
         }
 
-        if (in_array($command, [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_QUERY_DR], true)) {
-            $attributes['merchant_id'] = $client->merchantId;
-        }
-
-        ksort($attributes);
-
-        if (in_array($command, [PaymentGateway::RC_PURCHASE_PRO, PaymentGateway::RC_GET_MERCHANT_DATA], true)) {
-            if ($command === PaymentGateway::RC_PURCHASE_PRO) {
+        if ($command === PaymentGateway::RC_GET_MERCHANT_DATA || ($command === PaymentGateway::RC_PURCHASE && $client->getGateway()->pro)) {
+            ksort($attributes);
+            if ($command === PaymentGateway::RC_PURCHASE) {
                 $strSign = 'POST' . '&' . urlencode(PaymentGateway::PURCHASE_PRO_URL) . '&&' . urlencode(http_build_query($attributes));
             } else {
                 $strSign = 'GET' . '&' . urlencode(PaymentGateway::PRO_SELLER_INFO_URL) . '&' . urlencode(http_build_query($attributes)) . '&';
@@ -64,9 +66,13 @@ class RequestData extends BaseRequestData
             $signature = $client->signature($strSign, PaymentClient::SIGNATURE_RSA);
             $attributes['signature'] = base64_encode($signature);
         } elseif (in_array($command, [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_QUERY_DR], true)) {
+            $attributes['merchant_id'] = $client->merchantId;
+            ksort($attributes);
             $strSign = implode("", $attributes);
             $attributes['checksum'] = $client->signature($strSign, PaymentClient::SIGNATURE_HMAC);
         }
+
+        parent::ensureAttributes($attributes);
     }
 
 }

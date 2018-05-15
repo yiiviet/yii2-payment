@@ -21,7 +21,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 'components' => [
     'NLGateway' => [
         'class' => 'yiiviet\payment\nganluong\PaymentGateway',
-        'version' => '3.1', `3.1` sử dụng thanh toán redirect về Ngân Lượng, `3.2` khách thanh toán trực tiếp trên trang của bạn không cần `redirect` (seamless checkout).
+        'seamless' => FALSE, // Sử dụng phương thức thanh toán redirect về Ngân Lượng (FALSE) hoặc khách thanh toán trực tiếp trên trang của bạn không cần `redirect` (TRUE).
         'sandbox' => true
     ]
 ]
@@ -34,8 +34,8 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 'components' => [
     'NLGateway' => [
         'class' => 'yiiviet\payment\baokim\PaymentGateway',
+        'seamless' => FALSE, // Sử dụng phương thức thanh toán redirect về Ngân Lượng (FALSE) hoặc khách thanh toán trực tiếp trên trang của bạn không cần `redirect` (TRUE).
         'client' => [
-            'version' => '3.2', `3.1` sử dụng thanh toán redirect về Ngân Lượng, `3.2` khách thanh toán trực tiếp trên trang của bạn không cần `redirect` (seamless checkout).
             'email' => 'Email tài khoản ngân lượng của bạn',
             'merchantId' => 'Mã merchant bạn vừa đăng ký',
             'merchantPassword' => 'Merchant password bạn vừa đăng ký'
@@ -393,22 +393,10 @@ Khi gọi phương thức sẽ trả về `FALSE` nếu như dữ liệu không 
 và ngược lại sẽ là một đối tượng chứa các thuộc tính dữ liệu hợp lệ gửi từ Ngân Lượng,
 bảng thuộc tính:
 
-* Đối với đơn hàng tạo bằng phương thức `purchase`:
-
 | Khóa | Bắt buộc | Kiểu | Chi tiết |
 | :-----------: | :----: | :----: | ------ |
 | token | **có** | mixed | Mã token dùng để lấy thông tin đơn hàng thông qua phương thức `queryDR`. |
 
-* Bảng trạng thái giao dịch:
-
-| Gía trị | Mô tả |
-| :-------: | ----- |
-| **00** | giao dịch thành công|
-| 01 | đã thanh toán, chờ xử lý |
-| 02 | giao dịch chưa thanh toán |
-
-Như bạn thấy thì chúng ta chỉ quan tâm đến `00` vì trạng thái này cho ta biết
- khách đã thanh toán thành công.
 
 ## Câu hỏi thương gặp
 

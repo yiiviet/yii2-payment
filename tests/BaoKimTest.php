@@ -57,8 +57,9 @@ class BaoKimTest extends TestCase
      */
     public function testPurchasePro()
     {
+        $this->gateway->pro = true;
         // Valid
-        $responseData = $this->gateway->purchasePro([
+        $responseData = $this->gateway->purchase([
             'bank_payment_method_id' => '128',
             'payer_name' => 'vxm',
             'payer_email' => 'vxm@gmail.com',
@@ -70,7 +71,7 @@ class BaoKimTest extends TestCase
         $this->assertTrue($responseData->next_action === 'redirect');
 
         // Throws
-        $this->gateway->purchasePro([
+        $this->gateway->purchase([
             'bank_payment_method_id' => '128',
             'payer_name' => 'vxm',
             'payer_email' => 'vxm@gmail.com',

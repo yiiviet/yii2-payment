@@ -41,6 +41,10 @@ class RsaDataSignature extends DataSignature
     {
         if ($this->openSSLAlgo === null) {
             throw new InvalidConfigException('Property `openSSLAlgo` must be set!');
+        } else if ($this->privateCertificate === null) {
+            throw new InvalidConfigException('Property `privateCertificate` must be set for generate signature!');
+        } else if ($this->publicCertificate === null) {
+            throw new InvalidConfigException('Property `publicCertificate` must be set for validate signature!');
         }
 
         parent::init();
@@ -52,16 +56,12 @@ class RsaDataSignature extends DataSignature
      */
     public function generate(): string
     {
-        if ($this->privateCertificate === null) {
-            throw new InvalidConfigException('Property `privateCertificate` must be set for generate signature!');
-        } else {
-            if (($privateKey = openssl_pkey_get_private($this->privateCertificate)) && openssl_sign($this->getData(), $signature, $privateKey, $this->openSSLAlgo)) {
-                openssl_free_key($privateKey);
+        if (($privateKey = openssl_pkey_get_private($this->privateCertificate)) && openssl_sign($this->getData(), $signature, $privateKey, $this->openSSLAlgo)) {
+            openssl_free_key($privateKey);
 
-                return $signature;
-            } else {
-                throw new InvalidConfigException('Can not signature data via current private certificate!');
-            }
+            return $signature;
+        } else {
+            throw new InvalidConfigException('Can not signature data via current private certificate!');
         }
     }
 
@@ -71,14 +71,10 @@ class RsaDataSignature extends DataSignature
      */
     public function validate(string $expect): bool
     {
-        if ($this->publicCertificate === null) {
-            throw new InvalidConfigException('Property `publicCertificate` must be set for validate signature!');
-        } else {
-            $isValid = ($publicKey = openssl_pkey_get_public($this->publicCertificate)) && openssl_verify($this->getData(), $expect, $publicKey, $this->openSSLAlgo);
-            openssl_free_key($publicKey);
+        $isValid = ($publicKey = openssl_pkey_get_public($this->publicCertificate)) && openssl_verify($this->getData(), $expect, $publicKey, $this->openSSLAlgo);
+        openssl_free_key($publicKey);
 
-            return $isValid;
-        }
+        return $isValid;
     }
 
 }

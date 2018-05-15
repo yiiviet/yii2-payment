@@ -7,6 +7,7 @@
 
 namespace yiiviet\payment\baokim;
 
+use yii\base\NotSupportedException;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
@@ -23,6 +24,8 @@ use vxm\gatewayclients\DataInterface;
  * @method ResponseData purchase(array $data, $clientId = null)
  * @method ResponseData queryDR(array $data, $clientId = null)
  * @method bool|VerifiedData verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
+ * @method PaymentClient getClient($id = null)
+ * @method PaymentClient getDefaultClient()
  *
  * @property PaymentClient $client
  * @property PaymentClient $defaultClient
@@ -33,29 +36,9 @@ use vxm\gatewayclients\DataInterface;
 class PaymentGateway extends BasePaymentGateway
 {
     /**
-     * Lệnh `purchasePro` sử dụng cho việc tạo [[request()]] yêu cầu thanh toán PRO.
-     */
-    const RC_PURCHASE_PRO = 'purchasePro';
-
-    /**
      * Lệnh `getMerchantData` sử dụng cho việc tạo [[request()]] yêu cầu thông tin merchant.
      */
     const RC_GET_MERCHANT_DATA = 'getMerchantData';
-
-    /**
-     * @event RequestEvent được gọi trước khi tạo yêu câu thanh toán PRO.
-     */
-    const EVENT_BEFORE_PURCHASE_PRO = 'beforePurchasePro';
-
-    /**
-     * @event RequestEvent được gọi sau khi tạo yêu câu thanh toán PRO.
-     */
-    const EVENT_AFTER_PURCHASE_PRO = 'afterPurchasePro';
-
-    /**
-     * @event RequestEvent được gọi sau khi tạo yêu câu thanh toán PRO.
-     */
-    const EVENT_VERIFIED_REQUEST_PURCHASE_PRO_SUCCESS = 'verifiedRequestPurchaseProSuccess';
 
     /**
      * @event RequestEvent được gọi trước khi tạo yêu câu lấy thông tin merchant.
@@ -117,6 +100,11 @@ class PaymentGateway extends BasePaymentGateway
      * Transaction mode safe là thuộc tính khi tạo thanh toán Bảo Kim và PRO, cho phép chỉ định giao dịch tạm giữ.
      */
     const SAFE_TRANSACTION = 2;
+
+    /**
+     * @var bool Set it TRUE if you want use gateway with pro mode. Currently only method `purchase` is depend on it.
+     */
+    public $pro = false;
 
     /**
      * @see getMerchantData
@@ -182,21 +170,6 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
-     * Phương thức thanh toán pro (payment pro) hổ trợ tạo thanh toán với phương thức PRO của Bảo Kim.
-     * Đây là phương thức ánh xạ của [[request()]] sử dụng lệnh [[RC_PURCHASE_PRO]].
-     *
-     * @param array $data Dữ liệu yêu cầu khởi tạo thanh toán PRO
-     * @param null $clientId PaymentClient id sử dụng để tạo yêu cầu thanh toán.
-     * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
-     * @return ResponseData|DataInterface Trả về [[ResponseData]] là dữ liệu từ Bảo Kim phản hồi.
-     * @throws \ReflectionException|\yii\base\InvalidConfigException
-     */
-    public function purchasePro(array $data, $clientId = null): DataInterface
-    {
-        return $this->request(self::RC_PURCHASE_PRO, $data, $clientId);
-    }
-
-    /**
      * @inheritdoc
      */
     protected function getHttpClientConfig(): array
@@ -234,7 +207,7 @@ class PaymentGateway extends BasePaymentGateway
             $emailBusiness
         ];
 
-        if (!$this->merchantDataCache || !$responseData = $this->merchantDataCache->get($cacheKey)) {
+        if (!$this->merchantDataCache || !($responseData = $this->merchantDataCache->get($cacheKey))) {
             $responseData = $this->request(self::RC_GET_MERCHANT_DATA, [
                 'business' => $emailBusiness ?? $client->merchantEmail
             ], $clientId);
@@ -252,9 +225,7 @@ class PaymentGateway extends BasePaymentGateway
      */
     public function beforeRequest(RequestEvent $event)
     {
-        if ($event->command === self::RC_PURCHASE_PRO) {
-            $this->trigger(self::EVENT_BEFORE_PURCHASE_PRO, $event);
-        } elseif ($event->command === self::RC_GET_MERCHANT_DATA) {
+        if ($event->command === self::RC_GET_MERCHANT_DATA) {
             $this->trigger(self::EVENT_BEFORE_GET_MERCHANT_DATA, $event);
         }
 
@@ -266,9 +237,7 @@ class PaymentGateway extends BasePaymentGateway
      */
     public function afterRequest(RequestEvent $event)
     {
-        if ($event->command === self::RC_PURCHASE_PRO) {
-            $this->trigger(self::EVENT_AFTER_PURCHASE_PRO, $event);
-        } elseif ($event->command === self::RC_GET_MERCHANT_DATA) {
+        if ($event->command === self::RC_GET_MERCHANT_DATA) {
             $this->trigger(self::EVENT_AFTER_GET_MERCHANT_DATA, $event);
         }
 
@@ -286,10 +255,6 @@ class PaymentGateway extends BasePaymentGateway
         $command = $requestData->getCommand();
         $data = $requestData->get();
         $httpMethod = 'POST';
-        $options = [
-            CURLOPT_HTTPAUTH => CURLAUTH_DIGEST | CURLAUTH_BASIC,
-            CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword
-        ];
 
         if (in_array($command, [self::RC_GET_MERCHANT_DATA, self::RC_QUERY_DR], true)) {
             if ($command === self::RC_GET_MERCHANT_DATA) {
@@ -301,17 +266,22 @@ class PaymentGateway extends BasePaymentGateway
             $url = $data;
             $data = null;
             $httpMethod = 'GET';
-        } elseif ($command === self::RC_PURCHASE_PRO) {
-            $url = [self::PURCHASE_PRO_URL, 'signature' => ArrayHelper::remove($data, 'signature')];
         } else {
-            $data[0] = self::PURCHASE_URL;
-            return ['redirect_url' => $httpClient->get($data)->getFullUrl()];
+            if ($this->pro) {
+                $url = [self::PURCHASE_PRO_URL, 'signature' => ArrayHelper::remove($data, 'signature')];
+            } else {
+                $data[0] = self::PURCHASE_URL;
+                return ['redirect_url' => $httpClient->get($data)->getFullUrl()];
+            }
         }
 
         return $httpClient->createRequest()
             ->setUrl($url)
             ->setMethod($httpMethod)
-            ->addOptions($options)
+            ->addOptions([
+                CURLOPT_HTTPAUTH => CURLAUTH_DIGEST | CURLAUTH_BASIC,
+                CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword
+            ])
             ->addData($data)
             ->send()
             ->getData();

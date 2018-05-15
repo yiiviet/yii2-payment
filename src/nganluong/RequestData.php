@@ -12,6 +12,8 @@ use vxm\gatewayclients\RequestData as BaseRequestData;
 /**
  * Lớp RequestData cung cấp dữ liệu cho phương thức [[request()]] theo lệnh, để truy vấn với Ngân Lượng.
  *
+ * @method PaymentClient getClient()
+ *
  * @property PaymentClient $client
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
@@ -25,8 +27,10 @@ class RequestData extends BaseRequestData
      */
     public function rules()
     {
-        return [
-            [['merchant_id', 'merchant_password', 'version', 'function'], 'required'],
+        $rules = [
+            [['merchant_id', 'merchant_password', 'version', 'function'], 'required', 'on' => [
+                PaymentGateway::RC_PURCHASE, PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_AUTHENTICATE
+            ]],
             [[
                 'bank_code', 'buyer_fullname', 'buyer_email', 'buyer_mobile', 'return_url',
                 'total_amount', 'order_code', 'receiver_email', 'payment_method'
@@ -34,6 +38,14 @@ class RequestData extends BaseRequestData
             [['otp', 'auth_url'], 'required', 'on' => PaymentGateway::RC_AUTHENTICATE],
             [['token'], 'required', 'on' => [PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_AUTHENTICATE]]
         ];
+
+        if ($this->getClient()->getGateway()->getSeamless()) {
+            return array_merge($rules, [
+                [['card_number', 'card_fullname', 'card_month', 'card_year'], 'required', 'on' => PaymentGateway::RC_PURCHASE]
+            ]);
+        } else {
+            return $rules;
+        }
     }
 
     /**
@@ -41,7 +53,6 @@ class RequestData extends BaseRequestData
      */
     protected function ensureAttributes(array &$attributes)
     {
-        /** @var PaymentClient $client */
         $client = $this->getClient();
         $command = $this->getCommand();
 
@@ -57,9 +68,6 @@ class RequestData extends BaseRequestData
 
             if ($attributes['version'] === PaymentGateway::VERSION_3_2) {
                 $attributes['payment_method'] = $attributes['payment_method'] ?? PaymentGateway::PAYMENT_METHOD_ATM_ONLINE;
-                $this->addRule(['card_number', 'card_fullname', 'card_month', 'card_year'], 'required', [
-                    'on' => $command
-                ]);
             } else {
                 $attributes['payment_method'] = $attributes['payment_method'] ?? PaymentGateway::PAYMENT_METHOD_NL;
             }

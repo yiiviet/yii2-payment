@@ -12,6 +12,9 @@ use yiiviet\payment\BasePaymentClient;
 /**
  * Lớp PaymentClient là lớp chứa các thuộc tính để truy vấn đến ngân lượng nhu merchant id, merchant password, email...
  *
+ * @method PaymentGateway getGateway()
+ * @property PaymentGateway $gateway
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */

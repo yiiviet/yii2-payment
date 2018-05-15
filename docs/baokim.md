@@ -27,7 +27,8 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 'components' => [
     'BKGateway' => [
         'class' => 'yiiviet\payment\baokim\PaymentGateway',
-        'sandbox' => true
+        'sandbox' => true,
+        'pro' => true, // Sử dụng phương thức PRO bạn sẽ `redirect` khách trực tiếp đến bank không thông qua Bảo Kim. Ngược lại `FALSE` thì thanh toán thông qua Bảo Kim.
     ]
 ]
 
@@ -39,6 +40,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 'components' => [
     'BKGateway' => [
         'class' => 'yiiviet\payment\baokim\PaymentGateway',
+        'pro' => true, // Sử dụng phương thức PRO bạn sẽ `redirect` khách trực tiếp đến bank không thông qua Bảo Kim. Ngược lại `FALSE` thì thanh toán thông qua Bảo Kim.        
         'client' => [
             'merchantId' => 'Mã merchant bạn vừa đăng ký',
             'merchantEmail' => 'Email tài khoản bảo kim của bạn',
@@ -61,14 +63,13 @@ bằng cú pháp `Yii::$app->BKGateway`.
 | Tên phương thức | Mục đích |
 | :-----------:  | :----: |
 | **purchase** | Tạo lệnh thanh toán thông qua Bảo Kim (di chuyển đến website Bảo Kim để chọn hình thức thanh toán).|
-| **purchasePro** | Tạo lệnh thanh toán PRO (di chuyển trực tiếp đến ngân hàng). |
 | **queryDR** | Tạo lệnh yêu cầu truy vấn thông tin giao dịch. |
 | **verifyRequestPurchaseSuccess** | Kiểm tra tính hợp lệ của dữ liệu mà Bảo Kim gửi sang khi khách hàng thanh toán thành công (Client to Server). |
 | **verifyRequestIPN** | Kiểm tra tính hợp lệ của dữ liệu mà Bảo Kim gửi sang khi khách hàng thanh toán thành công (Server to Server). |
 | **getMerchantData** | Tạo lệnh yêu cầu bảo kim cấp thông tin merchant
 
 
-## Phương thức `purchase`
+## Phương thức `purchase` thông qua bảo kim (`pro` = FALSE)
 
 * Cách sử dụng cơ bản để yêu cầu Bảo Kim tạo thanh toán:
 
@@ -118,12 +119,12 @@ tượng `response` với các thuộc tính sau:
     }
 ``` 
 
-## Phương thức `purchasePro`
+## Phương thức `purchase` không thông qua Bảo Kim (`pro` = TRUE)
 
 * Cách sử dụng cơ bản để yêu cầu bảo kim tạo thanh toán với phương thức PRO:
 
 ```php
-    $result = Yii::$app->BKGateway->purchasePro([
+    $result = Yii::$app->BKGateway->purchase([
         'bank_payment_method_id' => 128,
         'payer_name' => 'vxm',
         'payer_email' => 'vxm@gmail.com',
@@ -172,7 +173,7 @@ tượng `response` với các thuộc tính sau:
 * Code hoàn chỉnh:
 
 ```php
-    $result = Yii::$app->BKGateway->purchasePro([
+    $result = Yii::$app->BKGateway->purchase([
         'bank_payment_method_id' => xxx,
         'payer_name' => 'vxm',
         'payer_email' => 'vxm@gmail.com',

@@ -13,6 +13,10 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
 /**
  * Class VerifiedData
  *
+ * @method PaymentClient getClient()
+ *
+ * @property PaymentClient $client
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
@@ -25,19 +29,8 @@ class VerifiedData extends BaseVerifiedData
     public function rules()
     {
         return [
-            [[
-                'vpc_Command', 'vpc_Locale', 'vpc_MerchTxnRef', 'vpc_Merchant', 'vpc_OrderInfo', 'vpc_Amount',
-                'vpc_TxnResponseCode', 'vpc_TransactionNo', 'vcp_Message', 'vpc_SecureHash'
-            ], 'required', 'on' => [
-                PaymentGateway::VRC_IPN_INTERNATIONAL, PaymentGateway::VRC_IPN,
-                PaymentGateway::VRC_PURCHASE_SUCCESS_INTERNATIONAL, PaymentGateway::VRC_PURCHASE_SUCCESS
-            ]],
             [['vpc_SecureHash'], 'validateSecureHash', 'message' => '{attribute} is not valid!', 'on' => [
-                PaymentGateway::VRC_IPN_INTERNATIONAL, PaymentGateway::VRC_IPN,
-                PaymentGateway::VRC_PURCHASE_SUCCESS_INTERNATIONAL, PaymentGateway::VRC_PURCHASE_SUCCESS
-            ]],
-            [['vpc_AcqResponseCode', 'vpc_Authorizeld', 'vpc_Card', 'vpc_3DSECI', 'vpc_3Dsenrolled', 'vpc_3Dsstatus', 'vpc_CommercialCard'], 'required', 'on' => [
-                PaymentGateway::VRC_PURCHASE_SUCCESS_INTERNATIONAL, PaymentGateway::VRC_IPN_INTERNATIONAL
+                PaymentGateway::VRC_IPN, PaymentGateway::VRC_PURCHASE_SUCCESS
             ]]
         ];
     }
@@ -53,7 +46,7 @@ class VerifiedData extends BaseVerifiedData
     public function validateSecureHash($attribute, $params, \yii\validators\InlineValidator $validator)
     {
         $data = $this->get(false);
-        $expectSignature = ArrayHelper::remove($data, $attribute);
+        $expectSignature = ArrayHelper::remove($data, $attribute, '');
         $dataSign = [];
 
         foreach ($data as $param => $value) {
@@ -63,11 +56,9 @@ class VerifiedData extends BaseVerifiedData
         }
 
         ksort($dataSign);
+        $data = urldecode(http_build_query($dataSign));
 
-        /** @var PaymentClient $client */
-        $client = $this->getClient();
-
-        if (!$client->validateSignature(http_build_query($dataSign), $expectSignature)) {
+        if (!$this->getClient()->validateSignature($data, $expectSignature)) {
             $validator->addError($this, $attribute, $validator->message);
         }
     }

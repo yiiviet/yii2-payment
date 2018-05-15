@@ -61,7 +61,8 @@ class OnePayTest extends TestCase
     public function testPurchaseInternational()
     {
         // Valid
-        $responseData = $this->gateway->purchaseInternational([
+        $this->gateway->international = true;
+        $responseData = $this->gateway->purchase([
             'ReturnURL' => 'http://localhost/',
             'OrderInfo' => time(),
             'Amount' => 500000,
@@ -106,7 +107,8 @@ class OnePayTest extends TestCase
     public function testQueryDRInternational()
     {
         // Valid
-        $responseData = $this->gateway->queryDRInternational([
+        $this->gateway->international = true;
+        $responseData = $this->gateway->queryDR([
             'MerchTxnRef' => 1
         ]);
 
@@ -125,7 +127,8 @@ class OnePayTest extends TestCase
 
     public function testVerifyRequestPurchaseInternationalSuccess()
     {
-        $result = $this->gateway->verifyRequestPurchaseInternationalSuccess();
+        $this->gateway->international = true;
+        $result = $this->gateway->verifyRequestPurchaseSuccess();
 
         $this->assertFalse($result);
     }
@@ -139,7 +142,8 @@ class OnePayTest extends TestCase
 
     public function testVerifyRequestIPNInternational()
     {
-        $result = $this->gateway->verifyIPNInternationalRequest();
+        $this->gateway->international = true;
+        $result = $this->gateway->verifyRequestIPN();
 
         $this->assertFalse($result);
     }

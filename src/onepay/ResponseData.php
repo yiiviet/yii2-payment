@@ -14,6 +14,8 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
 /**
  * Lớp ResponseData cung cấp dữ liệu nhận được từ OnePay khi gọi [[request()]] ở lớp [[PaymentGateway]].
  *
+ * @method PaymentClient getClient()
+ *
  * @property PaymentClient $client
  * @property string|null $message
  * @property int|null $responseCode
@@ -29,7 +31,7 @@ class ResponseData extends BaseResponseData
      */
     public function getIsOk(): bool
     {
-        if (in_array($this->getCommand(), [PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_DR_INTERNATIONAL], true)) {
+        if ($this->getCommand() === PaymentGateway::RC_QUERY_DR) {
             return isset($this['vpc_DRExists']) ? strcasecmp($this['vpc_DRExists'], 'Y') === 0 : false;
         } else {
             return true;

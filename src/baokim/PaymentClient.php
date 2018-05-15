@@ -14,6 +14,9 @@ use yiiviet\payment\BasePaymentClient;
 /**
  * Lớp PaymentClient chứa các thuộc tính dùng để hổ trợ [[PaymentGateway]] kết nối đến Bảo Kim.
  *
+ * @method PaymentGateway getGateway()
+ * @property PaymentGateway $gateway
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
  */
@@ -117,7 +120,7 @@ class PaymentClient extends BasePaymentClient
         if ($type === self::SIGNATURE_RSA) {
             $config = [
                 'class' => 'yiiviet\payment\RsaDataSignature',
-                'publicCertificate' => $this->publicCertificate,
+                'publicCertificate' => $this->publicCertificate ?? false,
                 'privateCertificate' => $this->privateCertificate,
                 'openSSLAlgo' => OPENSSL_ALGO_SHA1
             ];
