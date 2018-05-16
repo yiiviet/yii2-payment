@@ -1,9 +1,9 @@
 # Tích hợp đồng thời nhiều cổng thanh toán
 
-Để có thể tích hợp được nhiều cổng thanh toán thì bạn đã hiểu rõ về các phương thức: `purchase`, `queryDR`, `verifyRequestIPN`, `verifyRequestPurchaseSuccess`
+Để có thể tích hợp được nhiều cổng thanh toán thì bạn phải hiểu rõ về các phương thức: `purchase`, `queryDR`, `verifyRequestIPN`, `verifyRequestPurchaseSuccess`
 ở các cổng thanh toán, nếu chưa thì mời bạn quay lại tìm hiểu tại [đây](README.md).
 
-Ở bài viết này chúng tôi sẽ giới thiệu về bạn cách tạo `collection` cho các cổng thanh toán.
+Ở bài viết này chúng tôi sẽ giới thiệu với bạn cách tạo `collection` cho các cổng thanh toán.
 Để tạo một `collection` gồm nhiều cổng thanh toán thì bạn hãy khai báo đối tượng thuộc lớp
 `\yiiviet\payment\PaymentGatewayCollection` vào component của `app` trong file `web.php` ở
 thư mục `config` như sau:
@@ -11,69 +11,70 @@ thư mục `config` như sau:
 * Đối với môi trường `test`
 
 ```php
-    'paymentGateways' => [
-         'class' => 'yiiviet\payment\PaymentGatewayCollection',
-         'gatewayConfig' => [
-             'sandbox' => true
-         ],
-         'gateways' => [
-             'BK' => 'yiiviet\payment\baokim\PaymentGateway',
-             'NL' => 'yiiviet\payment\nganluong\PaymentGateway',
-             'OP' => 'yiiviet\payment\onepay\PaymentGateway',
-             'VNP' => 'yiiviet\payment\vnpayment\PaymentGateway'
+    'components' => [
+        'paymentGateways' => [
+             'class' => 'yiiviet\payment\PaymentGatewayCollection',
+             'gatewayConfig' => [
+                 'sandbox' => true
+             ],
+             'gateways' => [
+                 'BK' => 'yiiviet\payment\baokim\PaymentGateway',
+                 'NL' => 'yiiviet\payment\nganluong\PaymentGateway',
+                 'OP' => 'yiiviet\payment\onepay\PaymentGateway',
+                 'VNP' => 'yiiviet\payment\vnpayment\PaymentGateway'
+             ]
          ]
-     ]
+    ]    
 ```
 
 * Đối với môi trường `production`
 
 ```php
-    'paymentGateways' => [
-         'class' => 'yiiviet\payment\PaymentGatewayCollection',
-         'gatewayConfig' => [
-             'sandbox' => true
-         ],
-         'gateways' => [
-             'BK' => [
-                 'class' => 'yiiviet\payment\baokim\PaymentGateway',
-                 'pro' => true, // Sử dụng phương thức PRO bạn sẽ `redirect` khách trực tiếp đến bank không thông qua Bảo Kim. Ngược lại `FALSE` thì thanh toán thông qua Bảo Kim.        
-                 'client' => [
-                     'merchantId' => 'Mã merchant bạn vừa đăng ký',
-                     'merchantEmail' => 'Email tài khoản bảo kim của bạn',
-                     'securePassword' => 'Secure password bạn vừa đăng ký',
-                     'apiUser' => 'Api user bạn vừa đăng ký',
-                     'apiPassword' => 'Api password bạn vừa đăng ký',
-                     'privateCertificate' => 'Private certificate bạn vừa đăng ký, 
-                     không cần thiết lập nếu như bạn không xài phương thức PRO',
+    'components' => [
+        'paymentGateways' => [
+             'class' => 'yiiviet\payment\PaymentGatewayCollection',
+             'gateways' => [
+                 'BK' => [
+                     'class' => 'yiiviet\payment\baokim\PaymentGateway',
+                     'pro' => true, // Sử dụng phương thức PRO bạn sẽ `redirect` khách trực tiếp đến bank không thông qua Bảo Kim. Ngược lại `FALSE` thì thanh toán thông qua Bảo Kim.        
+                     'client' => [
+                         'merchantId' => 'Mã merchant bạn vừa đăng ký',
+                         'merchantEmail' => 'Email tài khoản bảo kim của bạn',
+                         'securePassword' => 'Secure password bạn vừa đăng ký',
+                         'apiUser' => 'Api user bạn vừa đăng ký',
+                         'apiPassword' => 'Api password bạn vừa đăng ký',
+                         'privateCertificate' => 'Private certificate bạn vừa đăng ký, 
+                         không cần thiết lập nếu như bạn không xài phương thức PRO',
+                     ]
+                 ],
+                 'NL' => [
+                     'class' => 'yiiviet\payment\nganluong\PaymentGateway',
+                     'seamless' => FALSE, // Sử dụng phương thức thanh toán redirect về Ngân Lượng (FALSE) hoặc khách thanh toán trực tiếp trên trang của bạn không cần `redirect` (TRUE).
+                     'client' => [
+                         'email' => 'Email tài khoản ngân lượng của bạn',
+                         'merchantId' => 'Mã merchant bạn vừa đăng ký',
+                         'merchantPassword' => 'Merchant password bạn vừa đăng ký'
+                     ]
+                 ],
+                 'OP' => [
+                     'class' => 'yiiviet\payment\onepay\PaymentGateway',
+                     'international' => false, //Thiết lập `FALSE` để sử dụng cổng nội địa và ngược lại là cổng quốc tế. Mặc định là `FALSE`.        
+                     'client' => [
+                         'accessCode' => 'Access code bạn vừa đăng ký',
+                         'merchantId' => 'Mã merchant bạn vừa đăng ký',
+                         'secureSecret' => 'Secure secret bạn vừa đăng ký'
+                     ]
+                 ],
+                 'VNP' => [
+                      'class' => 'yiiviet\payment\vnpayment\PaymentGateway',
+                      'client' => [
+                          'tmnCode' => 'TMN code bạn vừa đăng ký',
+                          'hashSecret' => 'Mã hash secret bạn vừa đăng ký'
+                      ]
                  ]
-             ],
-             'NL' => [
-                 'class' => 'yiiviet\payment\nganluong\PaymentGateway',
-                 'seamless' => FALSE, // Sử dụng phương thức thanh toán redirect về Ngân Lượng (FALSE) hoặc khách thanh toán trực tiếp trên trang của bạn không cần `redirect` (TRUE).
-                 'client' => [
-                     'email' => 'Email tài khoản ngân lượng của bạn',
-                     'merchantId' => 'Mã merchant bạn vừa đăng ký',
-                     'merchantPassword' => 'Merchant password bạn vừa đăng ký'
-                 ]
-             ],
-             'OP' => [
-                 'class' => 'yiiviet\payment\onepay\PaymentGateway',
-                 'international' => false, //Thiết lập `FALSE` để sử dụng cổng nội địa và ngược lại là cổng quốc tế. Mặc định là `FALSE`.        
-                 'client' => [
-                     'accessCode' => 'Access code bạn vừa đăng ký',
-                     'merchantId' => 'Mã merchant bạn vừa đăng ký',
-                     'secureSecret' => 'Secure secret bạn vừa đăng ký'
-                 ]
-             ],
-             'VNP' => [
-                  'class' => 'yiiviet\payment\vnpayment\PaymentGateway',
-                  'client' => [
-                      'tmnCode' => 'TMN code bạn vừa đăng ký',
-                      'hashSecret' => 'Mã hash secret bạn vừa đăng ký'
-                  ]
              ]
          ]
-     ]
+    ]     
 ```
 
 Tùy theo số lượng cổng thanh toán mà bạn muốn sử dụng từ đó hãy tùy chỉnh cho phù hợp.
@@ -150,6 +151,6 @@ Ví dụ:
 ```
 
 Như bạn thấy cách sử dụng không khác gì so với từng cổng thanh toán, điểm khác duy nhất
-là bạn phải chỉ định cổng thanh toán nào sẽ thực thi. Từ đây bạn có thể xây dựng 
+là bạn phải chỉ định cổng thanh toán nào sẽ thực thi. Từ đó bạn có thể xây dựng 
 mô hình thanh toán `dynamic` tùy theo sự tiện lợi của khách hàng mà họ sẽ tùy chọn
 cổng thanh toán cho mình.

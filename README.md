@@ -12,11 +12,11 @@
 Hiện nay các cổng thanh toán trong nước có cấu trúc API rất đa dạng và ít có điểm chung,
 khiến cho việc chúng ta xây dựng các `api-client` cũng gặp nhiều khó khăn, chính vì vậy 
 extension này được sinh ra nhằm `đồng bộ các phương thức của các cổng thanh toán`, giúp 
-cho việc tích hợp sẽ dễ dàng hơn, nó được thiết kê theo nguyên tắc 
+cho việc tích hợp sẽ dễ dàng hơn, nó được thiết kế theo nguyên tắc 
 [DRY](https://www.codehub.vn/Nguyen-Ly-DRY-Dont-Repeat-Yourself) giúp bạn tối giản lại
 các tham trị khi tạo `request` gửi lên các cổng thanh toán, chính vì tất cả các cổng thanh
-toán đều có phương thức chung nên nó sẽ giúp cho việc chuyển tiếp từ cổng thanh toán 
-này sang cổng thanh toán khác sẽ đơn giản hơn đối với bạn.
+toán đều có phương thức chung nên nó sẽ giúp cho bạn chuyển tiếp từ cổng thanh toán 
+này sang cổng thanh toán khác đơn giản hơn.
 
 Ví dụ:
 
