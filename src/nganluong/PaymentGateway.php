@@ -199,7 +199,7 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
-     * This method checking gateway mode is seamless or not.
+     * Phương thức dùng để nhận biết gateway có phải đang sử dụng chế độ `seamless checkout` hay không (version 3.2).
      *
      * @return bool Return TRUE if current mode is seamless.
      */
@@ -209,7 +209,7 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
-     * This method is an alias of `setVersion` to detect gateway mode is seamless or origin.
+     * Phương thức dùng để thiết lập `seamless checkout` (version 3.2).
      *
      * @param bool $seamless Mode seamless or not.
      * @return bool Return TRUE if seamless mode is turn on.

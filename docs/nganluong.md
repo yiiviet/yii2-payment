@@ -216,7 +216,7 @@ tượng `response` với các thuộc tính sau:
 * Code hoàn chỉnh:
 
 ```php
-    Yii::$app->NLGateway->setVersion('3.2');
+
     $result = Yii::$app->NLGateway->purchase([
         'bank_code' => 'VCB',
         'buyer_fullname' => 'vxm',
@@ -240,7 +240,7 @@ tượng `response` với các thuộc tính sau:
     }
 ``` 
 
-## Phương thức `authenticate` (version 3.2)
+## Phương thức `authenticate` (chỉ xài được khi `seamless` = `TRUE`)
 
 Phương thức này dùng để xác minh `OTP` thông qua `token` mà bạn nhận được từ
  phương thức `purchase` ở trên và mã `OTP` của khách nhập đối với các ngân hàng mà `auth_site` có giá trị
@@ -250,7 +250,7 @@ Cách kiểm tra:
 
 ```php
 
-    Yii::$app->NLGateway->setVersion('3.2');
+
     $result = Yii::$app->NLGateway->purchase([
         'bank_code' => 'VCB',
         'buyer_fullname' => 'vxm',
