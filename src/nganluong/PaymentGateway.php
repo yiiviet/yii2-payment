@@ -221,6 +221,19 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
+     * @throws NotSupportedException
+     */
+    public function verifyRequest($command, \yii\web\Request $request = null, $clientId = null)
+    {
+        if ($command === self::VRC_IPN) {
+            throw new NotSupportedException('IPN is not supported in Ngan Luong gateway!');
+        } else {
+            return parent::verifyRequest($command, $request, $clientId);
+        }
+    }
+
+    /**
+     * @inheritdoc
      */
     protected function defaultVersion(): string
     {
@@ -251,14 +264,6 @@ class PaymentGateway extends BasePaymentGateway
                 ]
             ]
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function verifyRequestCommands(): array
-    {
-        return [self::VRC_PURCHASE_SUCCESS];
     }
 
     /**
