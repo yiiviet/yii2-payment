@@ -7,6 +7,7 @@
 
 namespace yiiviet\payment\nganluong;
 
+use vxm\gatewayclients\DataInterface;
 use yii\base\NotSupportedException;
 
 use yiiviet\payment\BasePaymentGateway;
@@ -15,7 +16,7 @@ use vxm\gatewayclients\RequestEvent;
 
 /**
  * Lớp PaymentGateway hổ trợ việc kết nối đến Ngân Lượng.
- * Hiện tại nó hỗ trợ 100% tính năng của Ngân Lượng v3.1
+ * Hiện tại nó hỗ trợ 100% tính năng của Ngân Lượng v3.1, v3.2
  *
  * @method ResponseData purchase(array $data, $clientId = null)
  * @method ResponseData queryDR(array $data, $clientId = null)
@@ -189,8 +190,8 @@ class PaymentGateway extends BasePaymentGateway
      *
      * @param array $data Dữ liệu yêu cầu xác minh.
      * @param null $clientId Client id sử dụng để tạo yêu. Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
-     * @return ResponseData|\vxm\gatewayclients\DataInterface Trả về [[ResponseData]] là dữ liệu từ Ngân Lượng phản hồi.
-     * @throws \yii\base\InvalidConfigException|\ReflectionException
+     * @return ResponseData|DataInterface Trả về [[ResponseData]] là dữ liệu từ Ngân Lượng phản hồi.
+     * @throws \yii\base\InvalidConfigException|NotSupportedException|\ReflectionException
      */
     public function authenticate(array $data, $clientId = null)
     {
@@ -217,6 +218,19 @@ class PaymentGateway extends BasePaymentGateway
     public function setSeamless(bool $seamless): bool
     {
         return $this->setVersion($seamless ? self::VERSION_3_2 : self::VERSION_3_1);
+    }
+
+    /**
+     * @inheritdoc
+     * @throws NotSupportedException
+     */
+    public function request($command, array $data, $clientId = null): DataInterface
+    {
+        if ($command === self::RC_AUTHENTICATE && !$this->getSeamless()) {
+            throw new NotSupportedException('Authenticate command only support in `seamless` mode!');
+        } else {
+            return parent::request($command, $data, $clientId);
+        }
     }
 
     /**
