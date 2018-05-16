@@ -114,7 +114,7 @@ tượng `response` với các thuộc tính sau:
 Phương thức này cho bạn truy vấn thông tin giao dịch từ VNPayment thông qua `TxnRef` mà bạn tạo ra ở
  phương thức `purchase` phía trên. 
  
-Cách truy vấn thông tin cơ bản:
+* Cách truy vấn thông tin cơ bản:
 
 ```php
 
@@ -158,17 +158,12 @@ tượng `response` với các thuộc tính sau:
 | BankCode | không | mixed | Mã ngân hàng khách đã dùng để thanh toán. Nó chỉ tồn tại khi `isOk` là TRUE và đơn hàng giao dịch thành công |
 | PayDate | không | mixed | Thời gian khách hoàn thành thanh toán. Nó chỉ tồn tại khi `isOk` là TRUE và đơn hàng giao dịch thành công |
 | TransactionNo | không | mixed | Mã giao dịch trên VNPayment. Nó chỉ tồn tại khi `isOk` là TRUE và đơn hàng giao dịch thành công |
-| ResponseCode | không | mixed | Trạng thái phản hồi. Nó chỉ tồn tại khi `isOk` là TRUE |
 | TransactionType | không | mixed | Hình thức giao dịch (`01` giao dịch thanh toán, `02` giao dịch hoàn trả toàn phần, `03` giao dịch hoàn trả một phần). Nó chỉ tồn tại khi `isOk` là TRUE |
-| TransactionStatus | không | mixed | Trạng thái giao dịch. Nó chỉ tồn tại khi `isOk` là TRUE |
+| TransactionStatus | không | mixed | Trạng thái giao dịch chi tiết. Nó chỉ tồn tại khi `isOk` là TRUE |
+| ResponseCode | không | mixed | Trạng thái giao dịch. Giá trị `0` nghĩa là giao dịch thành công, còn lại là thất bại, [xem chi tiết](https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/) |
 
-* Bảng trạng thái giao dịch:
 
-| Gía trị | Mô tả |
-| :-------: | ----- |
-| **00** | giao dịch thành công, tất cả các giá trị còn lại đều thất bại. |
-
-Cách truy vấn thông tin hoàn chỉnh:
+* Cách truy vấn thông tin hoàn chỉnh:
 
 ```php
 
@@ -176,7 +171,7 @@ Cách truy vấn thông tin hoàn chỉnh:
         'MerchTxnRef' => 'abc'
     ]);    
 
-    if ($responseData->isOk && $responseData->TransactionStatus === 0) {
+    if ($responseData->isOk && $responseData->TransactionStatus == 0) {
         // code thêm vào đây tùy theo mục đích của bạn khi giao dịch thành công.
     }
     
@@ -190,12 +185,12 @@ mà bạn đã thiết lập ở `ReturnUrl` trong `purchase`, sau khi phương 
  này kiểm tra dữ liệu hợp lệ thì bạn mới tiến hành kiểm tra trạng thái 
  giao dịch, từ đó hiển thị thông báo thành công hoặc thất bại...
 
-Cách sử dụng:
+* Cách sử dụng:
 
 ```php
     if ($verifiedData = Yii::$app->VNPGateway->verifyRequestPurchaseSuccess()) {
         
-        if ($result->isOk && $result->TransactionStatus === 0) {            
+        if ($result->isOk && $result->ResponseCode == 0) {            
             return $this->render('order_completed', [
               'message' => 'success'
             ]);
@@ -208,28 +203,22 @@ Cách sử dụng:
     }
 ``` 
 
-Khi gọi phương thức sẽ trả về `FALSE` nếu như dữ liệu không hợp lệ (không phải VNPayment)
+* Khi gọi phương thức sẽ trả về `FALSE` nếu như dữ liệu không hợp lệ (không phải VNPayment)
 và ngược lại sẽ là một đối tượng chứa các thuộc tính dữ liệu hợp lệ gửi từ VNPayment,
 bảng thuộc tính:
 
 | Khóa | Bắt buộc | Kiểu | Chi tiết |
 | :-----------: | :----: | :----: | ------ |
-| TmnCode | không | string | TMN code của client đã dùng để tạo thanh toán. |
 | OrderInfo | **có** | mixed | Mô tả đơn hàng của bạn. |
 | TxnRef | **có** | mixed | Mã đơn hàng trên hệ thống của bạn. |
-| ResponseCode | **có** | int | Trạng thái đơn hàng. |
 | Amount | **có** | float | Số tiền của đơn hàng. |
-| Locale | **có** | string | Loại ngôn ngữ mà khách sử dụng để thanh toán. |
-| CurrencyCode | **có** | string | Loại tiền mà khách chọn để thanh toán. Có 2 giá trị `VND` và `USD`. |
-| Merchant | **có** | string | Merchant Id dùng để thanh toán. |
+| TmnCode | không | string | TMN code của client đã dùng để tạo thanh toán. |
 | TransactionNo | không | string | Mã giao dịch trên VNPayment. Nó chỉ tồn tại khi `ResponseCode` là `0` |
 | Message | không | string | Thông báo lỗi. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
-
-* Bảng trạng thái giao dịch:
-
-| Gía trị | Mô tả |
-| :-------: | ----- |
-| **0** | giao dịch thành công, tất cả các giá trị còn lại là thất bại |
+| BankCode | không | string | Mã ngân hàng khách dùng để giao dịch. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
+| BankTranNo | không | string | Mã giao dịch tại ngân hàng của khách đã thanh toán. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
+| PayDate | không | string | Thời gian khách hoàn thành thanh toán (Ymdhis). Nó chỉ tồn tại khi `ResponseCode` khác `0` |
+| ResponseCode | không | mixed | Trạng thái giao dịch. Giá trị `0` nghĩa là giao dịch thành công, còn lại là thất bại, [xem chi tiết](https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/) |
 
 
 ## Phương thức `verifyRequestIPN`
@@ -240,22 +229,23 @@ mà bạn đã thiết lập ở `IPN` trên hệ thống VNPayment, sau khi ph�
  này kiểm tra dữ liệu hợp lệ thì bạn mới tiến hành kiểm tra trạng thái 
  giao dịch, từ đó cập nhật database và xử lý nghiệp vụ...
 
-Cách sử dụng:
+* Cách sử dụng:
 
 ```php
     Yii::$app->response->format = 'json';
     
     if ($verifiedData = Yii::$app->VNPGateway->verifyRequestIPN()) {
         
-        if ($result->isOk) {  
-            if ($result->TransactionStatus === 0) {
-                // update database             
-            }          
-            return ['RspCode' => 00, 'Message' => 'Confirm Success']; 
+        if ($verifiedData->ResponseCode === 0) {  
+        
+            // update database       
+            return ['RspCode' => 00, 'Message' => 'Confirm Success'];       
          } 
+    } else {
+        return ['RspCode' => 99, 'Message' => 'Confirm Fail']; 
     }
     
-    return ['RspCode' => 99, 'Message' => 'Confirm Fail']; 
+
 ``` 
 
 Khi gọi phương thức sẽ trả về `FALSE` nếu như dữ liệu không hợp lệ (không phải VNPayment)
@@ -265,20 +255,15 @@ bảng thuộc tính:
 | Khóa | Bắt buộc | Kiểu | Chi tiết |
 | :-----------: | :----: | :----: | ------ |
 | OrderInfo | **có** | mixed | Mô tả đơn hàng của bạn. |
-| MerchTxnRef | **có** | mixed | Mã đơn hàng trên hệ thống của bạn. |
-| ResponseCode | **có** | int | Trạng thái đơn hàng. |
+| TxnRef | **có** | mixed | Mã đơn hàng trên hệ thống của bạn. |
 | Amount | **có** | float | Số tiền của đơn hàng. |
-| Locale | **có** | string | Loại ngôn ngữ mà khách sử dụng để thanh toán. |
-| CurrencyCode | **có** | string | Loại tiền mà khách chọn để thanh toán. Có 2 giá trị `VND` và `USD`. |
-| Merchant | **có** | string | Merchant Id dùng để thanh toán. |
+| TmnCode | không | string | TMN code của client đã dùng để tạo thanh toán. |
 | TransactionNo | không | string | Mã giao dịch trên VNPayment. Nó chỉ tồn tại khi `ResponseCode` là `0` |
 | Message | không | string | Thông báo lỗi. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
-
-Bảng trạng thái giao dịch:
-
-| Gía trị | Mô tả |
-| :-------: | ----- |
-| **0** | giao dịch thành công, tất cả các giá trị còn lại là thất bại |
+| BankCode | không | string | Mã ngân hàng khách dùng để giao dịch. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
+| BankTranNo | không | string | Mã giao dịch tại ngân hàng của khách đã thanh toán. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
+| PayDate | không | string | Thời gian khách hoàn thành thanh toán (Ymdhis). Nó chỉ tồn tại khi `ResponseCode` khác `0` |
+| ResponseCode | không | mixed | Trạng thái giao dịch. Giá trị `0` nghĩa là giao dịch thành công, còn lại là thất bại, [xem chi tiết](https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/) |
 
 Sau khi xử lý nghiệm vụ tại `action` của `IPN` bạn cần phải trả về dữ liệu
 cho VNPayment biết là bạn đã cập nhật đơn hàng, giúp cho VNPayment đồng bộ
@@ -288,10 +273,10 @@ Bảng thông tin cần trả về:
 
 | Gía trị | Mô tả |
 | :-------: | ----- |
-| responsecode | Trạng thái xử lý tại hệ thống của bạn. Có 2 giá trị là `1` mọi thứ tốt đẹp, `0` có lỗi xảy ra. |
-| desc | Mô tả lỗi xảy ra cho VNPayment biết khi `responsecode` là `0` có lỗi xảy ra. |
+| RspCode | Trạng thái xử lý tại hệ thống của bạn. `00` nghĩa là mọi thứ tốt đẹp ngược lại bạn hãy trả về `99`. |
+| Message | Mô tả lỗi xảy ra cho VNPayment biết khi `RspCode` là `99` có lỗi xảy ra. |
 
-Kiểu dữ liệu trả về có định dạng: `form-format-urlencoded`
+Kiểu dữ liệu trả về có định dạng: `json`
 
 ## Câu hỏi thương gặp
 
@@ -301,12 +286,12 @@ Kiểu dữ liệu trả về có định dạng: `form-format-urlencoded`
     do nếu chỉ cung cấp phương thức `verifyRequestPurchaseSuccess` thì sẽ có
     trường hợp khách hàng rớt mạng không thể `redirect` về `ReturnURL` được cho
     nên phương thức `verifyRequestIPN` được cung cấp để đảm bảo hơn do lúc này
-    connection sẽ là Bảo Kim với máy chủ của bạn tính ổn định sẽ là `99.99%`.
+    connection sẽ là VNPayment với máy chủ của bạn tính ổn định sẽ là `99.99%`.
     
 + Câu hỏi: Vậy thì luồn xử lý sẽ ra sao nếu như có đến 2 điểm nhận thông báo 
 (IPN và ReturnURL)?
-    - Trả lời: với chúng tôi `action` của `ReturnURL` chỉ dùng để xác minh tính 
-    hợp lệ của dữ liệu Bảo Kim từ đó hiển thị thanh toán thành công hoặc thất bại
+    - Trả lời: với chúng tôi `action` của `ReturnUrl` chỉ dùng để xác minh tính 
+    hợp lệ của dữ liệu VNPayment từ đó hiển thị thanh toán thành công hoặc thất bại
     KHÔNG đụng đến phần cập nhật database và các nghiệp vụ liên quan đến cập nhật
     trạng thái đơn hàng. Phần cập nhật trạng thái và xử lý nghiệp vụ liên quan sẽ
     nằm ở `action` của `IPN`.

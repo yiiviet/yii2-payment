@@ -14,7 +14,7 @@ Sau khi tích hợp xong bạn sẽ được Bảo Kim cấp các dữ liệu sa
 | Api Password | string |
 | Private Certificate | string |
 
-Với `private certificate` bạn sẽ được cấp khi đăng ký tích hợp `pro` và nó cũng chỉ cần
+Với `Private Certificate` bạn sẽ được cấp khi đăng ký tích hợp `pro` và nó cũng chỉ cần
 khi bạn có nhu cầu sử dụng. Nếu không có thì bạn không cần quan tâm.
 
 ## Thiết lập
@@ -64,8 +64,8 @@ bằng cú pháp `Yii::$app->BKGateway`.
 | :-----------:  | :----: |
 | **purchase** | Tạo lệnh thanh toán thông qua Bảo Kim (di chuyển đến website Bảo Kim để chọn hình thức thanh toán).|
 | **queryDR** | Tạo lệnh yêu cầu truy vấn thông tin giao dịch. |
-| **verifyRequestPurchaseSuccess** | Kiểm tra tính hợp lệ của dữ liệu mà Bảo Kim gửi sang khi khách hàng thanh toán thành công (Client to Server). |
 | **verifyRequestIPN** | Kiểm tra tính hợp lệ của dữ liệu mà Bảo Kim gửi sang khi khách hàng thanh toán thành công (Server to Server). |
+| **verifyRequestPurchaseSuccess** | Kiểm tra tính hợp lệ của dữ liệu mà Bảo Kim gửi sang khi khách hàng thanh toán thành công (Client to Server). |
 | **getMerchantData** | Tạo lệnh yêu cầu bảo kim cấp thông tin merchant
 
 
@@ -220,7 +220,7 @@ Khi gọi phương thức sẽ trả về `FALSE` nếu như dữ liệu không 
 và ngược lại sẽ là một đối tượng chứa các thuộc tính dữ liệu hợp lệ gửi từ Bảo Kim,
 bảng thuộc tính:
 
-* Đối với đơn hàng tạo bằng phương thức `purchase`:
+* Đối với đơn hàng tạo bằng phương thức `purchase` (`pro` = FALSE):
 
 | Khóa | Bắt buộc | Kiểu | Chi tiết |
 | :-----------: | :----: | :----: | ------ |
@@ -238,7 +238,7 @@ bảng thuộc tính:
 | payer_phone_no | **có** | string | Số điện thoại người mua. |
 | shipping_address | không | string | Địa chỉ giao hàng. |
 
-* Đối với đơn hàng tạo bằng phương thức `purchasePro`:
+* Đối với đơn hàng tạo bằng phương thức `purchase` (`pro` = TRUE):
 
 | Khóa | Bắt buộc | Kiểu | Chi tiết |
 | :-----------: | :----: | :----: | ------ |

@@ -243,7 +243,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
         if (in_array($command, $this->verifyRequestCommands(), true)) {
             $client = $this->getClient($clientId);
 
-            if ($request === null && Yii::$app) {
+            if ($request === null && Yii::$app instanceof \yii\web\Application) {
                 $request = Yii::$app->getRequest();
             } else {
                 throw new InvalidArgumentException('Request instance arg must be set to verify return request is valid or not!');

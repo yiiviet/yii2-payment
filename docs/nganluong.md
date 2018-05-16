@@ -363,7 +363,7 @@ Như bạn thấy thì chúng ta chỉ quan tâm đến `00` vì trạng thái n
 
 Phương thức này cho phép bạn kiểm tra tính hợp lệ của các dữ liệu từ
 Ngân Lượng gửi sang tránh trường hợp giả mạo. Nó phải được gọi trong `action`
-mà bạn đã thiết lập ở `return_url` trong `purchase``, sau
+mà bạn đã thiết lập ở `return_url` trong `purchase`, sau
 khi phương thức này kiểm tra dữ liệu hợp lệ thì bạn mới tiến hành kiểm tra
 trạng thái giao dịch, từ đó hiển thị thông báo thành công hoặc thất bại...
 

@@ -33,7 +33,7 @@ class VnPaymentTest extends TestCase
     public function testPurchase()
     {
         // Valid
-        $responseData = $this->gateway->purchase([
+        $responseData = $this->purchase([
             'TxnRef' => time(),
             'OrderType' => 100000,
             'OrderInfo' => time(),
@@ -46,7 +46,7 @@ class VnPaymentTest extends TestCase
         $this->assertTrue(isset($responseData['redirect_url']));
 
         // Throws
-        $this->gateway->purchase([
+        $this->purchase([
             'OrderType' => 100000,
             'IpAddr' => '127.0.0.1',
             'ReturnUrl' => 'http://localhost'
@@ -60,7 +60,7 @@ class VnPaymentTest extends TestCase
     public function testQueryDR()
     {
         // Valid
-        $responseData = $this->gateway->queryDR([
+        $responseData = $this->queryDR([
             'TxnRef' => 123,
             'IpAddr' => '127.0.0.1',
             'OrderInfo' => time(),
@@ -72,7 +72,7 @@ class VnPaymentTest extends TestCase
         $this->assertEquals(99, $responseData->getResponseCode());
 
         // Throws
-        $this->gateway->queryDR([
+        $this->queryDR([
             'IpAddr' => '127.0.0.1',
             'OrderInfo' => time(),
             'TransDate' => date('Ymdhis'),

@@ -7,7 +7,9 @@
 
 namespace yiiviet\payment\baokim;
 
-use yii\base\NotSupportedException;
+use Yii;
+
+use yii\base\InvalidArgumentException;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
@@ -23,6 +25,7 @@ use vxm\gatewayclients\DataInterface;
  *
  * @method ResponseData purchase(array $data, $clientId = null)
  * @method ResponseData queryDR(array $data, $clientId = null)
+ * @method bool|VerifiedData verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
  * @method bool|VerifiedData verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
  * @method PaymentClient getClient($id = null)
  * @method PaymentClient getDefaultClient()
@@ -289,21 +292,25 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
-     * @return bool|VerifiedData|DataInterface
      */
-    public function verifyRequestIPN(\yii\web\Request $request = null, $clientId = null)
+    public function verifyRequest($command, \yii\web\Request $request = null, $clientId = null)
     {
-        if ($request === null) {
-            $request = Instance::ensure('request', '\yii\web\Request');
+        if ($command === self::VRC_IPN) {
+
+            if ($request === null && Yii::$app instanceof \yii\web\Application) {
+                $request = Yii::$app->getRequest();
+            } else {
+                throw new InvalidArgumentException('Request instance arg must be set to verify return request is valid or not!');
+            }
+
+            $content = $this->getHttpClient()->post(self::VERIFY_IPN_URL, $request->post())->send()->getContent();
+
+            if (strpos($content, 'VERIFIED') === false) {
+                return false;
+            }
         }
 
-        $content = $this->getHttpClient()->post(self::VERIFY_IPN_URL, $request->post())->send()->getContent();
-
-        if (strpos($content, 'VERIFIED') !== false) {
-            return parent::verifyRequestIPN($request, $clientId);
-        } else {
-            return false;
-        }
+        return parent::verifyRequest($command, $request, $clientId);
     }
 
     /**

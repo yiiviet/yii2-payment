@@ -65,7 +65,7 @@ class PaymentGatewayCollection extends GatewayCollection
      * @param \yii\web\Request|null $request Đối tượng `request` chứa dữ liệu cần được xác minh.
      * @param null|int|string $clientId Id client của cổng thanh toán dùng đề tạo lệnh.
      * Nếu không thiết lập thì [[getDefaultClient()]] sẽ được gọi trong cổng thanh toán.
-     * @return bool|DataInterface|VerifiedData Trả về dữ liệu đã được xác minh hoặc là FALSE nếu dữ liệu không hợp lệ.
+     * @return bool|VerifiedData|DataInterface Trả về dữ liệu đã được xác minh hoặc là FALSE nếu dữ liệu không hợp lệ.
      * @see [[BasePaymentGateway::verifyRequestPurchaseSuccess()]].
      * @throws \yii\base\InvalidConfigException|\ReflectionException
      */
@@ -82,7 +82,7 @@ class PaymentGatewayCollection extends GatewayCollection
      * @param \yii\web\Request|null $request Đối tượng `request` chứa dữ liệu cần được xác minh.
      * @param null|int|string $clientId Id client của cổng thanh toán dùng đề tạo lệnh.
      * Nếu không thiết lập thì [[getDefaultClient()]] sẽ được gọi trong cổng thanh toán.
-     * @return bool|DataInterface|VerifiedData Trả về dữ liệu đã được xác minh hoặc là FALSE nếu dữ liệu không hợp lệ.
+     * @return bool|VerifiedData|DataInterface Trả về dữ liệu đã được xác minh hoặc là FALSE nếu dữ liệu không hợp lệ.
      * @see [[BasePaymentGateway::verifyRequestIPN()]].
      * @throws \yii\base\InvalidConfigException|\ReflectionException
      */

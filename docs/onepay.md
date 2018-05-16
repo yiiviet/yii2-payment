@@ -262,7 +262,7 @@ Cách sử dụng:
 ```php
     if ($verifiedData = Yii::$app->OPGateway->verifyRequestPurchaseSuccess()) {
         
-        if ($result->isOk && $result->ResponseCode === 0) {            
+        if ($verifiedData->ResponseCode === 0) {            
             return $this->render('order_completed', [
               'message' => 'success'
             ]);
@@ -313,21 +313,20 @@ Cách sử dụng:
       
     if ($verifiedData = Yii::$app->OPGateway->verifyRequestIPN()) {
         
-        if ($result->isOk) {  
-            if ($result->ResponseCode === 0) {
-                // update database             
-            }          
+        if ($verifiedData->ResponseCode === 0) {
+            // update database    
             return [
                 'responsecode' => 1,
                 'desc' => 'confirm-success'
-            ];
-         } 
+            ];         
+        }          
+
+    } else {
+        return [
+            'responsecode' => 0,
+            'desc' => 'confirm-fail'
+        ];
     }
-    
-    return [
-        'responsecode' => 0,
-        'desc' => 'confirm-fail'
-    ];
 ``` 
 
 Khi gọi phương thức sẽ trả về `FALSE` nếu như dữ liệu không hợp lệ (không phải OnePay)

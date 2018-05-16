@@ -33,7 +33,7 @@ class OnePayTest extends TestCase
     public function testPurchase()
     {
         // Valid
-        $responseData = $this->gateway->purchase([
+        $responseData = $this->purchase([
             'ReturnURL' => 'http://localhost/',
             'OrderInfo' => time(),
             'Amount' => 500000,
@@ -47,7 +47,7 @@ class OnePayTest extends TestCase
         $this->assertTrue(isset($responseData['redirect_url']));
 
         // Throws
-        $this->gateway->purchase([
+        $this->purchase([
             'ReturnURL' => 'http://localhost/',
             'TicketNo' => '127.0.0.1',
             'AgainLink' => 'http://localhost/'
@@ -62,7 +62,7 @@ class OnePayTest extends TestCase
     {
         // Valid
         $this->gateway->international = true;
-        $responseData = $this->gateway->purchase([
+        $responseData = $this->purchase([
             'ReturnURL' => 'http://localhost/',
             'OrderInfo' => time(),
             'Amount' => 500000,
@@ -76,7 +76,7 @@ class OnePayTest extends TestCase
         $this->assertTrue(isset($responseData['redirect_url']));
 
         // Throws
-        $this->gateway->purchase([
+        $this->purchase([
             'ReturnURL' => 'http://localhost/',
             'TicketNo' => '127.0.0.1',
             'AgainLink' => 'http://localhost/'
@@ -90,14 +90,14 @@ class OnePayTest extends TestCase
     public function testQueryDR()
     {
         // Valid
-        $responseData = $this->gateway->queryDR([
+        $responseData = $this->queryDR([
             'MerchTxnRef' => 1
         ]);
 
         $this->assertTrue($responseData->getIsOk());
 
         // Throws
-        $this->gateway->queryDR([]);
+        $this->queryDR([]);
     }
 
     /**
@@ -108,33 +108,33 @@ class OnePayTest extends TestCase
     {
         // Valid
         $this->gateway->international = true;
-        $responseData = $this->gateway->queryDR([
+        $responseData = $this->queryDR([
             'MerchTxnRef' => 1
         ]);
 
         $this->assertTrue($responseData->getIsOk());
 
         // Throws
-        $this->gateway->queryDR([]);
+        $this->queryDR([]);
     }
 
     public function testVerifyRequestPurchaseSuccess()
     {
-        $result = $this->gateway->verifyRequestPurchaseSuccess();
+        $result = $this->verifyRequestPurchaseSuccess();
         $this->assertFalse($result);
     }
 
     public function testVerifyRequestPurchaseInternationalSuccess()
     {
         $this->gateway->international = true;
-        $result = $this->gateway->verifyRequestPurchaseSuccess();
+        $result = $this->verifyRequestPurchaseSuccess();
 
         $this->assertFalse($result);
     }
 
     public function testVerifyRequestIPN()
     {
-        $result = $this->gateway->verifyRequestIPN();
+        $result = $this->verifyRequestIPN();
 
         $this->assertFalse($result);
     }
@@ -142,7 +142,7 @@ class OnePayTest extends TestCase
     public function testVerifyRequestIPNInternational()
     {
         $this->gateway->international = true;
-        $result = $this->gateway->verifyRequestIPN();
+        $result = $this->verifyRequestIPN();
 
         $this->assertFalse($result);
     }

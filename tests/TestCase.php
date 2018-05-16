@@ -92,4 +92,45 @@ abstract class TestCase extends BaseTestCase
     {
         Yii::$app = null;
     }
+
+    /**
+     * @param array $data
+     * @param null $clientId
+     * @return \vxm\gatewayclients\ResponseData
+     */
+    protected function purchase(array $data, $clientId = null)
+    {
+        return Yii::$app->get('paymentGateways')->purchase($data, static::gatewayId(), $clientId);
+    }
+
+    /**
+     * @param array $data
+     * @param null $clientId
+     * @return \vxm\gatewayclients\ResponseData
+     */
+    protected function queryDR(array $data, $clientId = null)
+    {
+        return Yii::$app->get('paymentGateways')->queryDR($data, static::gatewayId(), $clientId);
+    }
+
+    /**
+     * @param \yii\web\Request $request
+     * @param null $clientId
+     * @return \yiiviet\payment\VerifiedData
+     */
+    protected function verifyRequestPurchaseSuccess(\yii\web\Request $request = null, $clientId = null)
+    {
+        return Yii::$app->get('paymentGateways')->verifyRequestPurchaseSuccess(static::gatewayId(), $request, $clientId);
+    }
+
+    /**
+     * @param \yii\web\Request $request
+     * @param null $clientId
+     * @return \yiiviet\payment\VerifiedData
+     */
+    protected function verifyRequestIPN(\yii\web\Request $request = null, $clientId = null)
+    {
+        return Yii::$app->get('paymentGateways')->verifyRequestIPN(static::gatewayId(), $request, $clientId);
+    }
+
 }

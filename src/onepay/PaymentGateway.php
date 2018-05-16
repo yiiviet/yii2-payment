@@ -16,6 +16,10 @@ use vxm\gatewayclients\DataInterface;
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến OnePay.
  * Hiện tại nó hổ trợ 100% các tính năng từ cổng thanh toán OnePay v2.
  *
+ * @method ResponseData purchase(array $data, $clientId = null)
+ * @method ResponseData queryDR(array $data, $clientId = null)
+ * @method bool|VerifiedData verifyRequestIPN($clientId = null, \yii\web\Request $request = null)
+ * @method bool|VerifiedData verifyRequestPurchaseSuccess($clientId = null, \yii\web\Request $request = null)
  * @method PaymentClient getClient($id = null)
  * @method PaymentClient getDefaultClient()
  *
@@ -91,6 +95,32 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
+     * @return ResponseData|DataInterface
+     * @inheritdoc
+     */
+    public function request($command, array $data, $clientId = null): DataInterface
+    {
+        if ($clientId === null && $this->sandbox) {
+            $clientId = $this->international ? self::ID_CLIENT_SANDBOX_INTERNATIONAL : self::ID_CLIENT_SANDBOX_DOMESTIC;
+        }
+
+        return parent::request($command, $data, $clientId);
+    }
+
+    /**
+     * @return bool|VerifiedData
+     * @inheritdoc
+     */
+    public function verifyRequest($command, \yii\web\Request $request = null, $clientId = null)
+    {
+        if ($clientId === null && $this->sandbox) {
+            $clientId = $this->international ? self::ID_CLIENT_SANDBOX_INTERNATIONAL : self::ID_CLIENT_SANDBOX_DOMESTIC;
+        }
+
+        return parent::verifyRequest($command, $request, $clientId);
+    }
+
+    /**
      * @inheritdoc
      */
     protected function defaultVersion(): string
@@ -126,59 +156,6 @@ class PaymentGateway extends BasePaymentGateway
             ]
         ];
     }
-
-    /**
-     * @return ResponseData|DataInterface
-     * @inheritdoc
-     */
-    public function purchase(array $data, $clientId = null): DataInterface
-    {
-        if ($this->sandbox && $clientId === null) {
-            $clientId = $this->international ? self::ID_CLIENT_SANDBOX_INTERNATIONAL : self::ID_CLIENT_SANDBOX_DOMESTIC;
-        }
-
-        return parent::purchase($data, $clientId);
-    }
-
-    /**
-     * @return ResponseData|DataInterface
-     * @inheritdoc
-     */
-    public function queryDR(array $data, $clientId = null): DataInterface
-    {
-        if ($this->sandbox && $clientId === null) {
-            $clientId = $this->international ? self::ID_CLIENT_SANDBOX_INTERNATIONAL : self::ID_CLIENT_SANDBOX_DOMESTIC;
-        }
-
-        return parent::queryDR($data, $clientId);
-    }
-
-    /**
-     * @return bool|VerifiedData
-     * @inheritdoc
-     */
-    public function verifyRequestIPN(\yii\web\Request $request = null, $clientId = null)
-    {
-        if ($this->sandbox && $clientId === null) {
-            $clientId = $this->international ? self::ID_CLIENT_SANDBOX_INTERNATIONAL : self::ID_CLIENT_SANDBOX_DOMESTIC;
-        }
-
-        return parent::verifyRequestIPN($request, $clientId);
-    }
-
-    /**
-     * @return bool|VerifiedData
-     * @inheritdoc
-     */
-    public function verifyRequestPurchaseSuccess(\yii\web\Request $request = null, $clientId = null)
-    {
-        if ($this->sandbox && $clientId === null) {
-            $clientId = $this->international ? self::ID_CLIENT_SANDBOX_INTERNATIONAL : self::ID_CLIENT_SANDBOX_DOMESTIC;
-        }
-
-        return parent::verifyRequestPurchaseSuccess($request, $clientId);
-    }
-
 
     /**
      * @inheritdoc

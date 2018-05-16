@@ -39,7 +39,7 @@ class NganLuongTest extends TestCase
     public function testPurchase()
     {
         // Valid
-        $responseData = $this->gateway->purchase([
+        $responseData = $this->purchase([
             'bank_code' => 'VCB',
             'buyer_fullname' => 'vxm',
             'buyer_email' => 'admin@test.app',
@@ -53,7 +53,7 @@ class NganLuongTest extends TestCase
         $this->assertTrue(isset($responseData['checkout_url']));
 
         // Throws
-        $this->gateway->purchase([]);
+        $this->purchase([]);
 
     }
 
@@ -64,7 +64,7 @@ class NganLuongTest extends TestCase
     public function testQueryDR()
     {
         // Valid
-        $responseData = $this->gateway->queryDR([
+        $responseData = $this->queryDR([
             'token' => self::TOKEN
         ]);
 
@@ -72,7 +72,7 @@ class NganLuongTest extends TestCase
         $this->assertFalse($responseData->getIsOk());
 
         // Throws
-        $this->gateway->queryDR([]);
+        $this->queryDR([]);
     }
 
     /**
@@ -101,11 +101,11 @@ class NganLuongTest extends TestCase
     {
         $_GET['token'] = self::TOKEN;
 
-        $result = $this->gateway->verifyRequestPurchaseSuccess();
+        $result = $this->verifyRequestPurchaseSuccess();
         $this->assertInstanceOf('\yiiviet\payment\VerifiedData', $result);
 
         $_GET = [];
-        $result = $this->gateway->verifyRequestPurchaseSuccess();
+        $result = $this->verifyRequestPurchaseSuccess();
         $this->assertFalse($result);
     }
 
@@ -117,7 +117,7 @@ class NganLuongTest extends TestCase
     {
         // Valid
         $this->gateway->setVersion('3.2');
-        $responseData = $this->gateway->purchase([
+        $responseData = $this->purchase([
             'bank_code' => 'VCB',
             'buyer_fullname' => 'vxm',
             'buyer_email' => 'admin@test.app',
@@ -133,7 +133,7 @@ class NganLuongTest extends TestCase
         $this->assertFalse($responseData->getIsOk());
 
         // Throws
-        $this->gateway->purchase([
+        $this->purchase([
             'bank_code' => 'VCB',
             'buyer_fullname' => 'vxm',
             'buyer_email' => 'admin@test.app',

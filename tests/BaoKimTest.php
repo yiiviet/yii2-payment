@@ -34,7 +34,7 @@ class BaoKimTest extends TestCase
     public function testPurchase()
     {
         // valid
-        $responseData = $this->gateway->purchase([
+        $responseData = $this->purchase([
             'order_id' => 2,
             'total_amount' => 500000,
             'url_success' => '/'
@@ -44,7 +44,7 @@ class BaoKimTest extends TestCase
         $this->assertTrue(isset($responseData['redirect_url']));
 
         // throws
-        $this->gateway->purchase([
+        $this->purchase([
             'order_id' => 1,
             'url_success' => '/'
         ]);
@@ -59,7 +59,7 @@ class BaoKimTest extends TestCase
     {
         $this->gateway->pro = true;
         // Valid
-        $responseData = $this->gateway->purchase([
+        $responseData = $this->purchase([
             'bank_payment_method_id' => '128',
             'payer_name' => 'vxm',
             'payer_email' => 'vxm@gmail.com',
@@ -71,7 +71,7 @@ class BaoKimTest extends TestCase
         $this->assertTrue($responseData->next_action === 'redirect');
 
         // Throws
-        $this->gateway->purchase([
+        $this->purchase([
             'bank_payment_method_id' => '128',
             'payer_name' => 'vxm',
             'payer_email' => 'vxm@gmail.com',
@@ -89,11 +89,11 @@ class BaoKimTest extends TestCase
     public function testQueryDR()
     {
         // Valid
-        $responseData = $this->gateway->queryDR(['transaction_id' => 1]);
+        $responseData = $this->queryDR(['transaction_id' => 1]);
         $this->assertTrue($responseData->getIsOk());
 
         // Throws
-        $this->gateway->queryDR([]);
+        $this->queryDR([]);
     }
 
     public function testGetMerchantData()
@@ -112,7 +112,7 @@ class BaoKimTest extends TestCase
             'merchant_id' => 647,
             'url_success' => '/'
         ];
-        $responseData = $this->gateway->verifyRequestIPN();
+        $responseData = $this->verifyRequestIPN();
         $this->assertFalse($responseData);
     }
 
@@ -126,7 +126,7 @@ class BaoKimTest extends TestCase
             'merchant_id' => 647,
             'url_success' => '/'
         ];
-        $responseData = $this->gateway->verifyRequestPurchaseSuccess();
+        $responseData = $this->verifyRequestPurchaseSuccess();
         $this->assertFalse($responseData);
     }
 }
