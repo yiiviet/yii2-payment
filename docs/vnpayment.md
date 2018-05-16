@@ -52,6 +52,7 @@ bằng cú pháp `Yii::$app->VNPGateway`.
 | **queryDR** | Tạo lệnh yêu cầu truy vấn thông tin giao dịch. |
 | **verifyRequestIPN** | Kiểm tra tính hợp lệ của dữ liệu mà VNPayment gửi sang khi khách hàng thanh toán thành công (VNPayment to Server). |
 | **verifyRequestPurchaseSuccess** | Kiểm tra tính hợp lệ của dữ liệu mà VNPayment gửi sang khi khách hàng thanh toán thành công (Client to Server). |
+| **refund** | Yêu cầu VNPayment hoàn tiền lại cho đon hàng. |
 
 
 ## Phương thức `purchase`
@@ -176,6 +177,72 @@ tượng `response` với các thuộc tính sau:
     }
     
 ```
+ 
+ ## Phương thức `refund`
+ 
+ 
+* Cách sử dụng cơ bản:
+
+```php
+    $result = Yii::$app->VNPGateway->refund([
+        'TxnRef' => 123,
+        'Amount' => 100000,
+        'IpAddr' => '127.0.0.1',
+        'OrderInfo' => time(),
+        'TransDate' => date('Ymdhis'),
+        'TransactionNo' => 123,
+    ]);
+``` 
+
+* Giới thiệu các thành phần trong mảng khi tạo lệnh:
+
+| Khóa | Bắt buộc | Kiểu | Chi tiết |
+| :-----------: | :----: | :----: | ------ |
+| TxnRef | **có** | mixed | Mã đơn hàng do website bạn sinh ra thường thì nó chính là `primary key` của `order row`. Dùng để đối chứng khi khách hàng giao dịch thành công. |
+| Amount | **có** | int | Số tiền muốn hoàn trả. |
+| OrderInfo | **có** | string | Mô tả đơn hàng của bạn. |
+| TransDate | **có** | string | Ngày mà đơn hàng của bạn được tạo (Ymdhis). |
+| TransactionNo | **có** | string | Mã đơn hàng trên hệ thống VNPayment. |
+| IpAddr | không | string | IP của khách. Nếu không thiết lập và ở môi trường web app, hệ thống sẽ tự động xác định IP. |
+| CreateDate | không | string | Ngạy tạo đơn hàng (Ymdhis). Nếu không thiết lập sẽ lấy thời gian hiện tại. |
+
+* Sau khi gọi phương thức với các tham trị được yêu cầu nó sẽ trả về đối
+tượng `response` với các thuộc tính sau:
+
+| Thuộc tính | Bắt buộc | Kiểu | Mô tả |
+| ----------- | :----: | :------: | ----- |
+| isOk | **có** | bool | Thuộc tính cho biết tiến trình yêu cầu diễn ra tốt đẹp hay không. Nếu có là `TRUE` và ngược lại. |
+| TmnCode | không | string | TMN code của client đã dùng để tạo thanh toán. Nó chỉ tồn tại khi `isOk` là TRUE |
+| Amount | không | float | Số tiền đơn hàng. Nó chỉ tồn tại khi `isOk` là TRUE |
+| TxnRef | không | mixed | Mã đơn hàng trên hệ thống của bạn. Nó chỉ tồn tại khi `isOk` là TRUE |
+| OrderInfo | không | mixed | Mô tả đơn hàng trên hệ thống của bạn. Nó chỉ tồn tại khi `isOk` là TRUE |
+| TransactionNo | không | mixed | Mã giao dịch tại VNPayment. Nó chỉ tồn tại khi `isOk` là TRUE và đơn hàng giao dịch thành công |
+| BankCode | không | mixed | Mã ngân hàng khách đã dùng để thanh toán. Nó chỉ tồn tại khi `isOk` là TRUE và đơn hàng giao dịch thành công |
+| PayDate | không | mixed | Thời gian khách hoàn thành thanh toán. Nó chỉ tồn tại khi `isOk` là TRUE và đơn hàng giao dịch thành công |
+| TransactionNo | không | mixed | Mã giao dịch trên VNPayment. Nó chỉ tồn tại khi `isOk` là TRUE và đơn hàng giao dịch thành công |
+| TransactionType | không | mixed | Hình thức giao dịch (`01` giao dịch thanh toán, `02` giao dịch hoàn trả toàn phần, `03` giao dịch hoàn trả một phần). Nó chỉ tồn tại khi `isOk` là TRUE |
+| TransactionStatus | không | mixed | Trạng thái giao dịch chi tiết. Nó chỉ tồn tại khi `isOk` là TRUE |
+| ResponseCode | không | mixed | Trạng thái giao dịch. Giá trị `0` nghĩa là giao dịch thành công, còn lại là thất bại, [xem chi tiết](https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/) |
+
+* Code hoàn chỉnh:
+
+```php
+    $result = Yii::$app->VNPGateway->refund([
+        'TxnRef' => 123,
+        'Amount' => 100000,
+        'IpAddr' => '127.0.0.1',
+        'OrderInfo' => time(),
+        'TransDate' => date('Ymdhis'),
+        'TransactionNo' => 123,
+    ]);
+
+    if ($result->isOk) {
+        
+        // thực hiện nghiệm vụ tùy theo mục đích hoàn trả của bạn
+        
+    } 
+    
+``` 
  
 ## Phương thức `verifyRequestPurchaseSuccess`
 
