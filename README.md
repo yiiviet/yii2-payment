@@ -6,7 +6,6 @@
 [![Build Status](https://travis-ci.org/yiiviet/yii2-payment.svg?branch=master)](https://travis-ci.org/yiiviet/yii2-payment)
 [![Code Coverage](https://scrutinizer-ci.com/g/yiiviet/yii2-payment/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yiiviet/yii2-payment/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yiiviet/yii2-payment/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yiiviet/yii2-payment/?branch=master)
-[![Dependency Status](https://www.versioneye.com/user/projects/5aec90130fb24f5450e02d9e/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/5aec90130fb24f5450e02d9e)
 [![Yii2](https://img.shields.io/badge/Powered_by-Yii_Framework-green.svg?style=flat)](http://www.yiiframework.com/)
 
 Hiện nay các cổng thanh toán trong nước có cấu trúc API rất đa dạng và ít có điểm chung,
@@ -77,13 +76,13 @@ Cài đặt thông qua `composer` nếu như đó là một khái niệm mới v
 [đây](http://getcomposer.org/download/) để tìm hiểu nó.
 
 ```sh
-composer require "yiiviet/payment"
+composer require "yiiviet/yii2-payment"
 ```
 
 hoặc thêm
 
 ```json
-"yiiviet/payment": "*"
+"yiiviet/yii2-payment": "*"
 ```
 
 vào phần `require` trong file composer.json.
