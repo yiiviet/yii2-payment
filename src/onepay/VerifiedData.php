@@ -8,6 +8,7 @@
 namespace yiiviet\payment\onepay;
 
 use yii\helpers\ArrayHelper;
+
 use yiiviet\payment\VerifiedData as BaseVerifiedData;
 
 /**

@@ -7,7 +7,8 @@
 
 namespace yiiviet\payment\nganluong;
 
-use vxm\gatewayclients\DataInterface;
+use GatewayClients\DataInterface;
+
 use yii\base\NotSupportedException;
 
 use yiiviet\payment\BasePaymentGateway;

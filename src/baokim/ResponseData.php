@@ -7,8 +7,6 @@
 
 namespace yiiviet\payment\baokim;
 
-use Yii;
-
 use vxm\gatewayclients\ResponseData as BaseResponseData;
 
 /**

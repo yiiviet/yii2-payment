@@ -9,6 +9,8 @@ namespace yiiviet\payment\baokim;
 
 use Yii;
 
+use GatewayClients\DataInterface;
+
 use yii\base\InvalidArgumentException;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
@@ -16,7 +18,6 @@ use yii\helpers\ArrayHelper;
 use yiiviet\payment\BasePaymentGateway;
 
 use vxm\gatewayclients\RequestEvent;
-use vxm\gatewayclients\DataInterface;
 
 
 /**

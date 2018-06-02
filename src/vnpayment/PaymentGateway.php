@@ -7,9 +7,10 @@
 
 namespace yiiviet\payment\vnpayment;
 
+use GatewayClients\DataInterface;
+
 use yiiviet\payment\BasePaymentGateway;
 
-use vxm\gatewayclients\DataInterface;
 use vxm\gatewayclients\RequestEvent;
 
 /**

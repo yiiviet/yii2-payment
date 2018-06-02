@@ -10,13 +10,12 @@ namespace yiiviet\payment;
 use Yii;
 use ReflectionClass;
 
+use GatewayClients\DataInterface;
+
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
-use yii\helpers\ArrayHelper;
-use yii\httpclient\Client as HttpClient;
 
 use vxm\gatewayclients\BaseGateway;
-use vxm\gatewayclients\DataInterface;
 use vxm\gatewayclients\RequestEvent;
 use vxm\gatewayclients\ResponseData;
 

@@ -7,8 +7,6 @@
 
 namespace yiiviet\payment\vnpayment;
 
-use Yii;
-
 use vxm\gatewayclients\ResponseData as BaseResponseData;
 
 /**

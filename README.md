@@ -68,7 +68,7 @@ Các cổng thanh toán được hổ trợ:
 * [PHP >= 7.1](http://php.net)
 * [PHP Extension: cURL, openSSL](http://pear.php.net)
 * [yiisoft/yii2 >= 2.0.13](https://github.com/yiisoft/yii2/)
-* [vxm/gateway-clients >= 1.0.9](https://github.com/vuongxuongminh/yii2-gateway-clients)
+* [vxm/yii2-gateway-clients ~ 2.0.0](https://github.com/vuongxuongminh/yii2-gateway-clients)
 
 ## Cài đặt
 

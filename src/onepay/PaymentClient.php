@@ -9,8 +9,6 @@ namespace yiiviet\payment\onepay;
 
 use Yii;
 
-use yii\helpers\ArrayHelper;
-
 use yiiviet\payment\BasePaymentClient;
 
 /**

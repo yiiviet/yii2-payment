@@ -7,10 +7,9 @@
 
 namespace yiiviet\payment\onepay;
 
+use GatewayClients\DataInterface;
+
 use yiiviet\payment\BasePaymentGateway;
-
-use vxm\gatewayclients\DataInterface;
-
 
 /**
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến OnePay.

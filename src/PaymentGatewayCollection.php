@@ -7,7 +7,8 @@
 
 namespace yiiviet\payment;
 
-use vxm\gatewayclients\DataInterface;
+use GatewayClients\DataInterface;
+
 use vxm\gatewayclients\GatewayCollection;
 
 /**

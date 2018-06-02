@@ -7,8 +7,6 @@
 
 namespace yiiviet\payment\nganluong;
 
-use Yii;
-
 use vxm\gatewayclients\ResponseData as BaseResponseData;
 
 /**

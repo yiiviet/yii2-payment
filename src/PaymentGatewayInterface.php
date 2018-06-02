@@ -7,8 +7,7 @@
 
 namespace yiiviet\payment;
 
-use vxm\gatewayclients\DataInterface;
-use vxm\gatewayclients\GatewayInterface;
+use GatewayClients\GatewayInterface;
 
 /**
  * Mẫu trừu tượng PaymentGatewayInterface kế thừa [[GatewayInterface]] bổ sung thêm phương thức xác minh tính hợp lệ của dữ liệu
@@ -44,7 +43,7 @@ interface PaymentGatewayInterface extends GatewayInterface
      * Nếu không thiết lập tham trị này, request sẽ được chỉ định lấy từ [[Yii::$app->get('request')]].
      * @param int|string|null $clientId PaymentClient id được yêu cầu sử dụng để xác minh.
      * Nếu không thiết lập tham trị này, client sẽ được chỉ định lấy từ [[getDefaultClient()]].
-     * @return bool|DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
+     * @return bool|\GatewayClients\DataInterface Sẽ trả về FALSE nếu như dữ liệu không hợp lệ ngược lại sẽ trả về thông tin đơn hàng đã được xác thực.
      */
     public function verifyRequest($command, \yii\web\Request $request = null, $clientId = null);
 

@@ -7,7 +7,7 @@
 
 namespace yiiviet\payment;
 
-use vxm\gatewayclients\ClientInterface;
+use GatewayClients\ClientInterface;
 
 /**
  * Mẫu trừu tượng PaymentClientInterface kế thừa [[ClientInterface]] bổ sung thêm các phương thức liên quan đến
