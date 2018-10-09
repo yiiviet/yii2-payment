@@ -174,23 +174,6 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
-     * @inheritdoc
-     */
-    protected function getHttpClientConfig(): array
-    {
-        return [
-            'transport' => 'yii\httpclient\CurlTransport',
-            'requestConfig' => [
-                'format' => 'json',
-                'options' => [
-                    CURLOPT_SSL_VERIFYHOST => false,
-                    CURLOPT_SSL_VERIFYPEER => false
-                ]
-            ]
-        ];
-    }
-
-    /**
      * Phương thức hổ trợ lấy thông tin merchant thông qua email business.
      * Đây là phương thức ánh xạ của [[request()]] sử dụng lệnh [[RC_GET_MERCHANT_DATA]].
      *
@@ -250,7 +233,7 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
-     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\base\InvalidConfigException|\yii\httpclient\Exception
      */
     protected function requestInternal(\vxm\gatewayclients\RequestData $requestData, \yii\httpclient\Client $httpClient): array
     {
@@ -287,6 +270,7 @@ class PaymentGateway extends BasePaymentGateway
                 CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword
             ])
             ->addData($data)
+            ->setFormat('json')
             ->send()
             ->getData();
     }

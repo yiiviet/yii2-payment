@@ -268,22 +268,6 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
-    protected function getHttpClientConfig(): array
-    {
-        return [
-            'transport' => 'yii\httpclient\CurlTransport',
-            'requestConfig' => [
-                'options' => [
-                    CURLOPT_SSL_VERIFYPEER => false,
-                    CURLOPT_SSL_VERIFYHOST => false
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function beforeRequest(RequestEvent $event)
     {
         if ($event->command === self::RC_AUTHENTICATE) {
@@ -307,7 +291,7 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
-     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\base\InvalidConfigException|\yii\httpclient\Exception
      */
     protected function requestInternal(\vxm\gatewayclients\RequestData $requestData, \yii\httpclient\Client $httpClient): array
     {
