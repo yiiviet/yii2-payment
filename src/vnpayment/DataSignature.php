@@ -17,6 +17,7 @@ use yiiviet\payment\DataSignature as BaseDataSignature;
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
+ * @deprecated since 1.0.2 we use `yiiviet\payment\HashDataSignature` instead.
  */
 class DataSignature extends BaseDataSignature
 {
