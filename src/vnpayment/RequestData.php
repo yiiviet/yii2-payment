@@ -84,7 +84,7 @@ class RequestData extends BaseRequestData
 
         ksort($attributesEnsured);
 
-        $dataSign = urldecode(http_build_query($attributesEnsured));
+        $dataSign = $client->hashSecret . urldecode(http_build_query($attributesEnsured));
         $attributesEnsured['vnp_SecureHash'] = $client->signature($dataSign, $hashType);
         $attributesEnsured['vnp_SecureHashType'] = $hashType;
 

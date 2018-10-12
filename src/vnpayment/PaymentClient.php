@@ -10,6 +10,7 @@ namespace yiiviet\payment\vnpayment;
 use Yii;
 
 use yiiviet\payment\BasePaymentClient;
+use yiiviet\payment\HashDataSignature;
 
 /**
  * Lớp PaymentClient hổ trợ tạo và kiểm tra chữ ký dữ liệu và có các thuộc tính kết nối đến cổng thanh toán VnPayment
@@ -49,9 +50,8 @@ class PaymentClient extends BasePaymentClient
     protected function initDataSignature(string $data, string $type = null): ?\yiiviet\payment\DataSignature
     {
         return Yii::createObject([
-            'class' => DataSignature::class,
+            'class' => HashDataSignature::class,
             'hashAlgo' => $type,
-            'hashSecret' => $this->hashSecret
         ], [$data]);
     }
 }
