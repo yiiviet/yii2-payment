@@ -63,7 +63,7 @@ class HmacDataSignature extends DataSignature
     {
         $actual = $this->generate();
 
-        return strcasecmp($expect, $actual) === 0;
+        return strcmp($expect, $actual) === 0;
     }
 
 }
