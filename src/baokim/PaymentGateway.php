@@ -106,7 +106,7 @@ class PaymentGateway extends BasePaymentGateway
     const SAFE_TRANSACTION = 2;
 
     /**
-     * @var bool Set it TRUE if you want use gateway with pro mode. Currently only method `purchase` is depend on it.
+     * @var bool Thiết lập true nếu muốn thanh toán trực tiếp không chuyển khách đến Bảo Kim.
      */
     public $pro = false;
 
