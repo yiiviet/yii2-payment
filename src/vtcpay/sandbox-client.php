@@ -10,5 +10,6 @@
 return [
     'class' => 'yiiviet\payment\vtcpay\PaymentClient',
     'secureCode' => 'baogomCHUHOAchuthuongso123vakytudacbiet!@#',
-    'websiteId' => '74132'
+    'merchantId' => '74132',
+    'business' => '0963465816'
 ];

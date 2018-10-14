@@ -11,7 +11,11 @@ namespace yiiviet\payment\vtcpay;
 use vxm\gatewayclients\RequestData as BaseRequestData;
 
 /**
- * Lớp RequestData
+ * Lớp RequestData cung cấp dữ liệu để truy vấn đến VTCPay tạo lệnh thanh toán.
+ *
+ * @method PaymentClient getClient()
+ *
+ * @property PaymentClient $client
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.2
@@ -29,11 +33,25 @@ class RequestData extends BaseRequestData
         ];
     }
 
+    /**
+     * @inheritdoc
+     * @throws \yii\base\NotSupportedException
+     */
     protected function ensureAttributes(array &$attributes)
     {
-        parent::ensureAttributes($attributes);
         $client = $this->getClient();
-        $attributes['website_id'] = $this
+        parent::ensureAttributes($attributes);
+
+        $attributesEnsured = $attributes;
+        $attributesEnsured['website_id'] = $client->merchantId;
+        $attributesEnsured['receiver_account'] = $attributes['receiver_account'] ?? $client->business;
+        $attributesEnsured['currency'] = $attributes['currency'] ?? 'VND';
+
+        ksort($attributesEnsured);
+        $dataSign = implode('|', $attributesEnsured) . '|' . $client->secureCode;
+        $attributesEnsured['signature'] = $client->signature($dataSign);
+
+        $attributes = $attributesEnsured;
     }
 
 }

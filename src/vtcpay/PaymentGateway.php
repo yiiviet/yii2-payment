@@ -18,10 +18,10 @@ use yiiviet\payment\BasePaymentGateway;
 use vxm\gatewayclients\RequestData;
 
 /**
- * Lớp PaymentGateway
+ * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến VTCPay.
+ * Hiện tại nó hổ trợ 100% các tính năng từ cổng thanh toán VTCPay.
  *
  * @method ResponseData purchase(array $data, $clientId = null)
- * @method ResponseData queryDR(array $data, $clientId = null)
  * @method VerifiedData verifyRequestIPN(\yii\web\Request $request = null, $clientId = null)
  * @method VerifiedData verifyRequestPurchaseSuccess(\yii\web\Request $request = null, $clientId = null)
  * @method PaymentClient getClient($id = null)
@@ -38,13 +38,20 @@ class PaymentGateway extends BasePaymentGateway
      */
     const PURCHASE_URL = '/checkout.html';
 
+    /**
+     * Phương thức thanh toán bằng ví điện tử VTCPay.
+     */
     const PAYMENT_METHOD_VTCPAY = 'VTCPay';
 
+    /**
+     * Phương thức thanh toán bằng ngân hàng trong nước.
+     */
     const PAYMENT_METHOD_DOMESTIC_BANK = 'DomesticBank';
 
+    /**
+     * Phương thức thanh toán bằng thẻ quốc tế (visa/master).
+     */
     const PAYMENT_METHOD_INTERNATIONAL_CARD = 'InternationalCard';
-
-    const TRANSACTION_SALE = 'sale';
 
     /**
      * @inheritdoc
@@ -80,9 +87,9 @@ class PaymentGateway extends BasePaymentGateway
         throw new NotSupportedException('queryDR doesnt\'t supported in VTCPay!');
     }
 
-
     /**
      * @inheritdoc
+     * @throws \yii\base\InvalidConfigException
      */
     protected function requestInternal(RequestData $requestData, HttpClient $httpClient): array
     {

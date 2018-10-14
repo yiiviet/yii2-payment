@@ -14,7 +14,7 @@ use yiiviet\payment\BasePaymentClient;
 use yiiviet\payment\DataSignature;
 
 /**
- * Lớp PaymentClient
+ * Lớp PaymentClient hổ trợ tạo và kiểm tra chữ ký dữ liệu và có các thuộc tính kết nối đến cổng thanh toán VTCPay.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.2
@@ -25,7 +25,7 @@ class PaymentClient extends BasePaymentClient
     /**
      * @var string tài khoản nhận tiền mặc định khi thực hiện giao dịch.
      */
-    public $account;
+    public $business;
 
     /**
      * @var string Mã bảo vệ nhận khi đăng ký tích hợp.
@@ -36,7 +36,7 @@ class PaymentClient extends BasePaymentClient
     /**
      * @var string Mã website nhận khi đăng ký
      */
-    public $websiteId;
+    public $merchantId;
 
     /**
      * @inheritdoc
