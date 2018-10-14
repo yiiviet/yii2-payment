@@ -69,7 +69,7 @@ class VnPaymentTest extends TestCase
         ]);
 
         $this->assertFalse($responseData->getIsOk());
-        $this->assertEquals(99, $responseData->getResponseCode());
+        $this->assertEquals(91, $responseData->getResponseCode());
 
         // Throws
         $this->queryDR([
