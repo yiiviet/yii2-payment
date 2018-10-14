@@ -13,6 +13,7 @@ use Yii;
 use GatewayClients\DataInterface;
 
 use yii\base\ActionFilter;
+use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\web\ForbiddenHttpException;
 
@@ -28,7 +29,8 @@ class VerifyFilter extends ActionFilter
 {
 
     /**
-     * @var \yiiviet\payment\PaymentGatewayInterface Đối tượng cổng thanh toán dùng để xác thực tính hợp lệ của dữ liệu đầu vào.
+     * @var \yiiviet\payment\PaymentGatewayInterface Đối tượng cổng thanh toán dùng để xác thực tính hợp lệ của dữ liệu đầu vào,
+     * bạn có thể thiết lập nó thông qua `id component` trong `app`.
      */
     public $gateway;
 
@@ -44,10 +46,20 @@ class VerifyFilter extends ActionFilter
 
     /**
      * @inheritdoc
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function init()
     {
+        if ($this->gateway === null) {
+            throw new InvalidConfigException('`gateway` property must be set!');
+        } else {
+            $this->gateway = Instance::ensure($this->gateway, 'yiiviet\payment\PaymentGatewayInterface');
+        }
+
+        if ($this->command === null) {
+            throw new InvalidConfigException('`command` property must be set!');
+        }
+
         $this->request = Instance::ensure($this->request, 'yii\web\Request');
 
         parent::init();
