@@ -76,12 +76,14 @@ class VerifyFilterTest extends TestCase
             'signature' => '1d31c0779f47e2bc3bfe40becf1fda0d7e881aeb90d8efb0341e258692cf896a'
         ];
 
-        $result = (new VerifyFilter([
+        $behavior = new VerifyFilter([
             'gateway' => $this->gateway,
             'command' => 'IPN'
-        ]))->beforeAction(null);
+        ]);
 
-        $this->assertTrue($result);
+        $this->assertTrue($behavior->beforeAction(null));
+        $this->assertInstanceOf('\GatewayClients\DataInterface', $behavior->getVerifiedData());
+
     }
 
 
