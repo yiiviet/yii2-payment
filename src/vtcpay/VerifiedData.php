@@ -15,11 +15,11 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
 /**
  * Lớp VerifiedData tổng hợp dữ liệu đã được xác minh từ VTCPay.
  *
- * @method PaymentClient getClient()
+ * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
  * @property int $amount Số tiền đơn hàng.
  *
- * @property PaymentClient $client
+ * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.2

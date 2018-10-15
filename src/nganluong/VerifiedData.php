@@ -12,9 +12,10 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
 /**
  * Lớp VerifiedData cung cấp dữ liệu đã được xác thực từ Ngân Lượng gửi về.
  *
- * @method PaymentClient getClient()
+ * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
- * @property PaymentClient $client
+ * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
+ * @property string $token mã token dùng để truy vấn thông tin giao dịch.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

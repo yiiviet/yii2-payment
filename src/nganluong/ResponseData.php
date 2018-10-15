@@ -12,10 +12,18 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
 /**
  * Lớp ResponseData hổ trợ việc cung cấp, tổng hợp nội dung dữ liệu nhận được từ [[request()]] của [[PaymentGateway]].
  *
- * @method PaymentClient getClient()
+ * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
- * @property PaymentClient $client
- * @property string $message
+ * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
+ * @property bool $isOk trạng thái phản hồi từ Ngân Lượng `TRUE` thành công và ngược lại.
+ * @property string $message chuỗi thông báo trạng thái convert từ `error_code`.
+ * @property string $error_code mã lỗi.
+ * @property string $token của đơn hàng.
+ * @property string $checkout_url đường dẫn bạn sẽ redirect khách hàng để thực hiện thanh toán.
+ * @property int $time_limit số giây còn lại để khách thực thi.
+ * @property string $description mô tả.
+ * @property string $auth_url đường dẫn thực thi xác minh, chỉ tồn tại với phương thức seamless.
+ * @property string $auth_site nguồn thực thi xác minh, chỉ tồn tại với phương thức seamless.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

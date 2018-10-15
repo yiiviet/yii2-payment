@@ -12,10 +12,15 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
 /**
  * Lớp ResponseData cung cấp dữ liệu nhận được từ Bảo Kim khi tạo [[request()]] ở [[PaymentGateway]].
  *
- * @method PaymentClient getClient()
+ * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
- * @property PaymentClient $client
- * @property null|string $errorMessage
+ * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
+ * @property bool $isOk trạng thái phản hồi từ Bảo Kim `TRUE` thành công và ngược lại.
+ * @property null|string $errorMessage chuỗi thông báo lỗi khi `isOk` là `FALSE`.
+ * @property string $redirect_url đường dẫn chuyển tiếp thanh toán, chỉ tồn tại khi thuộc tính `isOk` là `TRUE`.
+ * @property string $next_action hành động tiếp theo cần phải thực thi, chỉ tồn tại khi thuộc tính `isOk` là `TRUE` và với phương thức `pro`.
+ * @property int $rv_id mã phiếu thu, chỉ tồn tại khi thuộc tính `isOk` là `TRUE` và với phương thức `pro`.
+ * @property int $guide_url mã phiếu thu, chỉ tồn tại khi thuộc tính `isOk` là `TRUE` và với phương thức `pro` khi thuộc tính `rv_id` có giá trị là `display_guide`.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

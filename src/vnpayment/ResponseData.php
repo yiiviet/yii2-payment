@@ -12,9 +12,9 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
 /**
  * Lớp ResponseData cung cấp dữ liệu phản hồi từ VnPayment sau khi thực hiện hàm [[request()]] ở [[PaymentGateway]].
  *
- * @method PaymentClient getClient()
+ * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
- * @property PaymentClient $client
+ * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
  * @property int|null $responseCode
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>

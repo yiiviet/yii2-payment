@@ -12,11 +12,20 @@ use yii\helpers\ArrayHelper;
 use yiiviet\payment\VerifiedData as BaseVerifiedData;
 
 /**
- * Class VerifiedData
+ * Lớp VerifiedData cung cấp dữ liệu đã được xác thực từ OnePay gửi về.
  *
- * @method PaymentClient getClient()
+ * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
- * @property PaymentClient $client
+ * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
+ * @property mixed $OrderInfo mô tả đơn hảng.
+ * @property mixed $MerchTxnRef mã đơn hàng trên hệ thống của bạn.
+ * @property int $ResponseCode trạng thái đơn hàng.
+ * @property int $Amount số tiền.
+ * @property string $Locale ngôn ngữ khách dùng để thanh toán.
+ * @property string $CurrencyCode mã tiền tệ.
+ * @property string $Merchant merchant id.
+ * @property string $TransactionNo mã giao dịch tại OnePay.
+ * @property string $Message thông báo từ OnePay.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

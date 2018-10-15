@@ -15,9 +15,26 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
 /**
  * Lớp VerifiedData cung cấp dữ liệu đã được xác minh từ các truy vấn IPN, success url.
  *
- * @method PaymentClient getClient()
+ * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
- * @property PaymentClient $client
+ * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
+ * @property mixed $order_id mã đơn hàng tại hệ thống.
+ * @property int $created_on thời gian tạo đơn hàng (timestamp).
+ * @property int $payment_type hình thức khách giao dịch (1 Trực tiếp, 2 Tạm giữ).
+ * @property int $transaction_status trạng thái giao dịch.
+ * @property int $total_amount tổng số tiền khách trả.
+ * @property int $net_amount tổng số tiền thực nhận.
+ * @property int $fee_amount số tiền phí Bảo Kim thu.
+ * @property int $merchant_id mã website tích hợp.
+ * @property int $transaction_id mã giao dịch tại Bảo Kim.
+ * @property string $payer_name tên người mua, chỉ tồn tại khi phương thức thanh toán thông qua bảo kim không phải `pro`.
+ * @property string $payer_email email người mua, chỉ tồn tại khi phương thức thanh toán thông qua bảo kim không phải `pro`.
+ * @property string $payer_phone_no số điện thoại người mua, chỉ tồn tại khi phương thức thanh toán thông qua bảo kim không phải `pro`.
+ * @property string $shipping_address địa chỉ giao hàng, chỉ tồn tại khi phương thức thanh toán thông qua bảo kim không phải `pro`.
+ * @property string $customer_name tên người mua, chỉ tồn tại khi phương thức thanh toán `pro`.
+ * @property string $customer_email email người mua, chỉ tồn tại khi phương thức thanh toán `pro`.
+ * @property string $customer_phone số điện thoại người mua, chỉ tồn tại khi phương thức thanh toán `pro`.
+ * @property string $customer_address địa chỉ giao hàng, chỉ tồn tại khi phương thức thanh toán `pro`.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
@@ -49,8 +66,9 @@ class VerifiedData extends BaseVerifiedData
         $client = $this->getClient();
         $data = $this->get(false);
         $expectSignature = ArrayHelper::remove($data, $attribute, false);
-        $dataSign = implode('', $data);
+        $data = array_filter($data);
         ksort($data);
+        $dataSign = implode('', $data);
 
         if (!$expectSignature || !$client->validateSignature($dataSign, $expectSignature, PaymentClient::SIGNATURE_HMAC)) {
             $validator->addError($this, $attribute, $validator->message);

@@ -12,11 +12,13 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
 /**
  * Lớp ResponseData cung cấp dữ liệu nhận được từ OnePay khi gọi [[request()]] ở lớp [[PaymentGateway]].
  *
- * @method PaymentClient getClient()
+ * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
- * @property PaymentClient $client
- * @property string|null $message
- * @property int|null $responseCode
+ * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
+ * @property bool $isOk trạng thái phản hồi từ OnePay `TRUE` thành công và ngược lại.
+ * @property string|null $message thông báo từ VNPayment.
+ * @property int|null $responseCode mã phản hồi.
+ * @property string $redirect_url đường dẫn redirect khách đến trang thanh toán.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
