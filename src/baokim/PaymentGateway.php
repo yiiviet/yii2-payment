@@ -282,10 +282,12 @@ class PaymentGateway extends BasePaymentGateway
     {
         if ($command === self::VRC_IPN) {
 
-            if ($request === null && Yii::$app instanceof \yii\web\Application) {
-                $request = Yii::$app->getRequest();
-            } else {
-                throw new InvalidArgumentException('Request instance arg must be set to verify return request is valid or not!');
+            if ($request === null) {
+                if (Yii::$app instanceof \yii\web\Application) {
+                    $request = Yii::$app->getRequest();
+                } else {
+                    throw new InvalidArgumentException('Request instance arg must be set to verify return request is valid or not!');
+                }
             }
 
             $content = $this->getHttpClient()->post(self::VERIFY_IPN_URL, $request->post())->send()->getContent();
