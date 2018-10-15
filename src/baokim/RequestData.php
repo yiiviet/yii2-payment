@@ -57,16 +57,20 @@ class RequestData extends BaseRequestData
         }
 
         if ($command === PaymentGateway::RC_GET_MERCHANT_DATA || ($command === PaymentGateway::RC_PURCHASE && $client->getGateway()->pro)) {
+            unset($attributes['signature']);
             ksort($attributes);
+
             if ($command === PaymentGateway::RC_PURCHASE) {
                 $strSign = 'POST' . '&' . urlencode(PaymentGateway::PURCHASE_PRO_URL) . '&&' . urlencode(http_build_query($attributes));
             } else {
                 $strSign = 'GET' . '&' . urlencode(PaymentGateway::PRO_SELLER_INFO_URL) . '&' . urlencode(http_build_query($attributes)) . '&';
             }
+
             $signature = $client->signature($strSign, PaymentClient::SIGNATURE_RSA);
             $attributes['signature'] = base64_encode($signature);
         } elseif (in_array($command, [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_QUERY_DR], true)) {
             $attributes['merchant_id'] = $client->merchantId;
+            unset($attributes['checksum']);
             ksort($attributes);
             $strSign = implode("", $attributes);
             $attributes['checksum'] = $client->signature($strSign, PaymentClient::SIGNATURE_HMAC);

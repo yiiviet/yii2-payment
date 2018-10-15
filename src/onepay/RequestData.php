@@ -120,6 +120,7 @@ class RequestData extends BaseRequestData
      */
     private function signature(array $data): string
     {
+        unset($data['vpc_SecureHash']);
         ksort($data);
         $dataSign = [];
 
