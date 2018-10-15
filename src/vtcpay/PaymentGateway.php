@@ -15,8 +15,6 @@ use yii\httpclient\Client as HttpClient;
 
 use yiiviet\payment\BasePaymentGateway;
 
-use vxm\gatewayclients\RequestData;
-
 /**
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến VTCPay.
  * Hiện tại nó hổ trợ 100% các tính năng từ cổng thanh toán VTCPay.
@@ -56,6 +54,26 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * @inheritdoc
      */
+    public $clientConfig = ['class' => PaymentClient::class];
+
+    /**
+     * @inheritdoc
+     */
+    public $requestDataConfig = ['class' => RequestData::class];
+
+    /**
+     * @inheritdoc
+     */
+    public $responseDataConfig = ['class' => ResponseData::class];
+
+    /**
+     * @inheritdoc
+     */
+    public $verifiedDataConfig = ['class' => VerifiedData::class];
+
+    /**
+     * @inheritdoc
+     */
     public function getBaseUrl(): string
     {
         return $this->sandbox ? 'http://alpha1.vtcpay.vn/portalgateway' : 'https://vtcpay.vn/bank-gateway';
@@ -91,7 +109,7 @@ class PaymentGateway extends BasePaymentGateway
      * @inheritdoc
      * @throws \yii\base\InvalidConfigException
      */
-    protected function requestInternal(RequestData $requestData, HttpClient $httpClient): array
+    protected function requestInternal(\vxm\gatewayclients\RequestData $requestData, HttpClient $httpClient): array
     {
         $data = $requestData->get();
         $data[0] = self::PURCHASE_URL;

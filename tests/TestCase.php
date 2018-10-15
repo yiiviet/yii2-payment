@@ -78,7 +78,8 @@ abstract class TestCase extends BaseTestCase
                         'BK' => 'yiiviet\payment\baokim\PaymentGateway',
                         'NL' => 'yiiviet\payment\nganluong\PaymentGateway',
                         'OP' => 'yiiviet\payment\onepay\PaymentGateway',
-                        'VNP' => 'yiiviet\payment\vnpayment\PaymentGateway'
+                        'VNP' => 'yiiviet\payment\vnpayment\PaymentGateway',
+                        'VTC' => 'yiiviet\payment\vtcpay\PaymentGateway'
                     ]
                 ]
             ],

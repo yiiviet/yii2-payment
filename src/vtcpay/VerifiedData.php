@@ -17,6 +17,8 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
  *
  * @method PaymentClient getClient()
  *
+ * @property int $amount Số tiền đơn hàng.
+ *
  * @property PaymentClient $client
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
@@ -54,6 +56,7 @@ class VerifiedData extends BaseVerifiedData
         if ($this->command === PaymentGateway::VRC_IPN) {
             $dataSign = $data['data'] ?? '';
         } else {
+            $data = array_filter($data);
             ksort($data);
             $dataSign = implode('|', $data);
         }

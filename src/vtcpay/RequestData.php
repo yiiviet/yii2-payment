@@ -47,8 +47,9 @@ class RequestData extends BaseRequestData
         $attributesEnsured['receiver_account'] = $attributes['receiver_account'] ?? $client->business;
         $attributesEnsured['currency'] = $attributes['currency'] ?? 'VND';
 
+        unset($attributesEnsured['signature']);
         ksort($attributesEnsured);
-        $dataSign = implode('|', $attributesEnsured) . '|' . $client->secureCode;
+        $dataSign = implode('|', $attributesEnsured);
         $attributesEnsured['signature'] = $client->signature($dataSign);
 
         $attributes = $attributesEnsured;

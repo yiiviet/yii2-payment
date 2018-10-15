@@ -16,6 +16,7 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  * @method PaymentClient getClient()
  *
  * @property PaymentClient $client
+ * @property string redirect_url
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.2
