@@ -48,7 +48,7 @@ class PaymentClient extends BasePaymentClient
         return Yii::createObject([
             'class' => 'yiiviet\payment\HashDataSignature',
             'hashAlgo' => 'sha256'
-        ], [$data]);
+        ], [$data . '|' . $this->secureCode]);
     }
 
 }

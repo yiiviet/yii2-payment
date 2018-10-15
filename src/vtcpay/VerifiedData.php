@@ -45,7 +45,7 @@ class VerifiedData extends BaseVerifiedData
      * @param \yii\validators\InlineValidator $validator
      * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
      */
-    public function validateSecureHash($attribute, $params, \yii\validators\InlineValidator $validator)
+    public function validateSignature($attribute, $params, \yii\validators\InlineValidator $validator)
     {
         $client = $this->getClient();
         $data = $this->get(false);
@@ -57,8 +57,6 @@ class VerifiedData extends BaseVerifiedData
             ksort($data);
             $dataSign = implode('|', $data);
         }
-
-        $dataSign .= '|' . $client->secureCode;
 
         if (!$expectSignature || !$client->validateSignature($dataSign, $expectSignature)) {
             $validator->addError($this, $attribute, $validator->message);
