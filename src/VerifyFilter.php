@@ -35,9 +35,16 @@ class VerifyFilter extends ActionFilter
     public $gateway;
 
     /**
-     * @var string Lệnh muốn thực thi xác thực tính hợp lệ của dữ liệu đầu vào.
+     * @var array chứa các command map với những action.
+     * Ví dụ:
+     *
+     * ```php
+     * [
+     *   'ipn' => 'IPN',
+     *   'purchase-success' => 'purchaseSuccess',
+     * ]
      */
-    public $command;
+    public $commands = [];
 
     /**
      * @var \yii\web\Request Đối tượng request dùng để lấy các dữ liệu đầu vào, nếu không thiết lập mặc định sẽ lấy `request` component trong `app`.
@@ -56,8 +63,8 @@ class VerifyFilter extends ActionFilter
             $this->gateway = Instance::ensure($this->gateway, 'yiiviet\payment\PaymentGatewayInterface');
         }
 
-        if ($this->command === null) {
-            throw new InvalidConfigException('`command` property must be set!');
+        if (empty($this->commands)) {
+            throw new InvalidConfigException('`commands` property must be set!');
         }
 
         $this->request = Instance::ensure($this->request, 'yii\web\Request');
