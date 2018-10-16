@@ -8,6 +8,8 @@
 
 namespace yiiviet\tests\unit\payment;
 
+use yii\base\Action;
+
 use yiiviet\payment\VerifyFilter;
 
 /**
@@ -26,7 +28,7 @@ class VerifyFilterTest extends TestCase
 
     /**
      * @expectedException \yii\base\InvalidConfigException
-     * @expectedExceptionMessage `command` property must be set!
+     * @expectedExceptionMessage `commands` property must be set!
      */
     public function testMissingCommand()
     {
@@ -42,7 +44,9 @@ class VerifyFilterTest extends TestCase
     public function testMissingGateway()
     {
         return new VerifyFilter([
-            'command' => 'IPN'
+            'commands' => [
+                'ipn' => 'IPN'
+            ]
         ]);
     }
 
@@ -59,8 +63,10 @@ class VerifyFilterTest extends TestCase
 
         return (new VerifyFilter([
             'gateway' => $this->gateway,
-            'command' => 'IPN'
-        ]))->beforeAction(null);
+            'commands' => [
+                'ipn' => 'IPN'
+            ]
+        ]))->beforeAction(new Action('ipn', null));
     }
 
     /**
@@ -78,14 +84,15 @@ class VerifyFilterTest extends TestCase
 
         $behavior = new VerifyFilter([
             'gateway' => $this->gateway,
-            'command' => 'IPN'
+            'commands' => [
+                'ipn' => 'IPN'
+            ]
         ]);
 
-        $this->assertTrue($behavior->beforeAction(null));
+        $this->assertTrue($behavior->beforeAction(new Action('ipn', null)));
         $this->assertInstanceOf('\GatewayClients\DataInterface', $behavior->getVerifiedData());
 
     }
-
 
 
 }
