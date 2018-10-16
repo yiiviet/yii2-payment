@@ -35,7 +35,7 @@ class VerifyFilter extends ActionFilter
     public $gateway;
 
     /**
-     * @var array chứa các command map với những action.
+     * @var array chứa các action `id` map với `command` cần verify, lưu ý rằng chỉ cần action `id` chứ không phải là action `uniqueId`.
      * Ví dụ:
      *
      * ```php
@@ -74,16 +74,23 @@ class VerifyFilter extends ActionFilter
 
     /**
      * @inheritdoc
-     * @throws ForbiddenHttpException
+     * @throws ForbiddenHttpException|InvalidConfigException
      */
     public function beforeAction($action)
     {
-        if (($verifiedData = $this->gateway->verifyRequest($this->command, $this->request)) instanceof DataInterface) {
-            $this->_verifiedData = $verifiedData;
+        $actionId = $action->id;
+        $command = $this->commands[$actionId] ?? null;
 
-            return true;
+        if ($command !== null) {
+            if (($verifiedData = $this->gateway->verifyRequest($command, $this->request)) instanceof DataInterface) {
+                $this->_verifiedData = $verifiedData;
+
+                return true;
+            } else {
+                throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+            }
         } else {
-            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+            throw new InvalidConfigException("Can't find verify command of action `$actionId`");
         }
     }
 

@@ -371,10 +371,8 @@ Cách sử dụng:
 
 ```php
     if ($verifiedData = Yii::$app->NLGateway->verifyRequestPurchaseSuccess()) {
-        $token = $verifiedData->token;
-        $result =  Yii::$app->NLGateway->queryDR(['token' => $token]);
-        
-        if ($result->isOk && $result->transaction_status == '00') {
+    
+        if ($verifiedData->transaction_status == '00') {
             // processing update database...
             
             return $this->render('order_completed', [
@@ -393,9 +391,32 @@ Khi gọi phương thức sẽ trả về `FALSE` nếu như dữ liệu không 
 và ngược lại sẽ là một đối tượng chứa các thuộc tính dữ liệu hợp lệ gửi từ Ngân Lượng,
 bảng thuộc tính:
 
-| Khóa | Bắt buộc | Kiểu | Chi tiết |
-| :-----------: | :----: | :----: | ------ |
-| token | **có** | mixed | Mã token dùng để lấy thông tin đơn hàng thông qua phương thức `queryDR`. |
+| Thuộc tính | Bắt buộc | Kiểu | Mô tả |
+| ----------- | :----: | :------: | ----- |
+| isOk | **có** | bool | Thuộc tính cho biết tiến trình yêu cầu diễn ra tốt đẹp hay không. Nếu có là `TRUE` và ngược lại. |
+| error_code | **có** | string | Mã báo lỗi `00` nghĩa là giao dịch thành công. |
+| token | **có** | string | Token của đơn hàng nó sẽ giống như token dùng để truy vấn. |
+| order_code | không | string | Mã đơn hàng trên hệ thống của bạn. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| total_amount | không | string |Tổng số tiền của đơn hàng. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| payment_method | không | string | Phương thức thanh toán. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| bank_code | không | string | Mã ngân hàng khách dùng để thanh toán. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| payment_type | không | int | Hình thức thanh toán `1` là trực tiếp, `2` là tạm giữ an toàn. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| order_description | không | string | Mô tả đơn hàng. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| tax_amount | không | int | Tiền thuế. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| discount_amount | không | int | Tiền khuyến mãi, giảm giá. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| fee_shipping | không | int | Tiền thuế. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| return_url | không | string | Đường dẫn Ngân Lượng `redirect` khách về sau khi họ thực hiện thanh toán, được thiết lập ở phương thức `purchase`. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| cancel_url | không | string | Đường dẫn Ngân Lượng `redirect` khách về khi họ thực hiện hủy đơn hàng, được thiết lập ở phương thức `purchase`. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| notify_url | không | string | Đường dẫn Ngân Lượng gọi về sau khi khách thực hiện thanh toán được thiết lập ở phương thức `purchase`. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| time_limit | không | int | Số phút còn lại để khách thực hiện giao dịch. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| buyer_fullname | không | string | Tên người mua. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| buyer_email | không | string | Email người mua. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| buyer_mobile | không | string | Số điện thoại người mua. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| buyer_address | không | string | Địa chỉ người mua. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| affiliate_code | không | string | Mã đối tác của Ngân Lượng. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| transaction_status | không | string | Trạng thái đơn hàng. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| transaction_id | không | string | Mã giao dịch tại hệ thống Ngân Lượng. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
+| description | không | string | Mô tả đơn hàng. Thuộc tính này chỉ tồn tại khi `isOk` là TRUE. |
 
 > Bạn có thể sử dụng `VerifyFilter` behavior để đảm nhiệm việc xác minh tính hợp lệ của dữ liệu trước
 > khi action trong controller diễn ra nhằm đơn giản hóa nghiệp vụ xử lý. Kham khảo tài liệu tại [đây](verifyfilter.md)
