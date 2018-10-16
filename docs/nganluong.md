@@ -397,6 +397,8 @@ bảng thuộc tính:
 | :-----------: | :----: | :----: | ------ |
 | token | **có** | mixed | Mã token dùng để lấy thông tin đơn hàng thông qua phương thức `queryDR`. |
 
+> Bạn có thể sử dụng `VerifyFilter` behavior để đảm nhiệm việc xác minh tính hợp lệ của dữ liệu trước
+> khi action trong controller diễn ra nhằm đơn giản hóa nghiệp vụ xử lý. Kham khảo tài liệu tại [đây](verifyfilter.md)
 
 ## Câu hỏi thương gặp
 

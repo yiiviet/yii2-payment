@@ -99,11 +99,6 @@ class NganLuongTest extends TestCase
 
     public function testVerifyRequestPurchaseSuccess()
     {
-        $_GET['token'] = self::TOKEN;
-
-        $result = $this->verifyRequestPurchaseSuccess();
-        $this->assertInstanceOf('\yiiviet\payment\VerifiedData', $result);
-
         $_GET = [];
         $result = $this->verifyRequestPurchaseSuccess();
         $this->assertFalse($result);
