@@ -120,7 +120,7 @@ mà bạn đã thiết lập ở `return_url` trong `purchase`, sau khi phương
 ```php
     if ($verifiedData = Yii::$app->VTCPay->verifyRequestPurchaseSuccess()) {
         
-        if ($result->status === 1) {            
+        if ($result->status == 1) {            
             return $this->render('order_completed', [
               'message' => 'success'
             ]);
