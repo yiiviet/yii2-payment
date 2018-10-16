@@ -257,7 +257,7 @@ mà bạn đã thiết lập ở `ReturnUrl` trong `purchase`, sau khi phương 
 ```php
     if ($verifiedData = Yii::$app->VNPGateway->verifyRequestPurchaseSuccess()) {
         
-        if ($result->isOk && $result->ResponseCode == 0) {            
+        if ($result->isOk && $result->ResponseCode === '00') {            
             return $this->render('order_completed', [
               'message' => 'success'
             ]);
@@ -280,12 +280,12 @@ bảng thuộc tính:
 | TxnRef | **có** | mixed | Mã đơn hàng trên hệ thống của bạn. |
 | Amount | **có** | float | Số tiền của đơn hàng. |
 | TmnCode | không | string | TMN code của client đã dùng để tạo thanh toán. |
-| TransactionNo | không | string | Mã giao dịch trên VNPayment. Nó chỉ tồn tại khi `ResponseCode` là `0` |
-| Message | không | string | Thông báo lỗi. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
-| BankCode | không | string | Mã ngân hàng khách dùng để giao dịch. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
-| BankTranNo | không | string | Mã giao dịch tại ngân hàng của khách đã thanh toán. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
-| PayDate | không | string | Thời gian khách hoàn thành thanh toán (Ymdhis). Nó chỉ tồn tại khi `ResponseCode` khác `0` |
-| ResponseCode | không | mixed | Trạng thái giao dịch. Giá trị `0` nghĩa là giao dịch thành công, còn lại là thất bại, [xem chi tiết](https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/) |
+| TransactionNo | không | string | Mã giao dịch trên VNPayment. Nó chỉ tồn tại khi `ResponseCode` là `00` |
+| Message | không | string | Thông báo lỗi. Nó chỉ tồn tại khi `ResponseCode` khác `00` |
+| BankCode | không | string | Mã ngân hàng khách dùng để giao dịch. Nó chỉ tồn tại khi `ResponseCode` khác `00` |
+| BankTranNo | không | string | Mã giao dịch tại ngân hàng của khách đã thanh toán. Nó chỉ tồn tại khi `ResponseCode` khác `00` |
+| PayDate | không | string | Thời gian khách hoàn thành thanh toán (Ymdhis). Nó chỉ tồn tại khi `ResponseCode` khác `00` |
+| ResponseCode | không | mixed | Trạng thái giao dịch. Giá trị `00` nghĩa là giao dịch thành công, còn lại là thất bại, [xem chi tiết](https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/) |
 
 
 ## Phương thức `verifyRequestIPN`
@@ -303,13 +303,13 @@ mà bạn đã thiết lập ở `IPN` trên hệ thống VNPayment, sau khi ph�
     
     if ($verifiedData = Yii::$app->VNPGateway->verifyRequestIPN()) {
         
-        if ($verifiedData->ResponseCode === 0) {  
+        if ($verifiedData->ResponseCode === '00') {  
         
             // update database       
-            return ['RspCode' => 00, 'Message' => 'Confirm Success'];       
+            return ['RspCode' => '00', 'Message' => 'Confirm Success'];       
          } 
     } else {
-        return ['RspCode' => 99, 'Message' => 'Confirm Fail']; 
+        return ['RspCode' => '99', 'Message' => 'Confirm Fail']; 
     }
     
 
@@ -325,12 +325,12 @@ bảng thuộc tính:
 | TxnRef | **có** | mixed | Mã đơn hàng trên hệ thống của bạn. |
 | Amount | **có** | float | Số tiền của đơn hàng. |
 | TmnCode | không | string | TMN code của client đã dùng để tạo thanh toán. |
-| TransactionNo | không | string | Mã giao dịch trên VNPayment. Nó chỉ tồn tại khi `ResponseCode` là `0` |
-| Message | không | string | Thông báo lỗi. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
-| BankCode | không | string | Mã ngân hàng khách dùng để giao dịch. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
-| BankTranNo | không | string | Mã giao dịch tại ngân hàng của khách đã thanh toán. Nó chỉ tồn tại khi `ResponseCode` khác `0` |
-| PayDate | không | string | Thời gian khách hoàn thành thanh toán (Ymdhis). Nó chỉ tồn tại khi `ResponseCode` khác `0` |
-| ResponseCode | không | mixed | Trạng thái giao dịch. Giá trị `0` nghĩa là giao dịch thành công, còn lại là thất bại, [xem chi tiết](https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/) |
+| TransactionNo | không | string | Mã giao dịch trên VNPayment. Nó chỉ tồn tại khi `ResponseCode` là `00` |
+| Message | không | string | Thông báo lỗi. Nó chỉ tồn tại khi `ResponseCode` khác `00` |
+| BankCode | không | string | Mã ngân hàng khách dùng để giao dịch. Nó chỉ tồn tại khi `ResponseCode` khác `00` |
+| BankTranNo | không | string | Mã giao dịch tại ngân hàng của khách đã thanh toán. Nó chỉ tồn tại khi `ResponseCode` khác `00` |
+| PayDate | không | string | Thời gian khách hoàn thành thanh toán (Ymdhis). Nó chỉ tồn tại khi `ResponseCode` khác `00` |
+| ResponseCode | không | mixed | Trạng thái giao dịch. Giá trị `00` nghĩa là giao dịch thành công, còn lại là thất bại, [xem chi tiết](https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/) |
 
 Sau khi xử lý nghiệm vụ tại `action` của `IPN` bạn cần phải trả về dữ liệu
 cho VNPayment biết là bạn đã cập nhật đơn hàng, giúp cho VNPayment đồng bộ
