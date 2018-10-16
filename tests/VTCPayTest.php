@@ -68,29 +68,31 @@ class VTCPayTest extends TestCase
         ]);
     }
 
-    public function testVerifyIPN()
-    {
-        $_POST = [
-            '_method' => 'POST',
-            'data' => '100000|VND|0963465816|1|74132',
-            'signature' => '1d31c0779f47e2bc3bfe40becf1fda0d7e881aeb90d8efb0341e258692cf896a'
-        ];
-
-        $this->assertInstanceOf('GatewayClients\DataInterface', $this->gateway->verifyRequestIPN());
-    }
-
-    /**
-     * @depends testVerifyIPN
-     */
     public function testInvalidVerifyIPN()
     {
         $_POST = [
             '_method' => 'POST',
-            'data' => '100000|VND|0963465816|1|74132',
-            'signature' => '1d31c0779f47e2bc3bfe40becf1fda0d7e881aeb90d8efb0341e258692cf896aa'
+            'data' => '100000|||1|1|1|1',
+            'signature' => '643679f173526028e6bb26c2bc1256a420e5713b92fdb44cb4740f3c7c204145a'
         ];
 
         $this->assertFalse($this->gateway->verifyRequestIPN());
+    }
+
+    /**
+     * @depends testInvalidVerifyIPN
+     */
+    public function testVerifyIPN()
+    {
+        $_POST = [
+            '_method' => 'POST',
+            'data' => '100000|||1|1|1|1',
+            'signature' => '643679f173526028e6bb26c2bc1256a420e5713b92fdb44cb4740f3c7c204145'
+        ];
+
+        $data = $this->gateway->verifyRequestIPN();
+        $this->assertInstanceOf('GatewayClients\DataInterface', $data);
+        $this->assertTrue(isset($data['amount']));
     }
 
     public function testVerifyPurchaseSuccess()

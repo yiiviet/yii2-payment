@@ -57,8 +57,8 @@ class VerifyFilterTest extends TestCase
     {
         $_POST = [
             '_method' => 'POST',
-            'data' => '100000|VND|0963465816|1|74132',
-            'signature' => '1d31c0779f47e2bc3bfe40becf1fda0d7e881aeb90d8efb0341e258692cf896aa'
+            'data' => '100000|||1|1|1|1',
+            'signature' => '643679f173526028e6bb26c2bc1256a420e5713b92fdb44cb4740f3c7c204145a'
         ];
 
         return (new VerifyFilter([
@@ -78,8 +78,8 @@ class VerifyFilterTest extends TestCase
     {
         $_POST = [
             '_method' => 'POST',
-            'data' => '100000|VND|0963465816|1|74132',
-            'signature' => '1d31c0779f47e2bc3bfe40becf1fda0d7e881aeb90d8efb0341e258692cf896a'
+            'data' => '100000|||1|1|1|1',
+            'signature' => '643679f173526028e6bb26c2bc1256a420e5713b92fdb44cb4740f3c7c204145'
         ];
 
         $behavior = new VerifyFilter([

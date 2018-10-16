@@ -68,6 +68,13 @@ class VerifiedData extends BaseVerifiedData
 
         if (!$expectSignature || !$client->validateSignature($dataSign, $expectSignature)) {
             $validator->addError($this, $attribute, $validator->message);
+        } elseif ($this->command === PaymentGateway::VRC_IPN) {
+            $attributes = ['amount', 'message', 'payment_type', 'reference_number', 'status', 'trans_ref_no', 'website_id'];
+            $values = explode('|', $dataSign);
+
+            foreach (array_combine($attributes, $values) as $attr => $value) {
+                $this->defineAttribute($attr, $value === '' ? null : $value);
+            }
         }
     }
 
