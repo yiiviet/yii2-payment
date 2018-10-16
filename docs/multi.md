@@ -21,7 +21,8 @@ thư mục `config` như sau:
                  'BK' => 'yiiviet\payment\baokim\PaymentGateway',
                  'NL' => 'yiiviet\payment\nganluong\PaymentGateway',
                  'OP' => 'yiiviet\payment\onepay\PaymentGateway',
-                 'VNP' => 'yiiviet\payment\vnpayment\PaymentGateway'
+                 'VNP' => 'yiiviet\payment\vnpayment\PaymentGateway',
+                 'VTC' => 'yiiviet\payment\vtcpay\PaymentGateway'
              ]
          ]
     ]    
@@ -71,6 +72,14 @@ thư mục `config` như sau:
                           'tmnCode' => 'TMN code bạn vừa đăng ký',
                           'hashSecret' => 'Mã hash secret bạn vừa đăng ký'
                       ]
+                 ],
+                 'VTC' => [
+                    'class' => 'yiiviet\payment\vtcpay\PaymentGateway',
+                    'client' => [
+                        'business' => 'Tài khoản VTCPay bạn vừa đăng ký',
+                        'merchantId' => 'Mã website bạn vừa đăng ký',
+                        'secureCode' => 'Mã bảo mật bạn vừa đăng ký'
+                    ]
                  ]
              ]
          ]
@@ -88,6 +97,7 @@ bằng cú pháp:
  $nganLuong = Yii::$app->paymentGateways->NL;
  $op = Yii::$app->paymentGateways->OP;
  $vnpayment = Yii::$app->paymentGateways->VNP;
+ $vtc = Yii::$app->paymentGateways->VTC;
  
  ```
  
@@ -148,6 +158,10 @@ Ví dụ:
         'ReturnUrl' => 'http://localhost'
     ], 'VNP');
 
+    Yii::$app->paymentGateways->->purchase([
+        'amount' => 100000,
+        'reference_number' => time()
+    ], 'VTC');
 ```
 
 Như bạn thấy cách sử dụng không khác gì so với từng cổng thanh toán, điểm khác duy nhất

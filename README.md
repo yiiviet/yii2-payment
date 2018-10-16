@@ -54,6 +54,11 @@ $vnPayment->purchase([
     'Amount' => 1000000,
     'ReturnUrl' => 'http://localhost'
 ]);
+
+$vtcPay->purchase([
+    'amount' => 100000,
+    'reference_number' => time()
+]);
 ```
 
 Các cổng thanh toán được hổ trợ:
@@ -62,7 +67,7 @@ Các cổng thanh toán được hổ trợ:
 * [Ngân Lượng](https://nganluong.vn)
 * [OnePay](https://onepay.vn)
 * [VnPayment](https://vnpayment.vn)
-
+* [VTCPay](https://vtcpay.vn)
 
 ## Yêu cầu
 * [PHP >= 7.1](http://php.net)
@@ -93,4 +98,5 @@ vào phần `require` trong file composer.json.
 * [Cổng thanh toán Ngân Lượng](/docs/nganluong.md).
 * [Cổng thanh toán OnePay](/docs/onepay.md).
 * [Cổng thanh toán VnPayment](/docs/vnpayment.md).
+* [Cổng thanh toán VTCPay](/docs/vtcpay.md).
 * [Tích hợp đồng thời nhiều cổng thanh toán](/docs/multi.md).
