@@ -297,6 +297,8 @@ bảng thuộc tính:
 | :-------: | ----- |
 | **0** | giao dịch thành công, tất cả các giá trị còn lại là thất bại |
 
+> Bạn có thể sử dụng `VerifyFilter` behavior để đảm nhiệm việc xác minh tính hợp lệ của dữ liệu trước
+> khi action trong controller diễn ra nhằm đơn giản hóa nghiệp vụ xử lý. Kham khảo tài liệu tại [đây](verifyfilter.md)
 
 ## Phương thức `verifyRequestIPN`
 
@@ -363,6 +365,9 @@ Bảng thông tin cần trả về:
 | desc | Mô tả lỗi xảy ra cho OnePay biết khi `responsecode` là `0` có lỗi xảy ra. |
 
 Kiểu dữ liệu trả về có định dạng: `form-format-urlencoded`
+
+> Bạn có thể sử dụng `VerifyFilter` behavior để đảm nhiệm việc xác minh tính hợp lệ của dữ liệu trước
+> khi action trong controller diễn ra nhằm đơn giản hóa nghiệp vụ xử lý. Kham khảo tài liệu tại [đây](verifyfilter.md)
 
 ## Câu hỏi thương gặp
 

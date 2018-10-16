@@ -257,7 +257,7 @@ mà bạn đã thiết lập ở `ReturnUrl` trong `purchase`, sau khi phương 
 ```php
     if ($verifiedData = Yii::$app->VNPGateway->verifyRequestPurchaseSuccess()) {
         
-        if ($result->isOk && $result->ResponseCode === '00') {            
+        if ($verifiedData->ResponseCode === '00') {            
             return $this->render('order_completed', [
               'message' => 'success'
             ]);
@@ -287,6 +287,8 @@ bảng thuộc tính:
 | PayDate | không | string | Thời gian khách hoàn thành thanh toán (Ymdhis). Nó chỉ tồn tại khi `ResponseCode` khác `00` |
 | ResponseCode | không | mixed | Trạng thái giao dịch. Giá trị `00` nghĩa là giao dịch thành công, còn lại là thất bại, [xem chi tiết](https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/) |
 
+> Bạn có thể sử dụng `VerifyFilter` behavior để đảm nhiệm việc xác minh tính hợp lệ của dữ liệu trước
+> khi action trong controller diễn ra nhằm đơn giản hóa nghiệp vụ xử lý. Kham khảo tài liệu tại [đây](verifyfilter.md)
 
 ## Phương thức `verifyRequestIPN`
 
@@ -344,6 +346,9 @@ Bảng thông tin cần trả về:
 | Message | Mô tả lỗi xảy ra cho VNPayment biết khi `RspCode` là `99` có lỗi xảy ra. |
 
 Kiểu dữ liệu trả về có định dạng: `json`
+
+> Bạn có thể sử dụng `VerifyFilter` behavior để đảm nhiệm việc xác minh tính hợp lệ của dữ liệu trước
+> khi action trong controller diễn ra nhằm đơn giản hóa nghiệp vụ xử lý. Kham khảo tài liệu tại [đây](verifyfilter.md)
 
 ## Câu hỏi thương gặp
 

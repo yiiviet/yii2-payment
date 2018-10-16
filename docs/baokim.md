@@ -275,6 +275,9 @@ bảng thuộc tính:
 Như bạn thấy thì chúng ta chỉ quan tâm đến `4` và `13` vì 2 trạng thái này cho ta biết
  khách đã thanh toán thành công.
 
+> Bạn có thể sử dụng `VerifyFilter` behavior để đảm nhiệm việc xác minh tính hợp lệ của dữ liệu trước
+> khi action trong controller diễn ra nhằm đơn giản hóa nghiệp vụ xử lý. Kham khảo tài liệu tại [đây](verifyfilter.md)
+
 ## Phương thức `verifyRequestIPN`
 
 Phương thức này cho phép bạn kiểm tra tính hợp lệ của các dữ liệu từ
@@ -336,6 +339,9 @@ bảng thuộc tính:
 Như bạn thấy thì chúng ta chỉ quan tâm đến `4` và `13` vì 2 trạng thái này cho ta biết
  khách đã thanh toán thành công.
  
+ > Bạn có thể sử dụng `VerifyFilter` behavior để đảm nhiệm việc xác minh tính hợp lệ của dữ liệu trước
+ > khi action trong controller diễn ra nhằm đơn giản hóa nghiệp vụ xử lý. Kham khảo tài liệu tại [đây](verifyfilter.md)
+
 ## Phương thức `queryDR`
 
 Phương thức này cho bạn truy vấn thông tin giao dịch từ Bảo Kim thông qua 
