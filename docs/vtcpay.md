@@ -19,7 +19,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 
 ```php
 'components' => [
-    'VTCPay' => [
+    'VTCGateway' => [
         'class' => 'yiiviet\payment\vtcpay\PaymentGateway',
         'sandbox' => true
     ]
@@ -118,7 +118,7 @@ mà bạn đã thiết lập ở `return_url` trong `purchase`, sau khi phương
 * Cách sử dụng:
 
 ```php
-    if ($verifiedData = Yii::$app->VTCPay->verifyRequestPurchaseSuccess()) {
+    if ($verifiedData = Yii::$app->VTCGateway->verifyRequestPurchaseSuccess()) {
         
         if ($result->status == 1) {            
             return $this->render('order_completed', [
