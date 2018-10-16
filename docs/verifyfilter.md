@@ -14,7 +14,7 @@ Bạn hãy cấu hình nó vào behavior của `controller` chứa `action` đ�
 
 class TestController extends \yii\web\Controller {
 
-    public function behavior() {
+    public function behaviors() {
     
         return [
             'verifyFilter' => [
