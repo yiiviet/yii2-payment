@@ -83,7 +83,6 @@ bằng cú pháp `Yii::$app->VTCGateway`.
 | url_return | không | string | Đường dẫn trả về hệ thống khi giao dịch thành công hay thất bại. |
 | language | không | string | Ngôn ngữ chỉ định cho VTCPay hiển thị có 2 kiểu `vi` và `en` mặc định là `vi`. |
 | payment_type | không | string | Phương thức thanh toán có 3 dạng `VTCPay` thanh toán bằng số dư ví VTCPay, `DomesticBank` thanh toán thông qua ngân hàng trong nước, `InternationalCard` thanh toán qua thẻ visa/master. Mặc định nếu không điền sẽ để khách chọn. |
-| Locale | không | string | Ngôn ngữ và giao diện thanh toán, có 2 giá trị `en` và `vn`. Mặc định là `vn`. |
 
 * Sau khi gọi phương thức với các tham trị được yêu cầu nó sẽ trả về đối
 tượng `response` với các thuộc tính sau:
