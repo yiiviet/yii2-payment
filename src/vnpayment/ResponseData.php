@@ -15,7 +15,9 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
  * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
- * @property int|null $responseCode
+ * @property bool $isOk trạng thái phản hồi từ VNPayment `TRUE` thành công và ngược lại.
+ * @property int|null $responseCode mã phản hồi.
+ * @property string $redirect_url đường dẫn sẽ redirect khách đến trang thanh toán, chỉ tồn tại khi `isOk` là TRUE.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

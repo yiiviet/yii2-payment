@@ -14,9 +14,19 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
 /**
  * Lớp VerifiedData tổng hợp dữ liệu đã được xác minh từ VnPayment.
  *
- * @method PaymentClient getClient()
+ * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
- * @property PaymentClient $client
+ * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
+ * @property string $OrderInfo mô tả đơn hàng.
+ * @property mixed $TxnRef mã đơn hàng.
+ * @property double $Amount số tiền.
+ * @property string $TmnCode của client.
+ * @property string $TransactionNo mã giao dịch tại VNPayment, chỉ tồn tại khi `ResponseCode` khác `00`.
+ * @property string $Message thông báo lỗi, chỉ tồn tại khi `ResponseCode` khác `00`.
+ * @property string $BankCode mã ngân hàng đã thực thi giao dịch, chỉ tồn tại khi `ResponseCode` khác `00`.
+ * @property string $BankTranNo mã giao dịch tại ngân hàng, chỉ tồn tại khi `ResponseCode` khác `00`.
+ * @property string $PayDate thời gian giao dịch, chỉ tồn tại khi `ResponseCode` khác `00`.
+ * @property string $ResponseCode mã phản hồi.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

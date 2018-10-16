@@ -17,9 +17,9 @@ use vxm\gatewayclients\RequestData as BaseRequestData;
  * Lớp RequestData cung cấp dữ liệu để truy vấn đến VnPayment tạo lệnh thanh toán,
  * kiểm tra giao dịch, hoàn trả hóa đơn....
  *
- * @method PaymentClient getClient()
+ * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
- * @property PaymentClient $client
+ * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

@@ -18,7 +18,7 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  * @property bool $isOk trạng thái phản hồi từ OnePay `TRUE` thành công và ngược lại.
  * @property string|null $message thông báo từ VNPayment.
  * @property int|null $responseCode mã phản hồi.
- * @property string $redirect_url đường dẫn redirect khách đến trang thanh toán.
+ * @property string $redirect_url đường dẫn redirect khách đến trang thanh toán, chỉ tồn tại khi `isOk` là TRUE.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

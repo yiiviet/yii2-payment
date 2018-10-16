@@ -12,9 +12,9 @@ use vxm\gatewayclients\RequestData as BaseRequestData;
 /**
  * Lớp RequestData cung cấp dữ liệu cho phương thức [[request()]] theo lệnh, để truy vấn với Ngân Lượng.
  *
- * @method PaymentClient getClient()
+ * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
- * @property PaymentClient $client
+ * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

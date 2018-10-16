@@ -17,9 +17,14 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
  *
  * @method PaymentClient getClient() đối tượng client đã dùng để thực thi request.
  *
- * @property int $amount Số tiền đơn hàng.
- *
  * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
+ * @property double $amount số tiền đơn hàng.
+ * @property string $message thông tin bổ sung.
+ * @property string $payment_type hình thức thanh toán.
+ * @property mixed $reference_number mã đơn hàng.
+ * @property int $status trạng thái.
+ * @property mixed $trans_ref_no mã giao dịch tại VTCPay.
+ * @property string $website_id merchant id của client.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.2
