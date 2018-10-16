@@ -20,7 +20,7 @@ use yii\web\ForbiddenHttpException;
 /**
  * Lớp VerifyFilter dùng để xác thực tính hợp lệ của dữ liệu đầu vào.
  *
- * @property DataInterface $verifiedData Đối tượng chứa các thuộc tính dữ liệu đã được xác minh tính hợp lệ.
+ * @property null|DataInterface $verifiedData đối tượng chứa các thuộc tính dữ liệu đã được xác minh tính hợp lệ.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.2
@@ -47,7 +47,7 @@ class VerifyFilter extends ActionFilter
     public $commands = [];
 
     /**
-     * @var \yii\web\Request Đối tượng request dùng để lấy các dữ liệu đầu vào, nếu không thiết lập mặc định sẽ lấy `request` component trong `app`.
+     * @var \yii\web\Request đối tượng request dùng để lấy các dữ liệu đầu vào, nếu không thiết lập mặc định sẽ lấy `request` component trong `app`.
      */
     public $request = 'request';
 
@@ -96,7 +96,7 @@ class VerifyFilter extends ActionFilter
 
 
     /**
-     * @var DataInterface Đối tượng tập hợp các thuộc tính dữ liệu đã xác thực.
+     * @var DataInterface đối tượng tập hợp các thuộc tính dữ liệu đã xác thực.
      * @see [[getVerifiedData()]]
      */
     private $_verifiedData;
@@ -104,7 +104,7 @@ class VerifyFilter extends ActionFilter
     /**
      * Phương thức hổ trợ lấy dữ liệu đã xác thực tính hợp lệ.
      *
-     * @return null|DataInterface Đối tượng chứa các thuộc tính dữ liệu đã xác thực.
+     * @return null|DataInterface đối tượng chứa các thuộc tính dữ liệu đã xác thực.
      */
     public function getVerifiedData(): ?DataInterface
     {
