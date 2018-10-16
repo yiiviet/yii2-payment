@@ -45,10 +45,12 @@ class PaymentClient extends BasePaymentClient
      */
     protected function initDataSignature(string $data, string $type = null): ?DataSignature
     {
+        $data .= '|' . $this->secureCode;
+
         return Yii::createObject([
             'class' => 'yiiviet\payment\HashDataSignature',
             'hashAlgo' => 'sha256'
-        ], [$data . '|' . $this->secureCode]);
+        ], [$data]);
     }
 
 }
