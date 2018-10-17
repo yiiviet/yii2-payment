@@ -9,7 +9,7 @@ Change Log
 1.0.2
 --------------------------
 
-- Tính năng #3: Hổ trợ cổng thanh toán VTCPay.
+- Tính năng #3: Hổ trợ cổng thanh toán VTCPay (vuongxuongminh).
 - Tính năng #2: Thêm `yiiviet\payment\VerifyFilter` hổ trợ việc xác minh tính hợp lệ của dữ liệu
 gửi từ cổng thanh toán (vuongxuongminh).
 
