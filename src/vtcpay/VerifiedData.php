@@ -61,7 +61,6 @@ class VerifiedData extends BaseVerifiedData
         if ($this->command === PaymentGateway::VRC_IPN) {
             $dataSign = $data['data'] ?? '';
         } else {
-            $data = array_filter($data);
             ksort($data);
             $dataSign = implode('|', $data);
         }
