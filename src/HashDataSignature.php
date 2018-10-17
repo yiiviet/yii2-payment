@@ -19,6 +19,9 @@ use yii\base\InvalidConfigException;
 class HashDataSignature extends DataSignature
 {
 
+    /**
+     * @var string tên loại mã hóa. Ví dụ: md5, sha1, sha256...
+     */
     public $hashAlgo;
 
     /**
