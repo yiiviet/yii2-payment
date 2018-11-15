@@ -4,6 +4,7 @@ Change Log
 1.0.3 under development
 --------------------------
 
+- Lỗi #6: `checksum` vẫn bị yêu cầu đối với phương thức `purchase` pro của Bảo Kim (vuongxuongminh).
 - Lỗi #5: Xác minh chữ ký dữ liểu gửi từ VTCPay (vuongxuongminh).
 
 1.0.2

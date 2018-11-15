@@ -27,20 +27,29 @@ class RequestData extends BaseRequestData
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             [['business'], 'required', 'on' => [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_GET_MERCHANT_DATA]],
             [['merchant_id', 'transaction_id'], 'required', 'on' => PaymentGateway::RC_QUERY_DR],
-            [['checksum'], 'required', 'on' => [PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_PURCHASE]],
-            [['order_id', 'total_amount', 'url_success'], 'required', 'on' => [PaymentGateway::RC_PURCHASE]]
+            [['checksum'], 'required', 'on' => [PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_PURCHASE], 'when' => function () {
+                if ($this->command === PaymentGateway::RC_PURCHASE) {
+                    return !$this->getClient()->getGateway()->pro;
+                } else {
+                    return true;
+                }
+            }],
+            [['signature'], 'required', 'on' => [PaymentGateway::RC_GET_MERCHANT_DATA, PaymentGateway::RC_PURCHASE], 'when' => function () {
+                if ($this->command === PaymentGateway::RC_PURCHASE) {
+                    return $this->getClient()->getGateway()->pro;
+                } else {
+                    return true;
+                }
+            }],
+            [['order_id', 'total_amount', 'url_success'], 'required', 'on' => [PaymentGateway::RC_PURCHASE]],
+            [['payer_name', 'payer_email', 'payer_phone_no', 'bank_payment_method_id'], 'required', 'on' => PaymentGateway::RC_PURCHASE, 'when' => function () {
+                return $this->getClient()->getGateway()->pro;
+            }]
         ];
 
-        if ($this->getClient()->getGateway()->pro && $this->getCommand() === PaymentGateway::RC_PURCHASE) {
-            return array_merge($rules, [
-                [['payer_name', 'payer_email', 'payer_phone_no', 'bank_payment_method_id'], 'required', 'on' => PaymentGateway::RC_PURCHASE]
-            ]);
-        } else {
-            return $rules;
-        }
     }
 
     /**
