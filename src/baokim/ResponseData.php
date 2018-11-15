@@ -21,6 +21,8 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  * @property string $next_action hành động tiếp theo cần phải thực thi, chỉ tồn tại khi thuộc tính `isOk` là `TRUE` và với phương thức `pro`.
  * @property int $rv_id mã phiếu thu, chỉ tồn tại khi thuộc tính `isOk` là `TRUE` và với phương thức `pro`.
  * @property int $guide_url mã phiếu thu, chỉ tồn tại khi thuộc tính `isOk` là `TRUE` và với phương thức `pro` khi thuộc tính `rv_id` có giá trị là `display_guide`.
+ * @property array $bank_payment_methods danh sách ngân hàng, chỉ tồn tại khi thuộc tính `isOk` là `TRUE` và truy vấn thông tin `merchantData`.
+ * @property array $seller_account thông tin merchant, chỉ tồn tại khi thuộc tính `isOk` là `TRUE` và truy vấn thông tin `merchantData`.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
