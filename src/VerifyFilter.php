@@ -27,6 +27,16 @@ use yii\web\ForbiddenHttpException;
  */
 class VerifyFilter extends ActionFilter
 {
+    
+    /**
+     * Ánh xạ của [[BasePaymentGateway::VRC_IPN]] hổ trợ khai báo thuộc tính `commands` dễ dàng hơn.
+     */
+    const VRC_IPN = BasePaymentGateway::VRC_IPN;
+
+    /**
+     * Ánh xạ của [[BasePaymentGateway::VRC_PURCHASE_SUCCESS]] hổ trợ khai báo thuộc tính `commands` dễ dàng hơn.
+     */
+    const VRC_PURCHASE_SUCCESS = BasePaymentGateway::VRC_PURCHASE_SUCCESS;
 
     /**
      * @var \yiiviet\payment\PaymentGatewayInterface Đối tượng cổng thanh toán dùng để xác thực tính hợp lệ của dữ liệu đầu vào,
