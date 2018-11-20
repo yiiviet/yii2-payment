@@ -35,6 +35,12 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
  * @property string $customer_email email người mua, chỉ tồn tại khi phương thức thanh toán `pro`.
  * @property string $customer_phone số điện thoại người mua, chỉ tồn tại khi phương thức thanh toán `pro`.
  * @property string $customer_address địa chỉ giao hàng, chỉ tồn tại khi phương thức thanh toán `pro`.
+ * @property string $merchant_address địa chỉ merchant, chỉ tồn tại khi phương thức thanh toán `pro`.
+ * @property string $merchant_email email merchant, chỉ tồn tại khi phương thức thanh toán `pro`.
+ * @property string $merchant_location khu vực merchant, chỉ tồn tại khi phương thức thanh toán `pro`.
+ * @property string $merchant_name tên người bán (merchant), chỉ tồn tại khi phương thức thanh toán `pro`.
+ * @property string $merchant_phone số điên thoại người bán, chỉ tồn tại khi phương thức thanh toán `pro`.
+ * @property string $customer_location khu vực khách hàng, chỉ tồn tại khi phương thức thanh toán `pro`.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0
