@@ -38,9 +38,12 @@ class VerifiedData extends BaseVerifiedData
     public function rules()
     {
         return [
+            [['signature'], 'required', 'on' => [
+                PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN
+            ]],
             [['signature'], 'validateSignature', 'message' => '{attribute} is not valid!', 'on' => [
                 PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN
-            ], 'skipOnEmpty' => false]
+            ]]
         ];
     }
 

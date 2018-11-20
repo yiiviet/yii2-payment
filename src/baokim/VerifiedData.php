@@ -48,7 +48,8 @@ class VerifiedData extends BaseVerifiedData
     public function rules()
     {
         return [
-            [['checksum'], 'verifyChecksum', 'message' => '{attribute} not match', 'on' => PaymentGateway::VRC_PURCHASE_SUCCESS, 'skipOnEmpty' => false]
+            [['checksum'], 'required', 'on' => PaymentGateway::VRC_PURCHASE_SUCCESS],
+            [['checksum'], 'verifyChecksum', 'message' => '{attribute} not match', 'on' => PaymentGateway::VRC_PURCHASE_SUCCESS]
         ];
     }
 
@@ -66,7 +67,6 @@ class VerifiedData extends BaseVerifiedData
         $client = $this->getClient();
         $data = $this->get(false);
         $expectSignature = ArrayHelper::remove($data, $attribute, false);
-        $data = array_filter($data);
         ksort($data);
         $dataSign = implode('', $data);
 

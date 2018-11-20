@@ -42,9 +42,12 @@ class VerifiedData extends BaseVerifiedData
     public function rules()
     {
         return [
+            [['vnp_SecureHash'], 'required', 'on' => [
+                PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN
+            ]],
             [['vnp_SecureHash'], 'validateSecureHash', 'message' => '{attribute} is not valid!', 'on' => [
                 PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN
-            ], 'skipOnEmpty' => false]
+            ]]
         ];
     }
 
