@@ -33,6 +33,12 @@ class HmacDataSignature extends DataSignature
     public $key;
 
     /**
+     * @var bool phân biệt ký tự hoa thường khi xác minh chữ ký.
+     * @since 1.0.3
+     */
+    public $caseSensitive = true;
+
+    /**
      * @inheritdoc
      * @throws InvalidConfigException
      */
@@ -63,7 +69,11 @@ class HmacDataSignature extends DataSignature
     {
         $actual = $this->generate();
 
-        return strcmp($expect, $actual) === 0;
+        if ($this->caseSensitive) {
+            return strcmp($expect, $actual) === 0;
+        } else {
+            return strcasecmp($expect, $actual) === 0;
+        }
     }
 
 }

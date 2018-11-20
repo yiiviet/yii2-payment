@@ -128,7 +128,8 @@ class PaymentClient extends BasePaymentClient
             $config = [
                 'class' => 'yiiviet\payment\HmacDataSignature',
                 'key' => $this->securePassword,
-                'hmacAlgo' => 'SHA1'
+                'hmacAlgo' => 'SHA1',
+                'caseSensitive' => false
             ];
         } else {
             return null;
