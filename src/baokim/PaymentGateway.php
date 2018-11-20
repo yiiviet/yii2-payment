@@ -308,7 +308,8 @@ class PaymentGateway extends BasePaymentGateway
         $params = [
             'order_id', 'transaction_id', 'created_on', 'payment_type', 'transaction_status', 'total_amount', 'net_amount',
             'fee_amount', 'merchant_id', 'customer_name', 'customer_email', 'customer_phone', 'customer_address', 'checksum',
-            'payer_name', 'payer_email', 'payer_phone_no', 'shipping_address', 'verify_sign', 'resend'
+            'payer_name', 'payer_email', 'payer_phone_no', 'shipping_address', 'verify_sign', 'resend', 'customer_location',
+            'merchant_address', 'merchant_email', 'merchant_location', 'merchant_name', 'merchant_phone'
         ];
         $commandRequestMethods = [self::VRC_PURCHASE_SUCCESS => 'get', self::VRC_IPN => 'post'];
         $requestMethod = $commandRequestMethods[$command];
