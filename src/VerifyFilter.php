@@ -27,7 +27,7 @@ use yii\web\ForbiddenHttpException;
  */
 class VerifyFilter extends ActionFilter
 {
-    
+
     /**
      * Ánh xạ của [[BasePaymentGateway::VRC_IPN]] hổ trợ khai báo thuộc tính `commands` dễ dàng hơn.
      */
@@ -62,6 +62,12 @@ class VerifyFilter extends ActionFilter
     public $request = 'request';
 
     /**
+     * @var bool tự động tắt kiểm tra `csrf` của controller hiện tại.
+     * @since 1.0.3
+     */
+    public $autoDisableControllerCsrfValidation = false;
+
+    /**
      * @inheritdoc
      * @throws InvalidConfigException
      */
@@ -94,6 +100,10 @@ class VerifyFilter extends ActionFilter
         if ($command !== null) {
             if (($verifiedData = $this->gateway->verifyRequest($command, $this->request)) instanceof DataInterface) {
                 $this->_verifiedData = $verifiedData;
+
+                if ($this->autoDisableControllerCsrfValidation) {
+                    $action->controller->enableCsrfValidation = false;
+                }
 
                 return true;
             } else {
