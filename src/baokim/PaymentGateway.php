@@ -33,6 +33,7 @@ use vxm\gatewayclients\RequestEvent;
  *
  * @property PaymentClient $client
  * @property PaymentClient $defaultClient
+ * @property ResponseData $merchantData
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0

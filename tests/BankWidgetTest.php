@@ -1,0 +1,42 @@
+<?php
+/**
+ * @link https://github.com/yiiviet/yii2-payment
+ * @copyright Copyright (c) 2017 Yii Viet
+ * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
+ */
+
+
+namespace yiiviet\tests\unit\payment;
+
+use yiiviet\payment\BankWidget;
+
+/**
+ * Lớp BankWidgetTest
+ *
+ * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @since 1.0.3
+ */
+abstract class BankWidgetTest extends TestCase
+{
+
+    public function testOutput()
+    {
+        $output = BankWidget::widget([
+            'gateway' => $this->gateway,
+            'name' => 'a'
+        ]);
+
+        $this->assertNotEmpty($output);
+    }
+
+    public function testBankList()
+    {
+        $widget = new BankWidget([
+            'gateway' => $this->gateway,
+            'name' => 'a'
+        ]);
+
+        $this->assertNotEmpty($widget->getBankProvider()->banks());
+    }
+
+}

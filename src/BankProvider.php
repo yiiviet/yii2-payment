@@ -9,6 +9,7 @@
 namespace yiiviet\payment;
 
 use yii\base\BaseObject;
+use yii\base\NotSupportedException;
 
 /**
  * Mẫu trừu tượng BankProviderInterface cung cấp các phương thức lấy thông tin ngân hàng như tên, logo, id.
@@ -50,7 +51,11 @@ abstract class BankProvider extends BaseObject
      *
      * @param mixed $bankId của ngân hàng.
      * @return string url logo absolute
+     * @throws NotSupportedException
      */
-    abstract public function getBankLogo($bankId): string;
+    public function getBankLogo($bankId): string
+    {
+        throw new NotSupportedException('This method doesn\'t supported by default!');
+    }
 
 }

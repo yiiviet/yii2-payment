@@ -11,6 +11,7 @@ use Yii;
 
 use yii\base\NotSupportedException;
 use yii\di\Instance;
+use yii\helpers\Html;
 use yii\widgets\InputWidget;
 
 use vxm\gatewayclients\BaseGateway;
@@ -18,10 +19,12 @@ use vxm\gatewayclients\BaseGateway;
 /**
  * Lớp BaseWidget hổ trợ render input danh sách ngân hàng cho user chọn hiện tại hổ trợ 2 định kiểu là radio list và dropdown list.
  *
+ * @property BankProvider $bankProvider đối tượng cung cấp thông tin ngân hàng
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.3
  */
-abstract class BankWidget extends InputWidget
+class BankWidget extends InputWidget
 {
 
     /**
@@ -49,6 +52,20 @@ abstract class BankWidget extends InputWidget
 
         $this->gateway = Instance::ensure($this->gateway, PaymentGatewayInterface::class);
         $this->providerClasses = array_merge($this->defaultProviderClasses(), $this->providerClasses);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function run()
+    {
+        if ($this->hasModel()) {
+
+            return Html::activeDropDownList($this->model, $this->attribute, $this->bankProvider->banks(), $this->options);
+        } else {
+
+            return Html::dropDownList($this->name, $this->value, $this->bankProvider->banks(), $this->options);
+        }
     }
 
     /**
@@ -90,11 +107,7 @@ abstract class BankWidget extends InputWidget
     protected function defaultProviderClasses(): array
     {
         return [
-            'yiiviet\payment\baokim\PaymentGateway' => 'yiiviet\payment\baokim\BankProvider',
-            'yiiviet\payment\vtcpay\PaymentGateway' => 'yiiviet\payment\vtcpay\BankProvider',
-            'yiiviet\payment\nganluong\PaymentGateway' => 'yiiviet\payment\nganluong\BankProvider',
-            'yiiviet\payment\vnpayment\PaymentGateway' => 'yiiviet\payment\vnpayment\BankProvider',
-            'yiiviet\payment\onepay\PaymentGateway' => 'yiiviet\payment\onepay\BankProvider'
+            'yiiviet\payment\baokim\PaymentGateway' => 'yiiviet\payment\baokim\BankProvider'
         ];
     }
 }
