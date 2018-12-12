@@ -14,7 +14,7 @@ namespace yiiviet\tests\unit\payment;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.3
  */
-class BaoKimBankWidgetTest extends TestCase
+class BaoKimBankWidgetTest extends BankWidgetTest
 {
     /**
      * @var \yiiviet\payment\baokim\PaymentGateway
@@ -26,4 +26,10 @@ class BaoKimBankWidgetTest extends TestCase
         return 'BK';
     }
 
+    public function testBankLogo()
+    {
+        $widget = $this->createWidget();
+
+        $this->assertNotEmpty($widget->getBankProvider()->getBankLogo(67));
+    }
 }

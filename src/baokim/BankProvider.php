@@ -8,8 +8,6 @@
 
 namespace yiiviet\payment\baokim;
 
-use Yii;
-
 use yii\base\InvalidCallException;
 
 use yiiviet\payment\BankProvider as BaseBankProvider;
@@ -69,40 +67,58 @@ class BankProvider extends BaseBankProvider
     protected $gateway;
 
     /**
-     * @var null|array danh sách ngân hàng
-     * @see [[banks()]]
-     */
-    private $_banks;
-
-    /**
      * @return array
      * @throws \ReflectionException
      * @throws \yii\base\InvalidConfigException
      */
     public function banks(): array
     {
-        if ($this->_banks === null) {
-            $merchantData = $this->gateway->getMerchantData($this->emailBusiness, $this->clientId);
+        $merchantData = $this->getMerchantData();
+        $banks = [];
 
-            if ($merchantData->isOk) {
-                $banks = [];
-
-                foreach ($merchantData['bank_payment_methods'] as $bank) {
-                    if ($bank['payment_method_type'] == $this->type) {
-                        $banks[$bank['id']] = $bank['name'];
-                    }
-                }
-
-                natsort($banks);
-
-                return $this->_banks = $banks;
-            } else {
-                throw new InvalidCallException('Can not get bank list!');
+        foreach ($merchantData['bank_payment_methods'] as $bank) {
+            if ($bank['payment_method_type'] == $this->type) {
+                $banks[$bank['id']] = $bank['name'];
             }
-        } else {
-            return $this->_banks;
         }
+
+        natsort($banks);
+
+        return $banks;
     }
 
+    /**
+     * @inheritdoc
+     * @throws \ReflectionException|\yii\base\InvalidConfigException
+     */
+    public function getBankLogo($bankId): string
+    {
+        $merchantData = $this->getMerchantData();
+
+        foreach ($merchantData['bank_payment_methods'] as $bank) {
+            if ($bank['id'] == $bankId) {
+                return $bank['logo_url'];
+            }
+        }
+
+        throw new InvalidCallException('Can\'t get bank logo of bank id: ' . $bankId);
+    }
+
+    /**
+     * Phương thức hổ trợ lấy thông tin merchant theo cấu hình chỉ định từ đó lấy ra thông tin các ngân hàng phù hợp.
+     *
+     * @return \GatewayClients\DataInterface|ResponseData đối tượng phản hồi từ cổng thanh toán chứa thông tin merchant.
+     * @throws \ReflectionException|\yii\base\InvalidConfigException
+     */
+    protected function getMerchantData()
+    {
+        $data = $this->gateway->getMerchantData($this->emailBusiness, $this->clientId);
+
+        if ($data->isOk) {
+            return $data;
+        } else {
+            throw new InvalidCallException('Can not get merchant data!');
+        }
+    }
 
 }

@@ -19,6 +19,14 @@ use yiiviet\payment\BankWidget;
 abstract class BankWidgetTest extends TestCase
 {
 
+    protected function createWidget()
+    {
+        return new BankWidget([
+            'gateway' => $this->gateway,
+            'name' => 'a'
+        ]);
+    }
+
     public function testOutput()
     {
         $output = BankWidget::widget([
@@ -31,12 +39,10 @@ abstract class BankWidgetTest extends TestCase
 
     public function testBankList()
     {
-        $widget = new BankWidget([
-            'gateway' => $this->gateway,
-            'name' => 'a'
-        ]);
+        $widget = $this->createWidget();
 
         $this->assertNotEmpty($widget->getBankProvider()->banks());
     }
+
 
 }
