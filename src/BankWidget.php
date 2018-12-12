@@ -73,7 +73,7 @@ abstract class BankWidget extends InputWidget
                     'class' => $this->providerClasses[$gatewayClass]
                 ]);
                 /** @var BankProvider $provider */
-                return $this->_provider = Instance::ensure($config, BankProvider::class);
+                return $this->_provider = Yii::createObject($config, [$this->gateway]);
             } else {
                 throw new NotSupportedException("Gateway: `$gatewayClass` is not supported!");
             }
