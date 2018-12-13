@@ -107,7 +107,8 @@ class BankWidget extends InputWidget
     protected function defaultProviderClasses(): array
     {
         return [
-            'yiiviet\payment\baokim\PaymentGateway' => 'yiiviet\payment\baokim\BankProvider'
+            'yiiviet\payment\baokim\PaymentGateway' => 'yiiviet\payment\baokim\BankProvider',
+            'yiiviet\payment\nganluong\PaymentGateway' => 'yiiviet\payment\nganluong\BankProvider'
         ];
     }
 }
