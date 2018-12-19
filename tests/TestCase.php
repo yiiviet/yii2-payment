@@ -63,6 +63,7 @@ abstract class TestCase extends BaseTestCase
             'id' => 'testapp',
             'basePath' => __DIR__,
             'vendorPath' => dirname(__DIR__, 2) . '/vendor',
+            'bootstrap' => ['yiiviet\payment\Bootstrap'],
             'components' => [
                 'cache' => 'yii\caching\DummyCache',
                 'request' => [
