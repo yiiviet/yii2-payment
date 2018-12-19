@@ -10,7 +10,7 @@ namespace yiiviet\payment;
 use yii\validators\RangeValidator;
 
 /**
- * Lớp BankValidator
+ * Lớp BankValidator hổ trợ kiểm tra tính hợp lệ của mã ngân hàng gửi lên từ client side.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.3
