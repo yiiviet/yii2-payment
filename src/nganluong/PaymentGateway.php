@@ -90,13 +90,19 @@ class PaymentGateway extends BasePaymentGateway
      * Hằng khai báo giúp Ngân Lượng xác định phương thức thanh toán là ATM Offline,
      * khi khởi tạo lệnh [[RC_PURCHASE]] tại phương thức [[request()]].
      */
-    const PAYMENT_METHOD_ATM_OFFLINE = 'ATM_ONLINE';
+    const PAYMENT_METHOD_ATM_OFFLINE = 'ATM_OFFLINE';
 
     /**
      * Hằng khai báo giúp Ngân Lượng xác định phương thức thanh toán là Internet Banking,
      * khi khởi tạo lệnh [[RC_PURCHASE]] tại phương thức [[request()]].
      */
     const PAYMENT_METHOD_INTERNET_BANKING = 'IB_ONLINE';
+
+    /**
+     * Hằng khai báo giúp Ngân Lượng xác định phương thức thanh toán là thanh toán tại shop,
+     * khi khởi tạo lệnh [[RC_PURCHASE]] tại phương thức [[request()]].
+     */
+    const PAYMENT_METHOD_CASH_IN_SHOP = 'CASH_IN_SHOP';
 
     /**
      * Hằng khai báo giúp Ngân Lượng xác định phương thức giao dịch là trực tiếp (trực tiếp nhận tiền),

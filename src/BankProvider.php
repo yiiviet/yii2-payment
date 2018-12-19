@@ -19,6 +19,10 @@ use yii\base\NotSupportedException;
  */
 abstract class BankProvider extends BaseObject
 {
+    /**
+     * @var mixed loại ngân hàng muốn lấy ví dụ visa/master, nội địa, thanh toán chuyển khoản... Nếu không thiết lập đồng nghĩa lấy toàn bộ không lọc.
+     */
+    public $type;
 
     /**
      * @var PaymentGatewayInterface xem phương thức [[__construct()]].
@@ -39,12 +43,11 @@ abstract class BankProvider extends BaseObject
     }
 
     /**
-     * Phương thức hổ trợ lấy danh sách ngân hàng.
+     * Phương thức hổ trợ lấy danh sách ngân hàng theo thuộc tính [[type]].
      *
      * @return array có khóa là mã ngân hàng và giá trị là tên ngân hàng.
      */
     abstract public function banks(): array;
-
 
     /**
      * Phương thức hổ trợ lấy logo ngân hàng thông qua id.

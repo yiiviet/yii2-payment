@@ -67,7 +67,7 @@ class BankProvider extends BaseBankProvider
     protected $gateway;
 
     /**
-     * @return array
+     * @inheritdoc
      * @throws \ReflectionException
      * @throws \yii\base\InvalidConfigException
      */
@@ -77,7 +77,7 @@ class BankProvider extends BaseBankProvider
         $banks = [];
 
         foreach ($merchantData['bank_payment_methods'] as $bank) {
-            if ($bank['payment_method_type'] == $this->type) {
+            if ($bank['payment_method_type'] == $this->type || $this->type === null) {
                 $banks[$bank['id']] = $bank['name'];
             }
         }
