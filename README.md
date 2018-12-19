@@ -100,3 +100,4 @@ vào phần `require` trong file composer.json.
 * [Cổng thanh toán VnPayment](/docs/vnpayment.md).
 * [Cổng thanh toán VTCPay](/docs/vtcpay.md).
 * [Tích hợp đồng thời nhiều cổng thanh toán](/docs/multi.md).
+* [Khai báo VerifyFilter để lọc request](/docs/verifyfilter.md)
