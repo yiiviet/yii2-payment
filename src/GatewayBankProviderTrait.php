@@ -17,7 +17,7 @@ use yii\di\Instance;
  * Trait GatewayBankProviderTrait bồ sung các thuộc tính, phương thức lấy thông tin ngân hàng
  *
  * @property BankProvider $bankProvider đối tượng cung cấp thông tin ngân hàng
- * @property BasePaymentGateway|PaymentGatewayInterface $gateway
+ * @property PaymentGatewayInterface $gateway
  * @property array $providerClasses có khóa là lớp đối tượng cổng thanh toán và giá trị là lớp đối tượng cung cấp thông tin ngân hàng.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
@@ -63,7 +63,7 @@ trait GatewayBankProviderTrait
     }
 
     /**
-     * @var BasePaymentGateway|PaymentGatewayInterface|null đối tượng cổng thanh toán.
+     * @var PaymentGatewayInterface|null đối tượng cổng thanh toán.
      * @see [[getGateway()]]
      * @see [[setGateway()]]
      */

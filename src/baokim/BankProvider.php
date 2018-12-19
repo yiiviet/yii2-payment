@@ -15,6 +15,8 @@ use yiiviet\payment\BankProvider as BaseBankProvider;
 /**
  * Lớp BankProvider
  *
+ * @property PaymentGateway $gateway
+ *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.3
  */
@@ -59,12 +61,6 @@ class BankProvider extends BaseBankProvider
      * @var mixed mã client dùng để truy xuất thông tin, nếu không chỉ định hệ thống sẽ tự động lấy.
      */
     public $clientId;
-
-    /**
-     * @var PaymentGateway
-     * @inheritdoc
-     */
-    protected $gateway;
 
     /**
      * @inheritdoc
