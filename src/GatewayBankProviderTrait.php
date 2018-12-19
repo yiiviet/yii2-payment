@@ -136,7 +136,8 @@ trait GatewayBankProviderTrait
     {
         return [
             'yiiviet\payment\baokim\PaymentGateway' => 'yiiviet\payment\baokim\BankProvider',
-            'yiiviet\payment\nganluong\PaymentGateway' => 'yiiviet\payment\nganluong\BankProvider'
+            'yiiviet\payment\nganluong\PaymentGateway' => 'yiiviet\payment\nganluong\BankProvider',
+            'yiiviet\payment\vnpayment\PaymentGateway' => 'yiiviet\payment\vnpayment\BankProvider'
         ];
     }
 

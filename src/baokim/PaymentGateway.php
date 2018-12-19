@@ -263,7 +263,8 @@ class PaymentGateway extends BasePaymentGateway
             }
         }
 
-        return $httpClient->createRequest()
+        return $httpClient
+            ->createRequest()
             ->setUrl($url)
             ->setMethod($httpMethod)
             ->addOptions([

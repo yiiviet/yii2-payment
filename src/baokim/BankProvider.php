@@ -13,7 +13,7 @@ use yii\base\InvalidCallException;
 use yiiviet\payment\BankProvider as BaseBankProvider;
 
 /**
- * Lớp BankProvider
+ * Lớp BankProvider cung cấp thông tin ngân hàng mà Bảo Kim hổ trợ.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.3
@@ -81,8 +81,6 @@ class BankProvider extends BaseBankProvider
                 $banks[$bank['id']] = $bank['name'];
             }
         }
-
-        natsort($banks);
 
         return $banks;
     }
