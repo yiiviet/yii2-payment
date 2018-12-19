@@ -9,27 +9,22 @@
 namespace yiiviet\tests\unit\payment;
 
 /**
- * Lớp BaoKimBankWidgetTest
+ * Lớp VnPaymentBankWidgetTest
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.3
  */
-class BaoKimBankWidgetTest extends BankWidgetTest
+class VnPaymentBankWidgetTest extends BankWidgetTest
 {
     /**
-     * @var \yiiviet\payment\baokim\PaymentGateway
+     * @var \yiiviet\payment\vnpayment\PaymentGateway
      */
     public $gateway;
 
+
     public static function gatewayId(): string
     {
-        return 'BK';
+        return 'VNP';
     }
 
-    public function testBankLogo()
-    {
-        $widget = $this->createWidget();
-
-        $this->assertNotEmpty($widget->provider->getBankLogo(67));
-    }
 }

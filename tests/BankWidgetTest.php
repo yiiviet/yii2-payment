@@ -41,7 +41,7 @@ abstract class BankWidgetTest extends TestCase
     {
         $widget = $this->createWidget();
 
-        $this->assertNotEmpty($widget->getBankProvider()->banks());
+        $this->assertNotEmpty($widget->provider->banks());
     }
 
 
