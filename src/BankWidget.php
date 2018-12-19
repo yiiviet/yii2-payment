@@ -28,10 +28,10 @@ class BankWidget extends InputWidget
     {
         if ($this->hasModel()) {
 
-            return Html::activeDropDownList($this->model, $this->attribute, $this->bankProvider->banks(), $this->options);
+            return Html::activeDropDownList($this->model, $this->attribute, $this->provider->banks(), $this->options);
         } else {
 
-            return Html::dropDownList($this->name, $this->value, $this->bankProvider->banks(), $this->options);
+            return Html::dropDownList($this->name, $this->value, $this->provider->banks(), $this->options);
         }
     }
 

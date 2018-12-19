@@ -25,7 +25,7 @@ class BankValidator extends RangeValidator
      */
     public function init()
     {
-        $this->range = array_keys($this->bankProvider->banks());
+        $this->range = array_keys($this->provider->banks());
 
         parent::init();
     }

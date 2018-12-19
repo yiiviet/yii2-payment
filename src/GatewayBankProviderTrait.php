@@ -16,7 +16,7 @@ use yii\di\Instance;
 /**
  * Trait GatewayBankProviderTrait bồ sung các thuộc tính, phương thức lấy thông tin ngân hàng
  *
- * @property BankProvider $bankProvider đối tượng cung cấp thông tin ngân hàng
+ * @property BankProvider $provider đối tượng cung cấp thông tin ngân hàng
  * @property PaymentGatewayInterface $gateway
  * @property array $providerClasses có khóa là lớp đối tượng cổng thanh toán và giá trị là lớp đối tượng cung cấp thông tin ngân hàng.
  *
@@ -108,7 +108,7 @@ trait GatewayBankProviderTrait
      * @return BankProvider|object
      * @throws \yii\base\InvalidConfigException|NotSupportedException
      */
-    public function getBankProvider(): BankProvider
+    public function getProvider(): BankProvider
     {
         if (!$this->_provider instanceof BankProvider) {
             $gatewayClass = get_class($this->gateway);
