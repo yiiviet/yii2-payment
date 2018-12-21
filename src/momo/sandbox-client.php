@@ -4,7 +4,6 @@
  * @copyright Copyright (c) 2017 Yii Viet
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  *
- * PaymentClient information below get from https://github.com/naustudio/node-vn-payments
  */
 
 return [
