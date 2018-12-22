@@ -4,6 +4,7 @@ Change Log
 1.0.3 under development
 --------------------------
 
+- Lỗi #11: Thêm kiểm tra dữ liệu đầu vào khi khởi tạo tại các lớp clients (vuongxuongminh)
 - Tính năng #1: Hổ trợ widget để xuất thông tin ngân hàng (vuongxuongminh)
 - Tính năng #10: Thêm validator `bankvn` hổ trợ kiểm tra mã ngân hàng (vuongxuongminh)
 - Tính năng #8: Thêm thuộc tính `autoDisableControllerCsrfValidation` tại `\yiiviet\payment\VerifyFilter` (vuongxuongminh). 

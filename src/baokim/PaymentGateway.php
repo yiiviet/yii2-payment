@@ -12,13 +12,15 @@ use Yii;
 use GatewayClients\DataInterface;
 
 use yii\base\InvalidArgumentException;
+use yii\base\NotSupportedException;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
+use yii\httpclient\CurlTransport as HttpClientCurlTransport;
+use yii\httpclient\StreamTransport as HttpClientStreamTransport;
 use yiiviet\payment\BasePaymentGateway;
 
 use vxm\gatewayclients\RequestEvent;
-
 
 /**
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến Bảo Kim.
@@ -234,7 +236,7 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
-     * @throws \yii\base\InvalidConfigException|\yii\httpclient\Exception
+     * @throws \yii\base\InvalidConfigException|\yii\httpclient\Exception|NotSupportedException
      */
     protected function requestInternal(\vxm\gatewayclients\RequestData $requestData, \yii\httpclient\Client $httpClient): array
     {
@@ -263,18 +265,26 @@ class PaymentGateway extends BasePaymentGateway
             }
         }
 
-        return $httpClient
-            ->createRequest()
-            ->setUrl($url)
-            ->setMethod($httpMethod)
-            ->addOptions([
+        $transport = $httpClient->getTransport();
+        $httpRequest = $httpClient->createRequest()->setUrl($url)->setMethod($httpMethod)->addData($data)->setFormat('json');
+
+        if ($transport instanceof HttpClientCurlTransport) {
+            $httpRequest->addOptions([
                 CURLOPT_HTTPAUTH => CURLAUTH_DIGEST | CURLAUTH_BASIC,
                 CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword
-            ])
-            ->addData($data)
-            ->setFormat('json')
-            ->send()
-            ->getData();
+            ]);
+        } elseif ($transport instanceof HttpClientStreamTransport) {
+            $httpRequest->addOptions([
+                'http' => [
+                    "header" => "Authorization: Basic " . base64_encode("$client->apiUser:$client->apiPassword"),
+                    "protocol_version" => 1.1,
+                ]
+            ]);
+        } else {
+            throw new NotSupportedException('Transport: ' . get_class($transport) . ' is not supported add basic auth!');
+        }
+
+        return $httpRequest->send()->getData();
     }
 
     /**

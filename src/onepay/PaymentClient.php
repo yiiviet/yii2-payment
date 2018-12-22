@@ -9,6 +9,8 @@ namespace yiiviet\payment\onepay;
 
 use Yii;
 
+use yii\base\InvalidConfigException;
+
 use yiiviet\payment\BasePaymentClient;
 
 /**
@@ -45,6 +47,27 @@ class PaymentClient extends BasePaymentClient
      */
     public $secureSecret;
 
+    /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     * @since 1.0.3
+     */
+    public function init()
+    {
+        if ($this->merchantId === null) {
+            throw new InvalidConfigException('Property `merchantId` must be set!');
+        }
+
+        if ($this->accessCode === null) {
+            throw new InvalidConfigException('Property `accessCode` must be set!');
+        }
+
+        if ($this->secureSecret === null) {
+            throw new InvalidConfigException('Property `secureSecret` must be set!');
+        }
+
+        parent::init();
+    }
 
     /**
      * @inheritdoc

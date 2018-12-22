@@ -9,6 +9,8 @@ namespace yiiviet\payment\baokim;
 
 use Yii;
 
+use yii\base\InvalidConfigException;
+
 use yiiviet\payment\BasePaymentClient;
 
 /**
@@ -31,22 +33,6 @@ class PaymentClient extends BasePaymentClient
      * Hằng khai báo kiểu chữ ký `HMAC` được dùng khi gọi phương thức [[signature()]] và [[validateSignature()]].
      */
     const SIGNATURE_HMAC = 'HMAC';
-
-    /**
-     * Thuộc tính dùng để khai báo `user` kết nối đến Bảo Kim khi tạo [[request()]] ở [[PaymentGateway]].
-     * Nó do Bảo Kim cấp khi đăng ký tích hợp website.
-     *
-     * @var string
-     */
-    public $apiUser;
-
-    /**
-     * Thuộc tính dùng để khai báo `password` kết nối đến Bảo Kim khi tạo [[request()]] ở [[PaymentGateway]].
-     * Nó do Bảo Kim cấp khi đăng ký tích hợp website.
-     *
-     * @var string
-     */
-    public $apiPassword;
 
     /**
      * Thuộc tính dùng để khai báo `merchant id` kết nối đến Bảo Kim khi tạo [[request()]] ở [[PaymentGateway]].
@@ -73,6 +59,22 @@ class PaymentClient extends BasePaymentClient
     public $securePassword;
 
     /**
+     * Thuộc tính dùng để khai báo `user` kết nối đến Bảo Kim khi tạo [[request()]] ở [[PaymentGateway]] khi thanh toán theo phương thức PRO.
+     * Nó do Bảo Kim cấp khi đăng ký tích hợp website.
+     *
+     * @var string
+     */
+    public $apiUser;
+
+    /**
+     * Thuộc tính dùng để khai báo `password` kết nối đến Bảo Kim khi tạo [[request()]] ở [[PaymentGateway]] khi thanh toán theo phương thức PRO.
+     * Nó do Bảo Kim cấp khi đăng ký tích hợp website.
+     *
+     * @var string
+     */
+    public $apiPassword;
+
+    /**
      * Thuộc tính được dùng để tạo chữ ký dữ liệu khi thanh toán theo phương thức PRO, lấy thông tin merchant.
      *
      * @var string
@@ -85,6 +87,42 @@ class PaymentClient extends BasePaymentClient
      * @var string
      */
     public $publicCertificate;
+
+    /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     * @since 1.0.3
+     */
+    public function init()
+    {
+        if ($this->merchantId === null) {
+            throw new InvalidConfigException('Property `merchantId` must be set!');
+        }
+
+        if ($this->merchantEmail === null) {
+            throw new InvalidConfigException('Property `merchantEmail` must be set!');
+        }
+
+        if ($this->securePassword === null) {
+            throw new InvalidConfigException('Property `securePassword` must be set!');
+        }
+
+        if ($this->getGateway()->pro) {
+            if ($this->apiUser === null) {
+                throw new InvalidConfigException('Property `apiUser` must be set on pro mode!');
+            }
+
+            if ($this->apiPassword === null) {
+                throw new InvalidConfigException('Property `apiPassword` must be set on pro mode!');
+            }
+
+            if ($this->privateCertificate === null) {
+                throw new InvalidConfigException('Property `privateCertificate` must be set on pro mode!');
+            }
+        }
+
+        parent::init();
+    }
 
     /**
      * @param $file

@@ -9,6 +9,8 @@ namespace yiiviet\payment\momo;
 
 use Yii;
 
+use yii\base\InvalidConfigException;
+
 use yiiviet\payment\BasePaymentClient;
 use yiiviet\payment\DataSignature;
 use yiiviet\payment\HmacDataSignature;
@@ -46,6 +48,27 @@ class PaymentClient extends BasePaymentClient
      * @var string
      */
     public $secretKey;
+
+    /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     */
+    public function init()
+    {
+        if ($this->partnerCode === null) {
+            throw new InvalidConfigException('Property `partnerCode` must be set!');
+        }
+
+        if ($this->accessKey === null) {
+            throw new InvalidConfigException('Property `accessKey` must be set!');
+        }
+
+        if ($this->secretKey === null) {
+            throw new InvalidConfigException('Property `secretKey` must be set!');
+        }
+
+        parent::init();
+    }
 
     /**
      * @inheritdoc

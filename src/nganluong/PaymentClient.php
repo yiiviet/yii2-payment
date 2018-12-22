@@ -7,6 +7,8 @@
 
 namespace yiiviet\payment\nganluong;
 
+use yii\base\InvalidConfigException;
+
 use yiiviet\payment\BasePaymentClient;
 
 /**
@@ -42,6 +44,27 @@ class PaymentClient extends BasePaymentClient
      */
     public $email;
 
+    /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     * @since 1.0.3
+     */
+    public function init()
+    {
+        if ($this->merchantId === null) {
+            throw new InvalidConfigException('Property `merchantId` must be set!');
+        }
+
+        if ($this->merchantPassword === null) {
+            throw new InvalidConfigException('Property `merchantPassword` must be set!');
+        }
+
+        if ($this->email === null) {
+            throw new InvalidConfigException('Property `email` must be set!');
+        }
+
+        parent::init();
+    }
 
     /**
      * @inheritdoc

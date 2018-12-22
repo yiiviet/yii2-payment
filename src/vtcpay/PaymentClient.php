@@ -10,6 +10,8 @@ namespace yiiviet\payment\vtcpay;
 
 use Yii;
 
+use yii\base\InvalidConfigException;
+
 use yiiviet\payment\BasePaymentClient;
 use yiiviet\payment\DataSignature;
 
@@ -32,11 +34,32 @@ class PaymentClient extends BasePaymentClient
      */
     public $secureCode;
 
-
     /**
      * @var string Mã website nhận khi đăng ký
      */
     public $merchantId;
+
+    /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     * @since 1.0.3
+     */
+    public function init()
+    {
+        if ($this->business === null) {
+            throw new InvalidConfigException('Property `business` must be set!');
+        }
+
+        if ($this->secureCode === null) {
+            throw new InvalidConfigException('Property `secureCode` must be set!');
+        }
+
+        if ($this->merchantId === null) {
+            throw new InvalidConfigException('Property `merchantId` must be set!');
+        }
+
+        parent::init();
+    }
 
     /**
      * @inheritdoc

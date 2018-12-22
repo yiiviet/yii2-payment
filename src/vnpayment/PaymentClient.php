@@ -9,6 +9,8 @@ namespace yiiviet\payment\vnpayment;
 
 use Yii;
 
+use yii\base\InvalidConfigException;
+
 use yiiviet\payment\BasePaymentClient;
 use yiiviet\payment\HashDataSignature;
 
@@ -26,12 +28,6 @@ class PaymentClient extends BasePaymentClient
 {
 
     /**
-     * @var string Thuộc tính dùng để tạo và kiểm tra chữ ký dữ liệu.
-     * Nó do VnPayment cấp khi thực hiện tích hợp website của bạn.
-     */
-    public $hashSecret;
-
-    /**
      * @var string Mã TMN được dùng để gửi lên VnPayment xác định là yêu cầu từ bạn.
      * Nó thường được dùng khi gọi [[request()]] ở [[PaymentGateway]].
      * Nó do VnPayment cấp khi thực hiện tích hợp website của bạn.
@@ -39,9 +35,33 @@ class PaymentClient extends BasePaymentClient
     public $tmnCode;
 
     /**
+     * @var string Thuộc tính dùng để tạo và kiểm tra chữ ký dữ liệu.
+     * Nó do VnPayment cấp khi thực hiện tích hợp website của bạn.
+     */
+    public $hashSecret;
+
+    /**
      * @var int Mã loại hàng mặc định của website bạn bán.
      */
     public $defaultOrderType;
+
+    /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     * @since 1.0.3
+     */
+    public function init()
+    {
+        if ($this->tmnCode === null) {
+            throw new InvalidConfigException('Property `tmnCode` must be set!');
+        }
+
+        if ($this->hashSecret === null) {
+            throw new InvalidConfigException('Property `hashSecret` must be set!');
+        }
+
+        parent::init();
+    }
 
     /**
      * @inheritdoc
