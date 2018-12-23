@@ -30,11 +30,11 @@ trait SignatureValidatorTrait
         $dataSignAttributes = $this->getDataSignAttributes();
         $data = array_merge(array_fill_keys($dataSignAttributes, ''), $this->get(false));
         $dataSign = array_intersect_key($data, array_flip($dataSignAttributes));
-        $expectSignature = urldecode(http_build_query($dataSign));
+        $dataSign = urldecode(http_build_query($dataSign));
 
         $client = $this->getClient();
 
-        if (!$client->validateSignature($expectSignature, $expectSignature)) {
+        if (!$client->validateSignature($dataSign, $this->$attribute)) {
             $validator->addError($this, $attribute, $validator->message);
         }
     }
