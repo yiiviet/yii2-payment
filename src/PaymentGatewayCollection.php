@@ -58,6 +58,39 @@ class PaymentGatewayCollection extends GatewayCollection
         return $this->request(BasePaymentGateway::RC_QUERY_DR, $data, $gatewayId, $clientId);
     }
 
+    /**
+     * Đây là phương thức ánh xạ của [[request()]]. Dùng để tạo lệnh yêu cầu hoàn tiền.
+     *
+     * @param array $data dữ liệu yêu cầu hoàn tiền.
+     * @param int|string $gatewayId Id của cổng thanh toán.
+     * @param null|int|string $clientId Id client của cổng thanh toán dùng đề tạo lệnh.
+     * Nếu không thiết lập thì [[getDefaultClient()]] sẽ được gọi trong cổng thanh toán.
+     * @return \vxm\gatewayclients\ResponseData|DataInterface
+     * @see [[BasePaymentGateway::purchase()]]
+     * @throws \yii\base\InvalidConfigException
+     * @since 1.0.3
+     */
+    public function refund(array $data, $gatewayId, $clientId = null): DataInterface
+    {
+        return $this->request(BasePaymentGateway::RC_REFUND, $data, $gatewayId, $clientId);
+    }
+
+    /**
+     * Đây là phương thức ánh xạ của [[request()]]. Dùng để tạo lệnh truy vấn trạng thái hoàn tiền.
+     *
+     * @param array $data dữ liệu truy vấn.
+     * @param int|string $gatewayId Id của cổng thanh toán.
+     * @param null|int|string $clientId Id client của cổng thanh toán dùng đề tạo lệnh.
+     * Nếu không thiết lập thì [[getDefaultClient()]] sẽ được gọi trong cổng thanh toán.
+     * @return \vxm\gatewayclients\ResponseData|DataInterface
+     * @see [[BasePaymentGateway::purchase()]]
+     * @throws \yii\base\InvalidConfigException
+     * @since 1.0.3
+     */
+    public function queryRefund(array $data, $gatewayId, $clientId = null): DataInterface
+    {
+        return $this->request(BasePaymentGateway::RC_QUERY_REFUND, $data, $gatewayId, $clientId);
+    }
 
     /**
      * Đây là phương thức ánh xạ của [[verifyRequest()]]. Dùng để xác minh tính hợp lệ của dữ liệu khi khách hoàn tất thanh toán.
