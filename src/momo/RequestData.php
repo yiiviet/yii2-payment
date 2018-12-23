@@ -71,13 +71,13 @@ class RequestData extends BaseRequestData
     {
         switch ($command = $this->getCommand()) {
             case PaymentGateway::RC_PURCHASE:
-                return 'captureMoMoWallet';
+                return PaymentGateway::REQUEST_TYPE_PURCHASE;
             case PaymentGateway::RC_QUERY_DR:
-                return 'transactionStatus';
+                return PaymentGateway::REQUEST_TYPE_QUERY_DR;
             case PaymentGateway::RC_REFUND:
-                return 'refundMoMoWallet';
+                return PaymentGateway::REQUEST_TYPE_REFUND;
             case PaymentGateway::RC_QUERY_REFUND:
-                return 'refundStatus';
+                return PaymentGateway::REQUEST_TYPE_QUERY_REFUND;
             default:
                 throw new NotSupportedException("Not supported command: `$command`");
         }
