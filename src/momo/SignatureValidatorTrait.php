@@ -7,6 +7,8 @@
 
 namespace yiiviet\payment\momo;
 
+use yii\base\InvalidCallException;
+
 /**
  * Trait SignatureValidatorTrait cung cấp phương thức xác minh chữ ký dữ liệu từ MOMO.
  *
@@ -21,7 +23,7 @@ trait SignatureValidatorTrait
      * @param string $attribute có giá trị là chữ ký cần kiểm tra.
      * @param array $params thiết lập từ rule
      * @param \yii\validators\InlineValidator $validator
-     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException
+     * @throws \yii\base\InvalidConfigException|\yii\base\NotSupportedException|InvalidCallException
      */
     public function signatureValidator($attribute, $params, \yii\validators\InlineValidator $validator)
     {
@@ -44,6 +46,6 @@ trait SignatureValidatorTrait
      */
     protected function getDataSignAttributes(): array
     {
-        return [];
+        throw new InvalidCallException(__METHOD__ . ' must be override by class used it!');
     }
 }
