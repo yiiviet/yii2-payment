@@ -131,7 +131,7 @@ class RequestData extends BaseRequestData
                 throw new NotSupportedException("Not supported command: `$command`");
         }
 
-        $dataSign = http_build_query($dataSign);
+        $dataSign = urldecode(http_build_query($dataSign));
         return $this->getClient()->signature($dataSign);
     }
 }
