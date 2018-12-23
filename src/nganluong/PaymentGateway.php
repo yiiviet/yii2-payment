@@ -101,6 +101,7 @@ class PaymentGateway extends BasePaymentGateway
     /**
      * Hằng khai báo giúp Ngân Lượng xác định phương thức thanh toán là thanh toán tại shop,
      * khi khởi tạo lệnh [[RC_PURCHASE]] tại phương thức [[request()]].
+     * @since 1.0.3
      */
     const PAYMENT_METHOD_CASH_IN_SHOP = 'CASH_IN_SHOP';
 
@@ -181,6 +182,15 @@ class PaymentGateway extends BasePaymentGateway
     public function getBaseUrl(): string
     {
         return ($this->sandbox ? 'https://sandbox.nganluong.vn:8088/nl30' : 'https://www.nganluong.vn') . '/checkout.api.nganluong.post.php';
+    }
+
+    /**
+     * @inheritdoc
+     * @since 1.0.3
+     */
+    public function requestCommands(): array
+    {
+        return [self::RC_PURCHASE, self::RC_QUERY_DR, self::RC_AUTHENTICATE];
     }
 
     /**

@@ -7,11 +7,7 @@
 
 namespace yiiviet\payment\vnpayment;
 
-use GatewayClients\DataInterface;
-
 use yiiviet\payment\BasePaymentGateway;
-
-use vxm\gatewayclients\RequestEvent;
 
 /**
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến OnePay.
@@ -19,6 +15,7 @@ use vxm\gatewayclients\RequestEvent;
  *
  * @method ResponseData purchase(array $data, $clientId = null)
  * @method ResponseData queryDR(array $data, $clientId = null)
+ * @method ResponseData refund(array $data, $clientId = null)
  * @method VerifiedData verifyRequestIPN(\yii\web\Request $request = null, $clientId = null)
  * @method VerifiedData verifyRequestPurchaseSuccess(\yii\web\Request $request = null, $clientId = null)
  * @method PaymentClient getClient($id = null)
@@ -32,20 +29,6 @@ use vxm\gatewayclients\RequestEvent;
  */
 class PaymentGateway extends BasePaymentGateway
 {
-    /**
-     * Lệnh `refund` sử dụng cho việc tạo [[request()]] yêu cầu hoàn trả tiền.
-     */
-    const RC_REFUND = 'refund';
-
-    /**
-     * @event RequestEvent được gọi trước khi khởi tạo lệnh [[RC_REFUND]] ở phương thức [[request()]].
-     */
-    const EVENT_BEFORE_REFUND = 'beforeRefund';
-
-    /**
-     * @event RequestEvent được gọi sau khi khởi tạo lệnh [[RC_REFUND]] ở phương thức [[request()]].
-     */
-    const EVENT_AFTER_REFUND = 'afterRefund';
 
     /**
      * Đường dẫn API để yêu cầu tạo giao dịch thanh toán.
@@ -92,49 +75,19 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
+     * @since 1.0.3
+     */
+    public function requestCommands(): array
+    {
+        return [self::RC_PURCHASE, self::RC_QUERY_DR, self::RC_REFUND];
+    }
+
+    /**
+     * @inheritdoc
      */
     protected function defaultVersion(): string
     {
         return '2.0.0';
-    }
-
-    /**
-     * Phương thức yêu cầu VnPayment hoàn trả tiền cho đơn hàng chỉ định.
-     * Đây là phương thức ánh xạ của [[request()]] sử dụng lệnh [[RC_REFUND]].
-     *
-     * @param array $data Dữ liệu yêu cầu hoàn trả.
-     * @param null $clientId Client id sử dụng để tạo yêu cầu.
-     * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
-     * @return ResponseData|DataInterface Trả về [[DataInterface]] là dữ liệu tổng hợp từ VnPayment phản hồi.
-     * @throws \ReflectionException|\yii\base\InvalidConfigException|\yii\base\InvalidArgumentException
-     */
-    public function refund(array $data, $clientId = null): DataInterface
-    {
-        return $this->request(self::RC_REFUND, $data, $clientId);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function beforeRequest(RequestEvent $event)
-    {
-        if ($event->command === self::RC_REFUND) {
-            $this->trigger(self::EVENT_BEFORE_REFUND, $event);
-        }
-
-        parent::beforeRequest($event);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function afterRequest(RequestEvent $event)
-    {
-        if ($event->command === self::RC_REFUND) {
-            $this->trigger(self::EVENT_AFTER_REFUND, $event);
-        }
-
-        parent::afterRequest($event);
     }
 
     /**

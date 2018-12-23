@@ -16,8 +16,6 @@ use yii\base\NotSupportedException;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
-use yii\httpclient\CurlTransport as HttpClientCurlTransport;
-use yii\httpclient\StreamTransport as HttpClientStreamTransport;
 use yiiviet\payment\BasePaymentGateway;
 
 use vxm\gatewayclients\RequestEvent;
@@ -168,6 +166,15 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
+     * @since 1.0.3
+     */
+    public function requestCommands(): array
+    {
+        return [self::RC_PURCHASE, self::RC_QUERY_DR, self::RC_GET_MERCHANT_DATA];
+    }
+
+    /**
+     * @inheritdoc
      * @throws \yii\base\InvalidConfigException
      */
     protected function initSandboxEnvironment()
@@ -265,26 +272,15 @@ class PaymentGateway extends BasePaymentGateway
             }
         }
 
-        $transport = $httpClient->getTransport();
-        $httpRequest = $httpClient->createRequest()->setUrl($url)->setMethod($httpMethod)->addData($data)->setFormat('json');
-
-        if ($transport instanceof HttpClientCurlTransport) {
-            $httpRequest->addOptions([
-                CURLOPT_HTTPAUTH => CURLAUTH_DIGEST | CURLAUTH_BASIC,
-                CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword
-            ]);
-        } elseif ($transport instanceof HttpClientStreamTransport) {
-            $httpRequest->addOptions([
-                'http' => [
-                    "header" => "Authorization: Basic " . base64_encode("$client->apiUser:$client->apiPassword"),
-                    "protocol_version" => 1.1,
-                ]
-            ]);
-        } else {
-            throw new NotSupportedException('Transport: ' . get_class($transport) . ' is not supported add basic auth!');
-        }
-
-        return $httpRequest->send()->getData();
+        return $httpClient
+            ->createRequest()
+            ->setUrl($url)
+            ->setMethod($httpMethod)
+            ->setFormat('json')
+            ->addData($data)
+            ->addHeaders(['Authorization' => 'Basic ' . base64_encode($client->apiUser . ':' . $client->apiPassword)])
+            ->send()
+            ->data;
     }
 
     /**

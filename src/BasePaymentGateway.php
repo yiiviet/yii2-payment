@@ -41,6 +41,16 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
     const RC_QUERY_DR = 'queryDR';
 
     /**
+     * Lệnh `refund` sử dụng cho việc tạo [[request()]] yêu cầu hoàn trả tiền.
+     */
+    const RC_REFUND = 'refund';
+
+    /**
+     * Lệnh `queryRefund` sử dụng cho việc tạo [[request()]] để kiểm tra trang thái của lệnh `refund` đã tạo.
+     */
+    const RC_QUERY_REFUND = 'queryRefund';
+
+    /**
      * Lệnh `purchaseSuccess` sử dụng cho việc yêu cấu xác thực tính hợp lệ
      * của dữ liệu khi khách hàng thanh toán thành công (cổng thanh toán redirect khách hàng về server).
      */
@@ -89,6 +99,30 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      * @event RequestEvent được gọi sau khi khởi tạo lệnh [[RC_QUERY_DR]] ở phương thức [[request()]].
      */
     const EVENT_AFTER_QUERY_DR = 'afterQueryDR';
+
+    /**
+     * @event RequestEvent được gọi trước khi khởi tạo lệnh [[RC_REFUND]] ở phương thức [[request()]].
+     * @since 1.0.3
+     */
+    const EVENT_BEFORE_REFUND = 'beforeRefund';
+
+    /**
+     * @event RequestEvent được gọi sau khi khởi tạo lệnh [[RC_REFUND]] ở phương thức [[request()]].
+     * @since 1.0.3
+     */
+    const EVENT_AFTER_REFUND = 'afterRefund';
+
+    /**
+     * @event RequestEvent được gọi trước khi khởi tạo lệnh [[RC_QUERY_REFUND]] ở phương thức [[request()]].
+     * @since 1.0.3
+     */
+    const EVENT_BEFORE_QUERY_REFUND = 'beforeQueryRefund';
+
+    /**
+     * @event RequestEvent được gọi sau khi khởi tạo lệnh [[RC_QUERY_REFUND]] ở phương thức [[request()]].
+     * @since 1.0.3
+     */
+    const EVENT_AFTER_QUERY_REFUND = 'afterQueryRefund';
 
     /**
      * @var bool nếu là môi trường test thì thiết lập là TRUE và ngược lại.
@@ -154,7 +188,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
     /**
      * Phương thức này là phương thức ánh xạ của [[request()]] nó sẽ tạo lệnh [[RC_PURCHASE]] để tạo yêu cầu giao dịch tới cổng thanh toán.
      *
-     * @param array $data Dữ liệu dùng để yêu cầu tạo giao dịch thanh toán bên trong thường có giá tiền, địa chỉ giao hàng...
+     * @param array $data dữ liệu dùng để yêu cầu tạo giao dịch thanh toán bên trong thường có giá tiền, địa chỉ giao hàng...
      * @param string|int $clientId PaymentClient id dùng để tạo yêu cầu thanh toán.
      * @return ResponseData|DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]] để lấy thông tin trả về từ cổng thanh toán.
      * @throws InvalidConfigException|\ReflectionException
@@ -167,7 +201,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
     /**
      * Phương thức này là phương thức ánh xạ của [[request()]] nó sẽ tạo lệnh [[RC_QUERY_DR]] để tạo yêu cầu truy vấn giao dịch tới cổng thanh toán.
      *
-     * @param array $data Dữ liệu dùng để truy vấn thông tin giao dịch bên trong thường có mã giao dịch từ cổng thanh toán...
+     * @param array $data dữ liệu dùng để truy vấn thông tin giao dịch bên trong thường có mã giao dịch từ cổng thanh toán...
      * @param string|int $clientId PaymentClient id dùng để tạo yêu cầu truy vấn giao dịch.
      * @return ResponseData|DataInterface Phương thức sẽ trả về mẫu trừu tượng [[DataInterface]] để lấy thông tin trả về từ cổng thanh toán.
      * @throws InvalidConfigException|\ReflectionException
@@ -178,14 +212,55 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
     }
 
     /**
+     * Phương thức này là phương thức ánh xạ của [[request()]] nó sẽ tạo lệnh [[RC_REFUND]] để tạo yêu cầu hoàn tiền tới cổng thanh toán.
+     *
+     * @param array $data dữ liệu yêu cầu hoàn trả.
+     * @param null $clientId Client id sử dụng để tạo yêu cầu.
+     * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
+     * @return ResponseData|DataInterface Trả về [[DataInterface]] là dữ liệu tổng hợp từ MOMO phản hồi.
+     * @throws \ReflectionException|\yii\base\InvalidConfigException|\yii\base\InvalidArgumentException
+     * @since 1.0.3
+     */
+    public function refund(array $data, $clientId = null): DataInterface
+    {
+        return $this->request(self::RC_REFUND, $data, $clientId);
+    }
+
+    /**
+     * Phương thức này là phương thức ánh xạ của [[request()]] nó sẽ tạo lệnh [[RC_QUERY_REFUND]] để tạo yêu cầu truy vấn trạng thái hoàn tiền tới cổng thanh toán.
+     *
+     * @param array $data dữ liệu trạng thái hoàn tiền.
+     * @param null $clientId Client id sử dụng để tạo yêu cầu truy vấn trạng thái.
+     * Nếu không thiết lập [[getDefaultClient()]] sẽ được gọi để xác định client.
+     * @return ResponseData|DataInterface Trả về [[DataInterface]] là dữ liệu tổng hợp từ MOMO phản hồi.
+     * @throws \ReflectionException|\yii\base\InvalidConfigException|\yii\base\InvalidArgumentException
+     * @since 1.0.3
+     */
+    public function queryRefund(array $data, $clientId = null): DataInterface
+    {
+        return $this->request(self::RC_QUERY_REFUND, $data, $clientId);
+    }
+
+    /**
      * @inheritdoc
      */
     public function beforeRequest(RequestEvent $event)
     {
-        if ($event->command === self::RC_PURCHASE) {
-            $this->trigger(self::EVENT_BEFORE_PURCHASE, $event);
-        } elseif ($event->command === self::RC_QUERY_DR) {
-            $this->trigger(self::EVENT_BEFORE_QUERY_DR, $event);
+        switch ($event->command) {
+            case self::RC_PURCHASE:
+                $this->trigger(self::EVENT_BEFORE_PURCHASE, $event);
+                break;
+            case self::RC_QUERY_DR:
+                $this->trigger(self::EVENT_BEFORE_QUERY_DR, $event);
+                break;
+            case self::RC_REFUND:
+                $this->trigger(self::EVENT_BEFORE_REFUND, $event);
+                break;
+            case self::RC_QUERY_REFUND:
+                $this->trigger(self::EVENT_BEFORE_QUERY_REFUND, $event);
+                break;
+            default:
+                break;
         }
 
         parent::beforeRequest($event);
@@ -196,10 +271,21 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
      */
     public function afterRequest(RequestEvent $event)
     {
-        if ($event->command === self::RC_PURCHASE) {
-            $this->trigger(self::EVENT_AFTER_PURCHASE, $event);
-        } elseif ($event->command === self::RC_QUERY_DR) {
-            $this->trigger(self::EVENT_AFTER_QUERY_DR, $event);
+        switch ($event->command) {
+            case self::RC_PURCHASE:
+                $this->trigger(self::EVENT_AFTER_PURCHASE, $event);
+                break;
+            case self::RC_QUERY_DR:
+                $this->trigger(self::EVENT_AFTER_QUERY_DR, $event);
+                break;
+            case self::RC_REFUND:
+                $this->trigger(self::EVENT_AFTER_REFUND, $event);
+                break;
+            case self::RC_QUERY_REFUND:
+                $this->trigger(self::EVENT_AFTER_QUERY_REFUND, $event);
+                break;
+            default:
+                break;
         }
 
         parent::afterRequest($event);
@@ -268,7 +354,7 @@ abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayI
                 return false;
             }
         } else {
-            throw new InvalidArgumentException("Unknown verify request command: `$command`");
+            throw new InvalidArgumentException("Verify request command: `$command` invalid in " . __CLASS__);
         }
     }
 

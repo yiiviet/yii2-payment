@@ -94,6 +94,15 @@ class PaymentGateway extends BasePaymentGateway
     }
 
     /**
+     * @inheritdoc
+     * @since 1.0.3
+     */
+    public function requestCommands(): array
+    {
+        return [self::RC_PURCHASE, self::RC_QUERY_DR];
+    }
+
+    /**
      * @return ResponseData|DataInterface
      * @inheritdoc
      */
