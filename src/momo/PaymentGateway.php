@@ -10,8 +10,6 @@ namespace yiiviet\payment\momo;
 
 use yii\httpclient\Client as HttpClient;
 
-use vxm\gatewayclients\RequestData;
-
 use yiiviet\payment\BasePaymentGateway;
 
 /**
@@ -98,11 +96,11 @@ class PaymentGateway extends BasePaymentGateway
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\httpclient\Exception
      */
-    protected function requestInternal(RequestData $requestData, HttpClient $httpClient): array
+    protected function requestInternal(\vxm\gatewayclients\RequestData $requestData, HttpClient $httpClient): array
     {
         $data = $requestData->get();
 
-        return $this->getHttpClient()->post('', $data)->send()->getData();
+        return $this->getHttpClient()->post('', $data)->setFormat('json')->send()->getData();
     }
 
     /**

@@ -8,6 +8,7 @@
 namespace yiiviet\payment\momo;
 
 use yii\base\NotSupportedException;
+use yii\behaviors\AttributeTypecastBehavior;
 
 use vxm\gatewayclients\RequestData as BaseRequestData;
 
@@ -23,6 +24,26 @@ use vxm\gatewayclients\RequestData as BaseRequestData;
  */
 class RequestData extends BaseRequestData
 {
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        $attributeTypes = [
+            'orderId' => 'string'
+        ];
+
+        if (in_array($this->command, [PaymentGateway::RC_PURCHASE, PaymentGateway::RC_QUERY_REFUND], true)) {
+            $attributeTypes['amount'] = 'string';
+        }
+
+        return [
+            'typeCast' => [
+                'class' => AttributeTypecastBehavior::class,
+                'attributeTypes' => $attributeTypes
+            ]
+        ];
+    }
 
     /**
      * @inheritdoc
@@ -31,7 +52,7 @@ class RequestData extends BaseRequestData
     {
         return [
             [['amount'], 'required', 'on' => [PaymentGateway::RC_REFUND, PaymentGateway::RC_PURCHASE]],
-            [['returnUrl'], 'required', 'on' => PaymentGateway::RC_PURCHASE],
+            [['returnUrl', 'notifyUrl'], 'required', 'on' => PaymentGateway::RC_PURCHASE],
             [['transId'], 'required', 'on' => PaymentGateway::RC_REFUND],
             [['partnerCode', 'accessKey', 'requestId', 'orderId', 'signature', 'requestType'], 'required', 'on' => [
                 PaymentGateway::RC_PURCHASE, PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_REFUND, PaymentGateway::RC_QUERY_REFUND
@@ -51,13 +72,13 @@ class RequestData extends BaseRequestData
         $attributes['partnerCode'] = $client->partnerCode;
         $attributes['accessKey'] = $client->accessKey;
 
-        if ($command === PaymentGateway::RC_QUERY_DR) {
+        if ($command === PaymentGateway::RC_PURCHASE) {
             $attributes['orderInfo'] = $attributes['orderInfo'] ?? '';
             $attributes['extraData'] = $attributes['extraData'] ?? '';
             $attributes['notifyUrl'] = $attributes['notifyUrl'] ?? '';
         }
 
-        $attributes['signature'] = $this->signature($attributes);
+        $attributes['signature'] = $this->getSignature($attributes);
         $attributes['requestType'] = $this->getRequestType();
     }
 

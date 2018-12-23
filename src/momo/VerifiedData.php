@@ -19,7 +19,7 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
  * @property string $accessKey của client sử dụng khi tạo request purchase.
  * @property mixed $requestId mã unique request id khi tạo request purchase
  * @property double $amount số tiền của đơn hàng.
- * @property mixed $orderId mã đơn hàng tại hệ thống.
+ * @property string $orderId mã đơn hàng tại hệ thống.
  * @property string $orderType có giá trị cố định là `momo_wallet`.
  * @property string $transId mã giao dịch tại MOMO.
  * @property string $message thống báo (eng).

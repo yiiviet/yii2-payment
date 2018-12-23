@@ -20,7 +20,7 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  * @property string $accessKey của client sử dụng khi tạo request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_REFUND, PaymentGateway::RC_QUERY_REFUND]].
  * @property mixed $requestId mã unique request id khi tạo request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_REFUND, PaymentGateway::RC_QUERY_REFUND]].
  * @property double $amount số tiền của đơn hàng chỉ tồn tại với request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_REFUND]].
- * @property mixed $orderId mã đơn hàng tại hệ thống.
+ * @property string $orderId mã đơn hàng tại hệ thống.
  * @property string $orderType có giá trị cố định là `momo_wallet`.
  * @property string $transId mã giao dịch tại MOMO chỉ tồn tại khi tạo request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_REFUND, PaymentGateway::RC_QUERY_REFUND]].
  * @property string $message thống báo (eng).
@@ -47,7 +47,7 @@ class ResponseData extends BaseResponseData
     {
         $requestCommands = $this->getClient()->getGateway()->requestCommands();
 
-        return array_fill_keys($requestCommands, ['errorCode', 'signature']);
+        return array_fill_keys($requestCommands, ['signature']);
     }
 
     /**
@@ -56,9 +56,8 @@ class ResponseData extends BaseResponseData
     public function rules()
     {
         return [
-            [['errorCode', 'signature'], 'required'],
-            [['errorCode'], 'compare', 'compareValue' => 0],
-            [['signature'], 'signatureValidator', 'message' => '{attribute} is not valid!']
+            ['signature', 'required'],
+            ['signature', 'signatureValidator', 'message' => '{attribute} is not valid!']
         ];
     }
 

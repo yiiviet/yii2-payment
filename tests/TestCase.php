@@ -80,7 +80,8 @@ abstract class TestCase extends BaseTestCase
                         'NL' => 'yiiviet\payment\nganluong\PaymentGateway',
                         'OP' => 'yiiviet\payment\onepay\PaymentGateway',
                         'VNP' => 'yiiviet\payment\vnpayment\PaymentGateway',
-                        'VTC' => 'yiiviet\payment\vtcpay\PaymentGateway'
+                        'VTC' => 'yiiviet\payment\vtcpay\PaymentGateway',
+                        'MM' => 'yiiviet\payment\momo\PaymentGateway'
                     ]
                 ]
             ],
@@ -113,6 +114,26 @@ abstract class TestCase extends BaseTestCase
     protected function queryDR(array $data, $clientId = null)
     {
         return Yii::$app->get('paymentGateways')->queryDR($data, static::gatewayId(), $clientId);
+    }
+
+    /**
+     * @param array $data
+     * @param null $clientId
+     * @return \vxm\gatewayclients\ResponseData
+     */
+    protected function refund(array $data, $clientId = null)
+    {
+        return Yii::$app->get('paymentGateways')->refund($data, static::gatewayId(), $clientId);
+    }
+
+    /**
+     * @param array $data
+     * @param null $clientId
+     * @return \vxm\gatewayclients\ResponseData
+     */
+    protected function queryRefund(array $data, $clientId = null)
+    {
+        return Yii::$app->get('paymentGateways')->queryRefund($data, static::gatewayId(), $clientId);
     }
 
     /**

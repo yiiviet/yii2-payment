@@ -86,7 +86,7 @@ class VnPaymentTest extends TestCase
     public function testRefund()
     {
         // Valid
-        $responseData = $this->gateway->refund([
+        $responseData = $this->refund([
             'TxnRef' => 123,
             'Amount' => 100000,
             'IpAddr' => '127.0.0.1',
@@ -99,7 +99,7 @@ class VnPaymentTest extends TestCase
         $this->assertEquals(99, $responseData->getResponseCode());
 
         // Throws
-        $this->gateway->refund([
+        $this->refund([
             'IpAddr' => '127.0.0.1',
             'OrderInfo' => time(),
             'TransDate' => date('Ymdhis'),

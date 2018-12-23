@@ -34,7 +34,7 @@ trait SignatureValidatorTrait
 
         $client = $this->getClient();
 
-        if (!$client->validateSignature($dataSign, $this->$attribute)) {
+        if (!$client->validateSignature($dataSign, $this->$attribute ?? '')) {
             $validator->addError($this, $attribute, $validator->message);
         }
     }
