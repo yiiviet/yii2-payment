@@ -112,7 +112,7 @@ class BankProvider extends BaseBankProvider
     {
         $data = $this->gateway->getMerchantData($this->emailBusiness, $this->clientId);
 
-        if ($data->isOk) {
+        if ($data->getIsOk()) {
             return $data;
         } else {
             throw new InvalidCallException('Can not get merchant data!');
