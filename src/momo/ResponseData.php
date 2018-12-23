@@ -37,8 +37,6 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
 class ResponseData extends BaseResponseData
 {
 
-    use SignatureValidatorTrait;
-
     /**
      * @inheritdoc
      * @throws \ReflectionException
@@ -57,7 +55,7 @@ class ResponseData extends BaseResponseData
     {
         return [
             ['signature', 'required'],
-            ['signature', 'signatureValidator', 'message' => '{attribute} is not valid!']
+            ['signature', SignatureValidator::class, 'client' => $this->getClient(), 'dataSignAttributes' => $this->getDataSignAttributes()]
         ];
     }
 

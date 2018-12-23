@@ -35,8 +35,6 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
 class VerifiedData extends BaseVerifiedData
 {
 
-    use SignatureValidatorTrait;
-
     /**
      * @inheritdoc
      */
@@ -46,20 +44,13 @@ class VerifiedData extends BaseVerifiedData
             [['signature'], 'required', 'on' => [
                 PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN
             ]],
-            [['signature'], 'signatureValidator', 'message' => '{attribute} is not valid!', 'on' => [
+            [['signature'], SignatureValidator::class, 'dataSignAttributes' => [
+                'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId', 'orderInfo', 'orderType',
+                'transId', 'message', 'localMessage', 'responseTime', 'errorCode', 'payType', 'extraData'
+            ], 'client' => $this->getClient(), 'on' => [
                 PaymentGateway::VRC_PURCHASE_SUCCESS, PaymentGateway::VRC_IPN
             ]]
         ];
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function getDataSignAttributes(): array
-    {
-        return [
-            'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId', 'orderInfo', 'orderType',
-            'transId', 'message', 'localMessage', 'responseTime', 'errorCode', 'payType', 'extraData'
-        ];
-    }
 }
