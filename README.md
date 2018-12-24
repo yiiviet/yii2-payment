@@ -59,6 +59,14 @@ $vtcPay->purchase([
     'amount' => 100000,
     'reference_number' => time()
 ]);
+
+$momo->purchase([
+    'amount' => 100000,
+    'orderId' => time(),
+    'requestId' => time(),
+    'returnUrl' => 'http://localhost',
+    'notifyUrl' => 'http://localhost/notify',
+]);
 ```
 
 Các cổng thanh toán được hổ trợ:
@@ -68,10 +76,11 @@ Các cổng thanh toán được hổ trợ:
 * [OnePay](https://onepay.vn)
 * [VnPayment](https://vnpayment.vn)
 * [VTCPay](https://vtcpay.vn)
+* [MoMo](https://momo.vn)
 
 ## Yêu cầu
 * [PHP >= 7.1](http://php.net)
-* [PHP Extension: openSSL](http://pear.php.net)
+* [PHP Extension: openSSL](http://pear.php.net) đối với Bảo Kim Pro
 * [yiisoft/yii2 >= 2.0.13](https://github.com/yiisoft/yii2/)
 * [vxm/yii2-gateway-clients >= 2.0.1](https://github.com/vuongxuongminh/yii2-gateway-clients)
 
@@ -99,5 +108,7 @@ vào phần `require` trong file composer.json.
 * [Cổng thanh toán OnePay](/docs/onepay.md).
 * [Cổng thanh toán VnPayment](/docs/vnpayment.md).
 * [Cổng thanh toán VTCPay](/docs/vtcpay.md).
+* [Cổng thanh toán MoMo](/docs/momo.md).
 * [Tích hợp đồng thời nhiều cổng thanh toán](/docs/multi.md).
-* [Khai báo VerifyFilter để lọc request](/docs/verifyfilter.md)
+* [Khai báo VerifyFilter để lọc request](/docs/verifyfilter.md).
+* [Bank Widget & Validator](/docs/widgetvalidator.md).

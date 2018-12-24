@@ -75,7 +75,6 @@ class RequestData extends BaseRequestData
         if ($command === PaymentGateway::RC_PURCHASE) {
             $attributes['orderInfo'] = $attributes['orderInfo'] ?? '';
             $attributes['extraData'] = $attributes['extraData'] ?? '';
-            $attributes['notifyUrl'] = $attributes['notifyUrl'] ?? '';
         }
 
         $attributes['signature'] = $this->getSignature($attributes);
