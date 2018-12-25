@@ -100,7 +100,7 @@ class PaymentGateway extends BasePaymentGateway
     {
         $data = $requestData->get();
 
-        return $this->getHttpClient()->post('', $data)->setFormat('json')->send()->getData();
+        return $httpClient->post('', $data)->setFormat('json')->send()->getData();
     }
 
     /**
