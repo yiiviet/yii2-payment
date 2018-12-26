@@ -1,9 +1,13 @@
 Change Log
 ==========================
 
-1.0.3 under development
+1.0.4 đang xây dựng
 --------------------------
 
+1.0.3
+--------------------------
+
+- Tính năng #9: Hổ trợ tích hợp cổng thanh toán MoMo (vuongxuongminh)
 - Lỗi #11: Thêm kiểm tra dữ liệu đầu vào khi khởi tạo tại các lớp clients (vuongxuongminh)
 - Tính năng #1: Hổ trợ widget để xuất thông tin ngân hàng (vuongxuongminh)
 - Tính năng #10: Thêm validator `bankvn` hổ trợ kiểm tra mã ngân hàng (vuongxuongminh)
