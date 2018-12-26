@@ -22,7 +22,8 @@ thư mục `config` như sau:
                  'NL' => 'yiiviet\payment\nganluong\PaymentGateway',
                  'OP' => 'yiiviet\payment\onepay\PaymentGateway',
                  'VNP' => 'yiiviet\payment\vnpayment\PaymentGateway',
-                 'VTC' => 'yiiviet\payment\vtcpay\PaymentGateway'
+                 'VTC' => 'yiiviet\payment\vtcpay\PaymentGateway',
+                 'MM' => 'yiiviet\payment\momo\PaymentGateway'
              ]
          ]
     ]    
@@ -80,7 +81,15 @@ thư mục `config` như sau:
                         'merchantId' => 'Mã website bạn vừa đăng ký',
                         'secureCode' => 'Mã bảo mật bạn vừa đăng ký'
                     ]
-                 ]
+                 ],
+                 'MM' => [
+                    'class' => 'yiiviet\payment\momo\PaymentGateway',
+                    'client' => [
+                        'partnerCode' => 'Partner code bạn vừa đăng ký',
+                        'accessKey' => 'Access key bạn vừa đăng ký',
+                        'secretKey' => 'Secret key bạn vừa đăng ký'
+                    ]
+                 ]                 
              ]
          ]
     ]     
@@ -98,6 +107,7 @@ bằng cú pháp:
  $op = Yii::$app->paymentGateways->OP;
  $vnpayment = Yii::$app->paymentGateways->VNP;
  $vtc = Yii::$app->paymentGateways->VTC;
+ $momo = Yii::$app->paymentGateways->MM;
  
  ```
  
@@ -111,6 +121,8 @@ bằng cú pháp:
 | :-----------:  | :----: |
 | **purchase** | Tạo lệnh thanh toán thông qua cổng thanh toán chỉ định.|
 | **queryDR** | Tạo lệnh yêu cầu cổng thanh toán truy vấn thông tin giao dịch. |
+| **refund** | Tạo yêu cầu hoàn tiền thông qua cổng thanh toán chỉ định.|
+| **queryRefund** | Tạo truy vấn trạng thái hoàn thông qua cổng thanh toán chỉ định. |
 | **verifyRequestIPN** | Kiểm tra tính hợp lệ của dữ liệu mà cổng thanh toán gửi sang khi khách hàng thanh toán thành công (VNPayment to Server). |
 | **verifyRequestPurchaseSuccess** | Kiểm tra tính hợp lệ của dữ liệu mà cổng thanh toán gửi sang khi khách hàng thanh toán thành công (Client to Server). |
 
@@ -162,6 +174,14 @@ Ví dụ:
         'amount' => 100000,
         'reference_number' => time()
     ], 'VTC');
+    
+    Yii::$app->paymentGateways->->purchase([
+        'amount' => 100000,
+        'orderId' => time(),
+        'requestId' => time(),
+        'returnUrl' => 'http://localhost',
+        'notifyUrl' => 'http://localhost/notify'
+    ], 'MM');    
 ```
 
 Như bạn thấy cách sử dụng không khác gì so với từng cổng thanh toán, điểm khác duy nhất

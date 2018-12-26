@@ -60,7 +60,7 @@ bằng cú pháp `Yii::$app->VTCGateway`.
 * Cách sử dụng cơ bản:
 
 ```php
-    $result = Yii::$app->VTCGateway->purchase([
+    $responseData = Yii::$app->VTCGateway->purchase([
        'amount' => 100000,
        'reference_number' => time()
     ]);
@@ -95,13 +95,13 @@ tượng `response` với các thuộc tính sau:
 * Code hoàn chỉnh:
 
 ```php
-    $result = Yii::$app->VTCGateway->purchase([
+    $responseData = Yii::$app->VTCGateway->purchase([
        'amount' => 100000,
        'reference_number' => time()
     ]);
 
-    if ($result->isOk) {
-        Yii::$app->response->redirect($result->redirect_url);
+    if ($responseData->isOk) {
+        Yii::$app->response->redirect($responseData->redirect_url);
     } 
     
 ``` 

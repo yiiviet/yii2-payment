@@ -60,7 +60,7 @@ bằng cú pháp `Yii::$app->VNPGateway`.
 * Cách sử dụng cơ bản:
 
 ```php
-    $result = Yii::$app->VNPGateway->purchase([
+    $responseData = Yii::$app->VNPGateway->purchase([
         'TxnRef' => time(),
         'OrderType' => 100000,
         'OrderInfo' => time(),
@@ -95,7 +95,7 @@ tượng `response` với các thuộc tính sau:
 * Code hoàn chỉnh:
 
 ```php
-    $result = Yii::$app->VNPGateway->purchase([
+    $responseData = Yii::$app->VNPGateway->purchase([
         'TxnRef' => time(),
         'OrderType' => 100000,
         'OrderInfo' => time(),
@@ -104,8 +104,8 @@ tượng `response` với các thuộc tính sau:
         'ReturnUrl' => 'http://localhost'
     ]);
 
-    if ($result->isOk) {
-        Yii::$app->response->redirect($result->redirect_url);
+    if ($responseData->isOk) {
+        Yii::$app->response->redirect($responseData->redirect_url);
     } 
     
 ``` 
@@ -184,7 +184,7 @@ tượng `response` với các thuộc tính sau:
 * Cách sử dụng cơ bản:
 
 ```php
-    $result = Yii::$app->VNPGateway->refund([
+    $responseData = Yii::$app->VNPGateway->refund([
         'TxnRef' => 123,
         'Amount' => 100000,
         'IpAddr' => '127.0.0.1',
@@ -227,7 +227,7 @@ tượng `response` với các thuộc tính sau:
 * Code hoàn chỉnh:
 
 ```php
-    $result = Yii::$app->VNPGateway->refund([
+    $responseData = Yii::$app->VNPGateway->refund([
         'TxnRef' => 123,
         'Amount' => 100000,
         'IpAddr' => '127.0.0.1',
@@ -236,7 +236,7 @@ tượng `response` với các thuộc tính sau:
         'TransactionNo' => 123,
     ]);
 
-    if ($result->isOk) {
+    if ($responseData->isOk) {
         
         // thực hiện nghiệm vụ tùy theo mục đích hoàn trả của bạn
         

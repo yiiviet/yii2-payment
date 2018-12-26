@@ -66,7 +66,7 @@ bạn sẽ phải `redirect` khách hàng sang Ngân Lượng để thực hiệ
 * Cách sử dụng cơ bản:
 
 ```php
-    $result = Yii::$app->NLGateway->purchase([
+    $responseData = Yii::$app->NLGateway->purchase([
         'bank_code' => 'VCB',
         'buyer_fullname' => 'vxm',
         'buyer_email' => 'admin@test.app',
@@ -123,7 +123,7 @@ tượng `response` với các thuộc tính sau:
 * Code hoàn chỉnh:
 
 ```php
-    $result = Yii::$app->NLGateway->purchase([
+    $responseData = Yii::$app->NLGateway->purchase([
         'bank_code' => 'VCB',
         'buyer_fullname' => 'vxm',
         'buyer_email' => 'admin@test.app',
@@ -133,10 +133,10 @@ tượng `response` với các thuộc tính sau:
         'return_url' => \yii\helpers\Url::to(['order/success'])
     ]);
 
-    if ($result->isOk) {
-        Yii::$app->response->redirect($result->checkout_url);
+    if ($responseData->isOk) {
+        Yii::$app->response->redirect($responseData->checkout_url);
     } else {
-        return $result->description;
+        return $responseData->description;
     }
 ``` 
 
@@ -149,7 +149,7 @@ toán bạn sẽ phải tự xây dựng. Ngân Lượng cấp phương thức `
 * Cách sử dụng cơ bản:
 
 ```php
-    $result = Yii::$app->NLGateway->purchase([
+    $responseData = Yii::$app->NLGateway->purchase([
         'bank_code' => 'VCB',
         'buyer_fullname' => 'vxm',
         'buyer_email' => 'admin@test.app',
@@ -217,7 +217,7 @@ tượng `response` với các thuộc tính sau:
 
 ```php
 
-    $result = Yii::$app->NLGateway->purchase([
+    $responseData = Yii::$app->NLGateway->purchase([
         'bank_code' => 'VCB',
         'buyer_fullname' => 'vxm',
         'buyer_email' => 'admin@test.app',
@@ -231,8 +231,8 @@ tượng `response` với các thuộc tính sau:
         'card_year' => 2012
     ]);
 
-    if ($result->isOk && $result->auth_site === 'BANK') {
-        Yii::$app->response->redirect($result->auth_url);
+    if ($responseData->isOk && $responseData->auth_site === 'BANK') {
+        Yii::$app->response->redirect($responseData->auth_url);
     } else {
         // Lưu lại thông tin `result` và hiển thị form cho khách nhập OTP.
         sau khi khách nhập OTP sử dụng mã OTP truyền vào phương thức `authenticate` để xác minh tính
@@ -251,7 +251,7 @@ Cách kiểm tra:
 ```php
 
 
-    $result = Yii::$app->NLGateway->purchase([
+    $responseData = Yii::$app->NLGateway->purchase([
         'bank_code' => 'VCB',
         'buyer_fullname' => 'vxm',
         'buyer_email' => 'admin@test.app',
@@ -265,11 +265,11 @@ Cách kiểm tra:
         'card_year' => 2012
     ]);
     
-    if ($result->isOk && $result->auth_site === 'NL') {
+    if ($responseData->isOk && $responseData->auth_site === 'NL') {
         $authResponse = Yii::$app->NLGateway->authenticate([
-            'token' => $result->token,
+            'token' => $responseData->token,
             'otp' => '123123',
-            'auth_url' => $result->auth_url
+            'auth_url' => $responseData->auth_url
         ]);    
     }
 ```

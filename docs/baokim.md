@@ -74,7 +74,7 @@ bằng cú pháp `Yii::$app->BKGateway`.
 * Cách sử dụng cơ bản để yêu cầu Bảo Kim tạo thanh toán:
 
 ```php
-    $result = Yii::$app->BKGateway->purchase([
+    $responseData = Yii::$app->BKGateway->purchase([
         'order_id' => 2, 
         'total_amount' => 500000, 
         'url_success' => \yii\helpers\Url::to(['payment/success]');
@@ -108,14 +108,14 @@ tượng `response` với các thuộc tính sau:
 * Code hoàn chỉnh:
 
 ```php
-    $result = Yii::$app->BKGateway->purchase([
+    $responseData = Yii::$app->BKGateway->purchase([
         'order_id' => 2, 
         'total_amount' => 500000, 
         'url_success' => '/'
     ]);
 
-    if ($result->isOk) {
-        Yii::$app->response->redirect($result->redirect_url);
+    if ($responseData->isOk) {
+        Yii::$app->response->redirect($responseData->redirect_url);
     }
 ``` 
 
@@ -124,7 +124,7 @@ tượng `response` với các thuộc tính sau:
 * Cách sử dụng cơ bản để yêu cầu bảo kim tạo thanh toán với phương thức PRO:
 
 ```php
-    $result = Yii::$app->BKGateway->purchase([
+    $responseData = Yii::$app->BKGateway->purchase([
         'bank_payment_method_id' => 128,
         'payer_name' => 'vxm',
         'payer_email' => 'vxm@gmail.com',
@@ -173,7 +173,7 @@ tượng `response` với các thuộc tính sau:
 * Code hoàn chỉnh:
 
 ```php
-    $result = Yii::$app->BKGateway->purchase([
+    $responseData = Yii::$app->BKGateway->purchase([
         'bank_payment_method_id' => xxx,
         'payer_name' => 'vxm',
         'payer_email' => 'vxm@gmail.com',
@@ -183,8 +183,8 @@ tượng `response` với các thuộc tính sau:
         'url_success' => '/'
     ]);
 
-    if ($result->isOk) {
-        $url = $result->next_action === 'redirect' ? $result->redirect_url : $result->guide_url;
+    if ($responseData->isOk) {
+        $url = $responseData->next_action === 'redirect' ? $responseData->redirect_url : $responseData->guide_url;
         Yii::$app->response->redirect($url);
     }
 ``` 

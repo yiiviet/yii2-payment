@@ -63,7 +63,7 @@ bằng cú pháp `Yii::$app->OPGateway`.
 * Cách sử dụng cơ bản:
 
 ```php
-    $result = Yii::$app->OPGateway->purchase([
+    $responseData = Yii::$app->OPGateway->purchase([
         'ReturnURL' => 'http://localhost/',
         'OrderInfo' => time(),
         'Amount' => 500000,
@@ -105,7 +105,7 @@ tượng `response` với các thuộc tính sau:
 * Code hoàn chỉnh:
 
 ```php
-    $result = Yii::$app->OPGateway->purchase([
+    $responseData = Yii::$app->OPGateway->purchase([
         'ReturnURL' => 'http://localhost/',
         'OrderInfo' => time(),
         'Amount' => 500000,
@@ -115,8 +115,8 @@ tượng `response` với các thuộc tính sau:
         'MerchTxnRef' => time()
     ]);
 
-    if ($result->isOk) {
-        Yii::$app->response->redirect($result->redirect_url);
+    if ($responseData->isOk) {
+        Yii::$app->response->redirect($responseData->redirect_url);
     } 
     
 ``` 
@@ -126,7 +126,7 @@ tượng `response` với các thuộc tính sau:
 * Cách sử dụng cơ bản:
 
 ```php
-    $result = Yii::$app->OPGateway->purchase([
+    $responseData = Yii::$app->OPGateway->purchase([
         'ReturnURL' => 'http://localhost/',
         'OrderInfo' => time(),
         'Amount' => 500000,
@@ -173,7 +173,7 @@ tượng `response` với các thuộc tính sau:
 * Code hoàn chỉnh:
 
 ```php
-    $result = Yii::$app->OPGateway->purchase([
+    $responseData = Yii::$app->OPGateway->purchase([
         'ReturnURL' => 'http://localhost/',
         'OrderInfo' => time(),
         'Amount' => 500000,
@@ -183,8 +183,8 @@ tượng `response` với các thuộc tính sau:
         'MerchTxnRef' => time()
     ]);
 
-    if ($result->isOk) {
-        Yii::$app->response->redirect($result->redirect_url);
+    if ($responseData->isOk) {
+        Yii::$app->response->redirect($responseData->redirect_url);
     } 
     
 ``` 
