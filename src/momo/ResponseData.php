@@ -16,16 +16,15 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  *
  * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
  *
- * @property string $partnerCode của client sử dụng khi tạo request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_REFUND, PaymentGateway::RC_QUERY_REFUND]].
- * @property string $accessKey của client sử dụng khi tạo request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_REFUND, PaymentGateway::RC_QUERY_REFUND]].
- * @property mixed $requestId mã unique request id khi tạo request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_REFUND, PaymentGateway::RC_QUERY_REFUND]].
+ * @property string $partnerCode của client sử dụng khi tạo request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_REFUND, PaymentGateway::RC_QUERY_REFUND]].
+ * @property string $accessKey của client sử dụng khi tạo request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_REFUND, PaymentGateway::RC_QUERY_REFUND]].
+ * @property mixed $requestId mã unique request id khi tạo request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_REFUND, PaymentGateway::RC_QUERY_REFUND]].
  * @property double $amount số tiền của đơn hàng chỉ tồn tại với request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_REFUND]].
  * @property string $orderId mã đơn hàng tại hệ thống.
  * @property string $orderType có giá trị cố định là `momo_wallet`.
- * @property string $transId mã giao dịch tại MOMO chỉ tồn tại khi tạo request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_QUERY_REFUND, PaymentGateway::RC_QUERY_REFUND]].
+ * @property string $transId mã giao dịch tại MOMO chỉ tồn tại khi tạo request [[PaymentGateway::RC_QUERY_DR, PaymentGateway::RC_REFUND, PaymentGateway::RC_QUERY_REFUND]].
  * @property string $message thống báo (eng).
  * @property string $localMessage thống báo (vi).
- * @property string $responseTime thời gian phản hồi.
  * @property int $errorCode mã báo lỗi.
  * @property string $payType hình thức thanh toán (web hoặc qr) chỉ tồn tại khi tạo request [[PaymentGateway::RC_QUERY_DR]].
  * @property mixed $extraData dữ liệu kèm theo khi tạo request purchase chỉ tồn tại khi tạo request [[PaymentGateway::RC_QUERY_DR]].
