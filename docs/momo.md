@@ -90,13 +90,12 @@ tượng `response` với các thuộc tính sau:
 | Thuộc tính | Bắt buộc | Kiểu | Mô tả |
 | :-----------: | :----: | :------: | ---- |
 | isOk | **có** | bool | Thuộc tính cho biết tiến trình yêu cầu diễn ra tốt đẹp hay không. Nếu có là `TRUE` và ngược lại. |
-| payUrl | **có** | string | Đường dẫn thanh toán MoMo. Bạn sẽ `redirect` khách đến đường dẫn để khách thực hiện thanh toán. |
-| amount | **có** | double | Số tiền của đơn hàng. |
-| orderId | **có** | string | Mã đơn hàng tại hệ thống. |
 | message | **có** | string | Thông báo (eng). |
 | localMessage | **có** | string | Thông báo (vi). |
-| responseTime | **có** | string | Thời gian phản hồi. |
 | errorCode | **có** | string | Mã trạng thái. |
+| payUrl | không | string | Đường dẫn thanh toán MoMo. Bạn sẽ `redirect` khách đến đường dẫn để khách thực hiện thanh toán. Nó chỉ tồn tại khi `isOk` là TRUE và `errorCode` bằng 0 |
+| amount | không | double | Số tiền của đơn hàng. Nó chỉ tồn tại khi `isOk` là TRUE và `errorCode` bằng 0 |
+| orderId | không | string | Mã đơn hàng tại hệ thống. Nó chỉ tồn tại khi `isOk` là TRUE và `errorCode` bằng 0 |
 
 * Code hoàn chỉnh:
 
@@ -109,9 +108,11 @@ tượng `response` với các thuộc tính sau:
         'notifyUrl' => 'http://localhost/notify'
     ]);
 
-    if ($responseData->isOk) {
+    if ($responseData->isOk && $responseData->errorCode == 0) {
         Yii::$app->response->redirect($result->payUrl);
-    } 
+    } else {
+        print $responseData->message;
+    }
     
 ``` 
  
