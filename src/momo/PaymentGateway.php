@@ -5,7 +5,6 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-
 namespace yiiviet\payment\momo;
 
 use yii\httpclient\Client as HttpClient;
@@ -33,26 +32,6 @@ use yiiviet\payment\BasePaymentGateway;
  */
 class PaymentGateway extends BasePaymentGateway
 {
-    /**
-     * Dùng để khai báo lệnh khi tạo request [[RC_PURCHASE]].
-     */
-    const REQUEST_TYPE_PURCHASE = 'captureMoMoWallet';
-
-    /**
-     * Dùng để khai báo lệnh khi tạo request [[RC_REFUND]].
-     */
-    const REQUEST_TYPE_REFUND = 'refundMoMoWallet';
-
-    /**
-     * Dùng để khai báo lệnh khi tạo request [[RC_QUERY_DR]].
-     */
-    const REQUEST_TYPE_QUERY_DR = 'transactionStatus';
-
-    /**
-     * Dùng để khai báo lệnh khi tạo request [[RC_QUERY_REFUND]].
-     */
-    const REQUEST_TYPE_QUERY_REFUND = 'refundStatus';
-
     /**
      * @inheritdoc
      */
