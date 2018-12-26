@@ -117,7 +117,7 @@ trait GatewayBankProviderTrait
                 $config = array_merge($this->providerConfig, [
                     'class' => $this->providerClasses[$gatewayClass]
                 ]);
-                /** @var BankProvider $provider */
+
                 return $this->_provider = Yii::createObject($config, [$this->gateway]);
             } else {
                 throw new NotSupportedException("Gateway: `$gatewayClass` is not supported!");
