@@ -44,7 +44,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```
 
 Khi đã thiết lập xong ngay lập tức bạn đã có thể truy xuất đến cổng thanh toán MoMo
-bằng cú pháp `Yii::$app->momo`.
+bằng cú pháp `Yii::$app->momoGateway`.
 
 ## Tổng quan các phương thức (methods)
 
