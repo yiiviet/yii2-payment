@@ -77,8 +77,8 @@ class RequestData extends BaseRequestData
             $attributes['extraData'] = $attributes['extraData'] ?? '';
         }
 
-        $attributes['signature'] = $this->getSignature($attributes);
         $attributes['requestType'] = $this->getRequestType();
+        $attributes['signature'] = $this->getSignature($attributes);
     }
 
     /**
@@ -115,27 +115,33 @@ class RequestData extends BaseRequestData
         switch ($command = $this->getCommand()) {
             case PaymentGateway::RC_PURCHASE:
                 $attributesSign = [
-                    'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId',
-                    'orderInfo', 'returnUrl', 'notifyUrl', 'extraData',
+                    'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId', 'orderInfo', 'returnUrl', 'notifyUrl', 'extraData'
                 ];
                 break;
             case PaymentGateway::RC_QUERY_DR:
             case PaymentGateway::RC_QUERY_REFUND:
                 $attributesSign = [
-                    'partnerCode', 'accessKey', 'requestId', 'orderId', 'requestType' => $this->getRequestType()
+                    'partnerCode', 'accessKey', 'requestId', 'orderId', 'requestType'
                 ];
                 break;
             case PaymentGateway::RC_REFUND:
                 $attributesSign = [
-                    'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId', 'transId', 'requestType' => $this->getRequestType()
+                    'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId', 'transId', 'requestType'
                 ];
                 break;
             default:
                 throw new NotSupportedException("Not supported command: `$command`");
         }
 
-        $dataSign = array_intersect_key($attributes, array_flip($attributesSign));
-        $strSign = urldecode(http_build_query($dataSign));
+        $data = [];
+
+        foreach ($attributesSign as $attributeSign) {
+            if (isset($attributes[$attributeSign])) {
+                $data[$attributeSign] = $attributes[$attributeSign];
+            }
+        }
+
+        $strSign = urldecode(http_build_query($data));
 
         return $this->getClient()->signature($strSign);
     }
