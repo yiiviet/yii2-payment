@@ -114,44 +114,29 @@ class RequestData extends BaseRequestData
     {
         switch ($command = $this->getCommand()) {
             case PaymentGateway::RC_PURCHASE:
-                $dataSign = [
-                    'partnerCode' => $attributes['partnerCode'],
-                    'accessKey' => $attributes['accessKey'],
-                    'requestId' => $attributes['requestId'],
-                    'amount' => $attributes['amount'],
-                    'orderId' => $attributes['orderId'],
-                    'orderInfo' => $attributes['orderInfo'],
-                    'returnUrl' => $attributes['returnUrl'],
-                    'notifyUrl' => $attributes['notifyUrl'],
-                    'extraData' => $attributes['extraData'],
+                $attributesSign = [
+                    'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId',
+                    'orderInfo', 'returnUrl', 'notifyUrl', 'extraData',
                 ];
                 break;
             case PaymentGateway::RC_QUERY_DR:
             case PaymentGateway::RC_QUERY_REFUND:
-                $dataSign = [
-                    'partnerCode' => $attributes['partnerCode'],
-                    'accessKey' => $attributes['accessKey'],
-                    'requestId' => $attributes['requestId'],
-                    'orderId' => $attributes['orderId'],
-                    'requestType' => $this->getRequestType()
+                $attributesSign = [
+                    'partnerCode', 'accessKey', 'requestId', 'orderId', 'requestType' => $this->getRequestType()
                 ];
                 break;
             case PaymentGateway::RC_REFUND:
-                $dataSign = [
-                    'partnerCode' => $attributes['partnerCode'],
-                    'accessKey' => $attributes['accessKey'],
-                    'requestId' => $attributes['requestId'],
-                    'amount' => $attributes['amount'],
-                    'orderId' => $attributes['orderId'],
-                    'transId' => $attributes['transId'],
-                    'requestType' => $this->getRequestType()
+                $attributesSign = [
+                    'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId', 'transId', 'requestType' => $this->getRequestType()
                 ];
                 break;
             default:
                 throw new NotSupportedException("Not supported command: `$command`");
         }
 
-        $dataSign = urldecode(http_build_query($dataSign));
-        return $this->getClient()->signature($dataSign);
+        $dataSign = array_intersect_key($attributes, array_flip($attributesSign));
+        $strSign = urldecode(http_build_query($dataSign));
+
+        return $this->getClient()->signature($strSign);
     }
 }
