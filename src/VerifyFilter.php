@@ -65,7 +65,7 @@ class VerifyFilter extends ActionFilter
      * @var bool tự động tắt kiểm tra `csrf` của controller hiện tại.
      * @since 1.0.3
      */
-    public $autoDisableControllerCsrfValidation = false;
+    public $autoDisableControllerCsrfValidation = true;
 
     /**
      * @inheritdoc
