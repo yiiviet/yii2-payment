@@ -145,7 +145,7 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
-     * @since 1.0.3.2
+     * @since 1.0.3.1
      */
     public $httpClientConfig = ['transport' => 'yii\httpclient\CurlTransport'];
 
