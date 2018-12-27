@@ -5,10 +5,12 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-
 namespace yiiviet\tests\unit\payment;
 
+use Yii;
+
 use yii\base\Action;
+use yii\web\Controller;
 
 use yiiviet\payment\VerifyFilter;
 
@@ -66,7 +68,7 @@ class VerifyFilterTest extends TestCase
             'commands' => [
                 'ipn' => 'IPN'
             ]
-        ]))->beforeAction(new Action('ipn', null));
+        ]))->beforeAction(new Action('ipn', new Controller('test', Yii::$app)));
     }
 
     /**
@@ -89,7 +91,7 @@ class VerifyFilterTest extends TestCase
             ]
         ]);
 
-        $this->assertTrue($behavior->beforeAction(new Action('ipn', null)));
+        $this->assertTrue($behavior->beforeAction(new Action('ipn', new Controller('test', Yii::$app))));
         $this->assertInstanceOf('\GatewayClients\DataInterface', $behavior->getVerifiedData());
 
     }
