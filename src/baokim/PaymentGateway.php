@@ -145,6 +145,12 @@ class PaymentGateway extends BasePaymentGateway
 
     /**
      * @inheritdoc
+     * @since 1.0.3.2
+     */
+    public $httpClientConfig = ['transport' => 'yii\httpclient\CurlTransport'];
+
+    /**
+     * @inheritdoc
      */
     public function getBaseUrl(): string
     {
@@ -278,9 +284,12 @@ class PaymentGateway extends BasePaymentGateway
             ->setMethod($httpMethod)
             ->setFormat('json')
             ->addData($data)
-            ->addHeaders(['Authorization' => 'Basic ' . base64_encode($client->apiUser . ':' . $client->apiPassword)])
+            ->addOptions([
+                CURLOPT_HTTPAUTH => CURLAUTH_DIGEST | CURLAUTH_BASIC,
+                CURLOPT_USERPWD => $client->apiUser . ':' . $client->apiPassword
+            ])
             ->send()
-            ->data;
+            ->getData();
     }
 
     /**
