@@ -51,8 +51,14 @@ class SignatureValidator extends Validator
      */
     public function validateAttribute($model, $attribute)
     {
-        $data = array_merge(array_fill_keys($this->dataSignAttributes, ''), $model->toArray());
-        $dataSign = array_intersect_key($data, array_flip($this->dataSignAttributes));
+        $dataSign = [];
+
+        foreach ($this->dataSignAttributes as $signAttribute) {
+            if (isset($model[$signAttribute])) {
+                $dataSign[$signAttribute] = $model[$signAttribute];
+            }
+        }
+
         $actualSignature = urldecode(http_build_query($dataSign));
 
         if (!$this->client->validateSignature($actualSignature, $model->$attribute ?? '')) {

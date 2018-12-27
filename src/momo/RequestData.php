@@ -114,18 +114,18 @@ class RequestData extends BaseRequestData
     {
         switch ($command = $this->getCommand()) {
             case PaymentGateway::RC_PURCHASE:
-                $attributesSign = [
+                $signAttributes = [
                     'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId', 'orderInfo', 'returnUrl', 'notifyUrl', 'extraData'
                 ];
                 break;
             case PaymentGateway::RC_QUERY_DR:
             case PaymentGateway::RC_QUERY_REFUND:
-                $attributesSign = [
+                $signAttributes = [
                     'partnerCode', 'accessKey', 'requestId', 'orderId', 'requestType'
                 ];
                 break;
             case PaymentGateway::RC_REFUND:
-                $attributesSign = [
+                $signAttributes = [
                     'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId', 'transId', 'requestType'
                 ];
                 break;
@@ -133,15 +133,15 @@ class RequestData extends BaseRequestData
                 throw new NotSupportedException("Not supported command: `$command`");
         }
 
-        $data = [];
+        $dataSign = [];
 
-        foreach ($attributesSign as $attributeSign) {
-            if (isset($attributes[$attributeSign])) {
-                $data[$attributeSign] = $attributes[$attributeSign];
+        foreach ($signAttributes as $signAttribute) {
+            if (isset($attributes[$signAttribute])) {
+                $dataSign[$signAttribute] = $attributes[$signAttribute];
             }
         }
 
-        $strSign = urldecode(http_build_query($data));
+        $strSign = urldecode(http_build_query($dataSign));
 
         return $this->getClient()->signature($strSign);
     }
