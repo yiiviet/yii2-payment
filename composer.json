@@ -12,7 +12,6 @@
     ],
     "require": {
         "php": ">=7.1.0",
-        "ext-openssl": "*",
         "yiisoft/yii2": ">=2.0.13",
         "vxm/yii2-gateway-clients": ">=2.0.1"
     },
