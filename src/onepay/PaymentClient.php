@@ -79,7 +79,8 @@ class PaymentClient extends BasePaymentClient
         return Yii::createObject([
             'class' => 'yiiviet\payment\HmacDataSignature',
             'key' => pack('H*', $this->secureSecret),
-            'hmacAlgo' => 'sha256'
+            'hmacAlgo' => 'sha256',
+            'caseSensitive' => false
         ], [$data]);
     }
 
