@@ -16,8 +16,6 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  *
  * @property PaymentClient $client đối tượng client đã dùng để thực thi request.
  * @property bool $isOk trạng thái phản hồi từ OnePay `TRUE` thành công và ngược lại.
- * @property string|null $message thông báo từ VNPayment.
- * @property int|null $responseCode mã phản hồi.
  * @property string $redirect_url đường dẫn redirect khách đến trang thanh toán, chỉ tồn tại khi `isOk` là TRUE.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
@@ -37,37 +35,6 @@ class ResponseData extends BaseResponseData
             return isset($this['vpc_DRExists']) ? strcasecmp($this['vpc_DRExists'], 'Y') === 0 : false;
         } else {
             return true;
-        }
-    }
-
-    /**
-     * Phương thức hổ trợ lấy `vpc_Message` nhận từ OnePay.
-     *
-     * @return null|string Trả về NULL nếu như dữ liệu OnePay gửi về không tồn tại `vpc_Message` và ngược lại.
-     */
-    public function getMessage(): ?string
-    {
-        if (isset($this['vpc_Message'])) {
-            return $this['vpc_Message'];
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Phương thức hổ trợ lấy response code từ OnePay,
-     * do tùy theo lệnh mà giá trị này nằm ở các attribute phản hồi khác nhau nên phương thức này sẽ tự động xác định.
-     *
-     * @return int|null Trả về NULL nếu như không có response code và ngược lại
-     */
-    public function getResponseCode(): ?int
-    {
-        if (isset($this['vpc_TxnResponseCode'])) {
-            return $this['vpc_TxnResponseCode'];
-        } elseif (isset($this['vpc_ResponseCode'])) {
-            return $this['vpc_ResponseCode'];
-        } else {
-            return null;
         }
     }
 
