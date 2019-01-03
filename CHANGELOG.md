@@ -3,6 +3,7 @@ Change Log
 
 1.0.4 đang xây dựng
 --------------------------
+- Lỗi #12: Không thể kiểm tra chữ ký dữ liệu gửi từ OnePay (vuongxuongminh)
 
 1.0.3
 --------------------------

@@ -41,9 +41,13 @@ class RsaDataSignature extends DataSignature
     {
         if ($this->openSSLAlgo === null) {
             throw new InvalidConfigException('Property `openSSLAlgo` must be set!');
-        } else if ($this->privateCertificate === null) {
+        }
+
+        if ($this->privateCertificate === null) {
             throw new InvalidConfigException('Property `privateCertificate` must be set for generate signature!');
-        } else if ($this->publicCertificate === null) {
+        }
+
+        if ($this->publicCertificate === null) {
             throw new InvalidConfigException('Property `publicCertificate` must be set for validate signature!');
         }
 
