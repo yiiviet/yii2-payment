@@ -74,7 +74,7 @@ class PaymentClient extends BasePaymentClient
      * @return object|\yiiviet\payment\HmacDataSignature
      * @throws \yii\base\InvalidConfigException
      */
-    public function initDataSignature(string $data, string $type = null): ?\yiiviet\payment\DataSignature
+    protected function initDataSignature(string $data, string $type = null): ?\yiiviet\payment\DataSignature
     {
         return Yii::createObject([
             'class' => 'yiiviet\payment\HmacDataSignature',

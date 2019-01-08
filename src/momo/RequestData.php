@@ -112,30 +112,9 @@ class RequestData extends BaseRequestData
      */
     protected function getSignature(array $attributes): string
     {
-        switch ($command = $this->getCommand()) {
-            case PaymentGateway::RC_PURCHASE:
-                $signAttributes = [
-                    'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId', 'orderInfo', 'returnUrl', 'notifyUrl', 'extraData'
-                ];
-                break;
-            case PaymentGateway::RC_QUERY_DR:
-            case PaymentGateway::RC_QUERY_REFUND:
-                $signAttributes = [
-                    'partnerCode', 'accessKey', 'requestId', 'orderId', 'requestType'
-                ];
-                break;
-            case PaymentGateway::RC_REFUND:
-                $signAttributes = [
-                    'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId', 'transId', 'requestType'
-                ];
-                break;
-            default:
-                throw new NotSupportedException("Not supported command: `$command`");
-        }
-
         $dataSign = [];
 
-        foreach ($signAttributes as $signAttribute) {
+        foreach ($this->getSignatureAttributes() as $signAttribute) {
             if (isset($attributes[$signAttribute])) {
                 $dataSign[$signAttribute] = $attributes[$signAttribute];
             }
@@ -145,4 +124,33 @@ class RequestData extends BaseRequestData
 
         return $this->getClient()->signature($strSign);
     }
+
+    /**
+     * Phương thức cung cấp các attribute theo [[getCommand()]] dùng để tạo chữ ký dữ liệu.
+     *
+     * @return array các phần tử có giá trị là tên attribute
+     * @throws NotSupportedException
+     * @since 1.0.4
+     */
+    protected function getSignatureAttributes(): array
+    {
+        switch ($command = $this->getCommand()) {
+            case PaymentGateway::RC_PURCHASE:
+                return [
+                    'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId', 'orderInfo', 'returnUrl', 'notifyUrl', 'extraData'
+                ];
+            case PaymentGateway::RC_QUERY_DR:
+            case PaymentGateway::RC_QUERY_REFUND:
+                return [
+                    'partnerCode', 'accessKey', 'requestId', 'orderId', 'requestType'
+                ];
+            case PaymentGateway::RC_REFUND:
+                return [
+                    'partnerCode', 'accessKey', 'requestId', 'amount', 'orderId', 'transId', 'requestType'
+                ];
+            default:
+                throw new NotSupportedException("Not supported command: `$command`");
+        }
+    }
+
 }
