@@ -45,6 +45,12 @@ class VerifyFilter extends ActionFilter
     public $gateway;
 
     /**
+     * @var string|int id của client thuộc [[gateway]] dùng để xác thực. Nếu không thiết lập sẽ sử dụng `clientId` mặc định của `gateway`.
+     * @since 1.0.4
+     */
+    public $clientId;
+
+    /**
      * @var array chứa các action `id` map với `command` cần verify, lưu ý rằng chỉ cần action `id` chứ không phải là action `uniqueId`.
      * Ví dụ:
      *
@@ -74,12 +80,15 @@ class VerifyFilter extends ActionFilter
     public function init()
     {
         if ($this->gateway === null) {
+
             throw new InvalidConfigException('`gateway` property must be set!');
         } else {
+
             $this->gateway = Instance::ensure($this->gateway, 'yiiviet\payment\PaymentGatewayInterface');
         }
 
         if (empty($this->commands)) {
+
             throw new InvalidConfigException('`commands` property must be set!');
         }
 
@@ -97,21 +106,25 @@ class VerifyFilter extends ActionFilter
         $actionId = $action->id;
         $command = $this->commands[$actionId] ?? null;
 
-        if ($command !== null) {
-            if (($verifiedData = $this->gateway->verifyRequest($command, $this->request)) instanceof DataInterface) {
-                $this->_verifiedData = $verifiedData;
+        if ($command === null) {
 
-                if ($this->autoDisableControllerCsrfValidation) {
-                    $action->controller->enableCsrfValidation = false;
-                }
-
-                return true;
-            } else {
-                throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
-            }
-        } else {
             throw new InvalidConfigException("Can't find verify command of action `$actionId`");
         }
+
+        $verifiedData = $this->gateway->verifyRequest($command, $this->request, $this->clientId);
+
+        if (!$verifiedData instanceof DataInterface) {
+
+            throw new ForbiddenHttpException( 'You are not allowed to perform this action.');
+        }
+
+        $this->_verifiedData = $verifiedData;
+
+        if ($this->autoDisableControllerCsrfValidation) {
+            $action->controller->enableCsrfValidation = false;
+        }
+
+        return true;
     }
 
 
