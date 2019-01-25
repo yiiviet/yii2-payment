@@ -3,6 +3,7 @@ Change Log
 
 1.0.4 đang xây dựng
 --------------------------
+- Tính năng #13: Hổ trợ thiết lập `clientId` tại lớp `yiiviet\payment\VerifyFilter` (vuongxuongminh)
 - Lỗi #12: Không thể kiểm tra chữ ký dữ liệu gửi từ OnePay (vuongxuongminh)
 
 1.0.3
