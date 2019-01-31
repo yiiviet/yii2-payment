@@ -177,11 +177,14 @@ class PaymentGateway extends BasePaymentGateway
     protected function getVerifyRequestData($command, \yii\web\Request $request): array
     {
         $params = [
-            'vpc_Command', 'vpc_Locale', 'vpc_MerchTxnRef', 'vpc_TxnResponseCode',
-            'vpc_OrderInfo', 'vpc_Amount', 'vpc_SecureHash', 'vpc_AcqResponseCode',
-            'vpc_TransactionNo', 'vpc_Message', 'vpc_3Dsstatus', 'vpc_3Dsstatus',
-            'vpc_Authorizeld', 'vpc_Card', 'vpc_3DSECI', 'vpc_Merchant', 'vpc_Version',
-            'vpc_CurrencyCode', 'vpc_AdditionData', 'vpc_CommercialCard', 'vpc_3Dsenrolled'
+            'vpc_Command', 'vpc_Locale', 'vpc_MerchTxnRef',
+            'vpc_OrderInfo', 'vpc_Amount', 'vpc_SecureHash',
+            'vpc_AcqResponseCode', 'vpc_TxnResponseCode', 'vpc_Card',
+            'vpc_TransactionNo', 'vpc_Message', 'vpc_3Dsstatus',
+            'vpc_Authorizeld', 'vpc_3DSECI', 'vpc_Merchant',
+            'vpc_CurrencyCode', 'vpc_AdditionData', 'vpc_CommercialCard',
+            'vpc_TicketNo', 'vpc_3Dsenrolled', 'vpc_Version',
+            'vpc_3Dsstatus'
         ];
 
         $data = [];
