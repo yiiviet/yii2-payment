@@ -128,14 +128,10 @@ class PaymentGateway extends BasePaymentGateway
      */
     protected function getVerifyRequestData($command, \yii\web\Request $request): array
     {
-        $params = [
-            'vnp_TmnCode', 'vnp_Amount', 'vnp_BankCode', 'vnp_BankTranNo', 'vnp_CardType', 'vnp_PayDate', 'vnp_CurrCode',
-            'vnp_OrderInfo', 'vnp_TransactionNo', 'vnp_ResponseCode', 'vnp_TxnRef', 'vnp_SecureHashType', 'vnp_SecureHash'
-        ];
-
         $data = [];
-        foreach ($params as $param) {
-            if (($value = $request->get($param)) !== null) {
+
+        foreach ($request->get() as $param => $value) {
+            if (strpos($param, 'vnp_') === 0) {
                 $data[$param] = $value;
             }
         }
