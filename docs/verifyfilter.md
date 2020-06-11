@@ -18,7 +18,7 @@ class TestController extends \yii\web\Controller {
     
         return [
             'verifyFilter' => [
-                'class' => 'yiiviet\payment\VerifyFilter',
+                'class' => 'nhuluc\payment\VerifyFilter',
                 'gateway' => \Yii::$app->BKGateway,
                 'commands' => [
                     'ipn' => 'IPN',

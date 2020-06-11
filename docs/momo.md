@@ -20,7 +20,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```php
 'components' => [
     'momoGateway' => [
-        'class' => 'yiiviet\payment\momo\PaymentGateway',
+        'class' => 'nhuluc\payment\momo\PaymentGateway',
         'sandbox' => true
     ]
 ]
@@ -32,7 +32,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```php
 'components' => [
     'momoGateway' => [
-        'class' => 'yiiviet\payment\momo\PaymentGateway',
+        'class' => 'nhuluc\payment\momo\PaymentGateway',
         'client' => [
             'partnerCode' => 'Partner code bạn vừa đăng ký',
             'accessKey' => 'Access key bạn vừa đăng ký',

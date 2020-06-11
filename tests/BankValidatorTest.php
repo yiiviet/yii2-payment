@@ -10,12 +10,12 @@ namespace yiiviet\tests\unit\payment;
 use Yii;
 
 use yii\base\DynamicModel;
-use yiiviet\payment\baokim\BankProvider;
+use nhuluc\payment\baokim\BankProvider;
 
 /**
  * Lớp BankValidatorTest
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.3
  */
 class BankValidatorTest extends TestCase

@@ -5,9 +5,9 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\nganluong;
+namespace nhuluc\payment\nganluong;
 
-use yiiviet\payment\VerifiedData as BaseVerifiedData;
+use nhuluc\payment\VerifiedData as BaseVerifiedData;
 
 /**
  * Lớp VerifiedData cung cấp dữ liệu đã được xác thực từ Ngân Lượng gửi về.
@@ -39,7 +39,7 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
  * @property string $transaction_id mã giao dịch tại Ngân Lượng, chỉ tồn tại khi `token` hợp lệ.
  * @property string $description thông tin giao dịch tại Ngân Lượng, chỉ tồn tại khi `token` hợp lệ.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class VerifiedData extends BaseVerifiedData

@@ -5,12 +5,12 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\vnpayment;
+namespace nhuluc\payment\vnpayment;
 
 /**
  * Trait MagicPropertiesTrait là trait bổ sung phương thức getter và setter nhầm giảm hóa sự lập đi lập lại của prefix `vnp_`
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 trait MagicPropertiesTrait

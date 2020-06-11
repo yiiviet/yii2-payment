@@ -5,14 +5,14 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use yii\base\InvalidConfigException;
 
 /**
  * Lớp HmacDataSignature dùng cho việc tạo và kiểm tra chữ ký theo chuẩn HMAC.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class HmacDataSignature extends DataSignature

@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\nganluong;
+namespace nhuluc\payment\nganluong;
 
 use vxm\gatewayclients\ResponseData as BaseResponseData;
 
@@ -44,7 +44,7 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  * @property string $transaction_status trạng thái giao dịch, chỉ tồn tại khi thực thi `queryDR`.
  * @property string $transaction_id mã giao dịch tại Ngân Lượng, chỉ tồn tại khi thực thi `queryDR`.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class ResponseData extends BaseResponseData

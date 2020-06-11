@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use yii\base\BaseObject;
 
@@ -15,7 +15,7 @@ use yii\base\BaseObject;
  *
  * @property string $data Chuỗi dữ liệu cần được ký hoặc xác minh tính hợp lệ.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 abstract class DataSignature extends BaseObject

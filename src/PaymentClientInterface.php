@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use GatewayClients\ClientInterface;
 
@@ -13,7 +13,7 @@ use GatewayClients\ClientInterface;
  * Mẫu trừu tượng PaymentClientInterface kế thừa [[ClientInterface]] bổ sung thêm các phương thức liên quan đến
  * chữ ký dữ liệu hổ trợ cho việc tạo chữ ký dữ liệu hoặc kiểm tra chữ ký từ cổng thanh toán.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 interface PaymentClientInterface extends ClientInterface

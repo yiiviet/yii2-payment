@@ -6,19 +6,19 @@
  */
 
 
-namespace yiiviet\payment\vtcpay;
+namespace nhuluc\payment\vtcpay;
 
 use Yii;
 
 use yii\base\InvalidConfigException;
 
-use yiiviet\payment\BasePaymentClient;
-use yiiviet\payment\DataSignature;
+use nhuluc\payment\BasePaymentClient;
+use nhuluc\payment\DataSignature;
 
 /**
  * Lớp PaymentClient hổ trợ tạo và kiểm tra chữ ký dữ liệu và có các thuộc tính kết nối đến cổng thanh toán VTCPay.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.2
  */
 class PaymentClient extends BasePaymentClient
@@ -38,6 +38,11 @@ class PaymentClient extends BasePaymentClient
      * @var string Mã website nhận khi đăng ký
      */
     public $merchantId;
+
+    /**
+     * @var bool phân biệt ký tự hoa thường khi xác minh chữ ký.
+     */
+    public $caseSensitive = false;
 
     /**
      * @inheritdoc
@@ -71,8 +76,9 @@ class PaymentClient extends BasePaymentClient
         $data .= '|' . $this->secureCode;
 
         return Yii::createObject([
-            'class' => 'yiiviet\payment\HashDataSignature',
-            'hashAlgo' => 'sha256'
+            'class' => 'nhuluc\payment\HashDataSignature',
+            'hashAlgo' => 'sha256',
+            'caseSensitive' => $this->caseSensitive
         ], [$data]);
     }
 

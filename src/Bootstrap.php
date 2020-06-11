@@ -6,7 +6,7 @@
  */
 
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use yii\base\BootstrapInterface;
 use yii\validators\Validator;
@@ -14,7 +14,7 @@ use yii\validators\Validator;
 /**
  * Lớp Bootstrap hổ trợ cấu hình bank validator
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.3
  */
 class Bootstrap implements BootstrapInterface

@@ -5,14 +5,14 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use yii\base\Event;
 
 /**
  * Lớp VerifiedRequestEvent sự kiện được khởi tạo khi việc xác minh dữ liệu đầu vào thành công,
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class VerifiedRequestEvent extends Event

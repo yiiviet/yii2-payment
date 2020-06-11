@@ -6,14 +6,14 @@
  */
 
 
-namespace yiiviet\payment\vtcpay;
+namespace nhuluc\payment\vtcpay;
 
 use GatewayClients\DataInterface;
 
 use yii\base\NotSupportedException;
 use yii\httpclient\Client as HttpClient;
 
-use yiiviet\payment\BasePaymentGateway;
+use nhuluc\payment\BasePaymentGateway;
 
 /**
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến VTCPay.
@@ -25,7 +25,7 @@ use yiiviet\payment\BasePaymentGateway;
  * @method PaymentClient getClient($id = null)
  * @method PaymentClient getDefaultClient()
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.2
  */
 class PaymentGateway extends BasePaymentGateway

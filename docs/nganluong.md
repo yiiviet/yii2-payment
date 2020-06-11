@@ -20,7 +20,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```php
 'components' => [
     'NLGateway' => [
-        'class' => 'yiiviet\payment\nganluong\PaymentGateway',
+        'class' => 'nhuluc\payment\nganluong\PaymentGateway',
         'seamless' => FALSE, // Sử dụng phương thức thanh toán redirect về Ngân Lượng (FALSE) hoặc khách thanh toán trực tiếp trên trang của bạn không cần `redirect` (TRUE).
         'sandbox' => true
     ]
@@ -33,7 +33,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```php
 'components' => [
     'NLGateway' => [
-        'class' => 'yiiviet\payment\nganluong\PaymentGateway',
+        'class' => 'nhuluc\payment\nganluong\PaymentGateway',
         'seamless' => FALSE, // Sử dụng phương thức thanh toán redirect về Ngân Lượng (FALSE) hoặc khách thanh toán trực tiếp trên trang của bạn không cần `redirect` (TRUE).
         'client' => [
             'email' => 'Email tài khoản ngân lượng của bạn',

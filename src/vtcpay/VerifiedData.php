@@ -6,11 +6,11 @@
  */
 
 
-namespace yiiviet\payment\vtcpay;
+namespace nhuluc\payment\vtcpay;
 
 use yii\helpers\ArrayHelper;
 
-use yiiviet\payment\VerifiedData as BaseVerifiedData;
+use nhuluc\payment\VerifiedData as BaseVerifiedData;
 
 /**
  * Lớp VerifiedData tổng hợp dữ liệu đã được xác minh từ VTCPay.
@@ -26,7 +26,7 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
  * @property mixed $trans_ref_no mã giao dịch tại VTCPay.
  * @property string $website_id merchant id của client.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.2
  */
 class VerifiedData extends BaseVerifiedData

@@ -5,11 +5,11 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\onepay;
+namespace nhuluc\payment\onepay;
 
 use yii\helpers\ArrayHelper;
 
-use yiiviet\payment\VerifiedData as BaseVerifiedData;
+use nhuluc\payment\VerifiedData as BaseVerifiedData;
 
 /**
  * Lớp VerifiedData cung cấp dữ liệu đã được xác thực từ OnePay gửi về.
@@ -25,7 +25,7 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
  * @property string $Merchant merchant id.
  * @property string $TransactionNo mã giao dịch tại OnePay.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class VerifiedData extends BaseVerifiedData

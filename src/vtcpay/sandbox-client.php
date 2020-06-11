@@ -7,7 +7,7 @@
  */
 
 return [
-    'class' => 'yiiviet\payment\vtcpay\PaymentClient',
+    'class' => 'nhuluc\payment\vtcpay\PaymentClient',
     'secureCode' => 'baogomCHUHOAchuthuongso123vakytudacbiet!@#',
     'merchantId' => '74132',
     'business' => '0963465816'

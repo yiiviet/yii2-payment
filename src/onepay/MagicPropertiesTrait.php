@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\onepay;
+namespace nhuluc\payment\onepay;
 
 /**
  * Trait MagicPropertiesTrait là trait bổ sung phương thức getter và setter nhầm giảm hóa sự lập đi lập lại của prefix `vpc_`
@@ -13,7 +13,7 @@ namespace yiiviet\payment\onepay;
  * @property string|null $Message thông báo từ VNPayment.
  * @property int|null $ResponseCode mã phản hồi.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 trait MagicPropertiesTrait

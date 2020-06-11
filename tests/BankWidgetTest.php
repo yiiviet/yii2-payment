@@ -8,12 +8,12 @@
 
 namespace yiiviet\tests\unit\payment;
 
-use yiiviet\payment\BankWidget;
+use nhuluc\payment\BankWidget;
 
 /**
  * Lớp BankWidgetTest
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.3
  */
 abstract class BankWidgetTest extends TestCase

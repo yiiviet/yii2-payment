@@ -10,7 +10,7 @@ namespace yiiviet\tests\unit\payment;
 /**
  * Lớp MoMoTest
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.3
  */
 class MoMoTest extends TestCase

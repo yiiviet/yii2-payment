@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use yii\helpers\Html;
 use yii\widgets\InputWidget;
@@ -13,7 +13,7 @@ use yii\widgets\InputWidget;
 /**
  * Lớp BaseWidget hổ trợ render input danh sách ngân hàng cho user chọn (dropdown list).
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.3
  */
 class BankWidget extends InputWidget

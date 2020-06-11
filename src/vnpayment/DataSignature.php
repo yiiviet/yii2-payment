@@ -5,17 +5,17 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\vnpayment;
+namespace nhuluc\payment\vnpayment;
 
 use yii\base\InvalidConfigException;
-use yiiviet\payment\DataSignature as BaseDataSignature;
+use nhuluc\payment\DataSignature as BaseDataSignature;
 
 /**
  * Lớp DataSignature hổ trợ tạo và kiểm tra chữ ký dữ liệu khi tương tác với VnPayment.
  *
  * @property string $secureHash
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  * @deprecated since 1.0.2 we use `yiiviet\payment\HashDataSignature` instead.
  */

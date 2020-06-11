@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 /**
  * Class TestCase
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 abstract class TestCase extends BaseTestCase
@@ -71,7 +71,7 @@ abstract class TestCase extends BaseTestCase
                     'scriptUrl' => '/index.php'
                 ],
                 'paymentGateways' => [
-                    'class' => 'yiiviet\payment\PaymentGatewayCollection',
+                    'class' => 'nhuluc\payment\PaymentGatewayCollection',
                     'gatewayConfig' => [
                         'sandbox' => true
                     ],

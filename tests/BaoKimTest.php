@@ -12,7 +12,7 @@ use Yii;
 /**
  * Class BaoKimTest
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class BaoKimTest extends TestCase

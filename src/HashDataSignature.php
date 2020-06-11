@@ -6,14 +6,14 @@
  */
 
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use yii\base\InvalidConfigException;
 
 /**
  * Lớp HashDataSignature hổ trợ tạo chữ ký dữ liệu thông qua các kiểu mã hóa hash 1 chiều như md5, sha1, sha256...
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.2
  */
 class HashDataSignature extends DataSignature

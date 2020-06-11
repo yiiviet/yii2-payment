@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\baokim;
+namespace nhuluc\payment\baokim;
 
 use vxm\gatewayclients\ResponseData as BaseResponseData;
 
@@ -24,7 +24,7 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  * @property array $bank_payment_methods danh sách ngân hàng, chỉ tồn tại khi thuộc tính `isOk` là `TRUE` và truy vấn thông tin `merchantData`.
  * @property array $seller_account thông tin merchant, chỉ tồn tại khi thuộc tính `isOk` là `TRUE` và truy vấn thông tin `merchantData`.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class ResponseData extends BaseResponseData

@@ -5,15 +5,15 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\momo;
+namespace nhuluc\payment\momo;
 
 use Yii;
 
 use yii\base\InvalidConfigException;
 
-use yiiviet\payment\BasePaymentClient;
-use yiiviet\payment\DataSignature;
-use yiiviet\payment\HmacDataSignature;
+use nhuluc\payment\BasePaymentClient;
+use nhuluc\payment\DataSignature;
+use nhuluc\payment\HmacDataSignature;
 
 /**
  * Lớp PaymentClient chứa các thuộc tính dùng để hổ trợ [[PaymentGateway]] kết nối đến MOMO.
@@ -21,7 +21,7 @@ use yiiviet\payment\HmacDataSignature;
  * @method PaymentGateway getGateway()
  * @property PaymentGateway $gateway
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class PaymentClient extends BasePaymentClient

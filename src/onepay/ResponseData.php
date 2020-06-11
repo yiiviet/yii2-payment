@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\onepay;
+namespace nhuluc\payment\onepay;
 
 use vxm\gatewayclients\ResponseData as BaseResponseData;
 
@@ -18,7 +18,7 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  * @property bool $isOk trạng thái phản hồi từ OnePay `TRUE` thành công và ngược lại.
  * @property string $redirect_url đường dẫn redirect khách đến trang thanh toán, chỉ tồn tại khi `isOk` là TRUE.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class ResponseData extends BaseResponseData

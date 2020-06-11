@@ -24,7 +24,7 @@ Ví dụ:
 ```php
 'components' => [
     'BKGateway' => [
-        'class' => 'yiiviet\payment\baokim\PaymentGateway',
+        'class' => 'nhuluc\payment\baokim\PaymentGateway',
         'sandbox' => true,
         'pro' => true, // Sử dụng phương thức PRO bạn sẽ `redirect` khách trực tiếp đến bank không thông qua Bảo Kim. Ngược lại `FALSE` thì thanh toán thông qua Bảo Kim.
     ]
@@ -37,7 +37,7 @@ Ví dụ:
 ```php
 
 use yii\widgets\ActiveForm;
-use yiiviet\payment\BankWidget;
+use nhuluc\payment\BankWidget;
 
 $form = ActiveForm::begin();
 
@@ -63,7 +63,7 @@ Ví dụ:
 ```php
 'components' => [
     'BKGateway' => [
-        'class' => 'yiiviet\payment\baokim\PaymentGateway',
+        'class' => 'nhuluc\payment\baokim\PaymentGateway',
         'sandbox' => true,
         'pro' => true, // Sử dụng phương thức PRO bạn sẽ `redirect` khách trực tiếp đến bank không thông qua Bảo Kim. Ngược lại `FALSE` thì thanh toán thông qua Bảo Kim.
     ]

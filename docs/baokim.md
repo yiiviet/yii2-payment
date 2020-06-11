@@ -26,7 +26,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```php
 'components' => [
     'BKGateway' => [
-        'class' => 'yiiviet\payment\baokim\PaymentGateway',
+        'class' => 'nhuluc\payment\baokim\PaymentGateway',
         'sandbox' => true,
         'pro' => true, // Sử dụng phương thức PRO bạn sẽ `redirect` khách trực tiếp đến bank không thông qua Bảo Kim. Ngược lại `FALSE` thì thanh toán thông qua Bảo Kim.
     ]
@@ -39,7 +39,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```php
 'components' => [
     'BKGateway' => [
-        'class' => 'yiiviet\payment\baokim\PaymentGateway',
+        'class' => 'nhuluc\payment\baokim\PaymentGateway',
         'pro' => true, // Sử dụng phương thức PRO bạn sẽ `redirect` khách trực tiếp đến bank không thông qua Bảo Kim. Ngược lại `FALSE` thì thanh toán thông qua Bảo Kim.        
         'client' => [
             'merchantId' => 'Mã merchant bạn vừa đăng ký',

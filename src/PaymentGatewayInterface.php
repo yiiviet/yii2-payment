@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use GatewayClients\GatewayInterface;
 
@@ -18,7 +18,7 @@ use GatewayClients\GatewayInterface;
  * @property array|PaymentClientInterface[] $merchants
  * @property PaymentClientInterface $merchant
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 interface PaymentGatewayInterface extends GatewayInterface

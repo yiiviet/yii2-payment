@@ -5,14 +5,14 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\vnpayment;
+namespace nhuluc\payment\vnpayment;
 
 use Yii;
 
 use yii\base\InvalidConfigException;
 
-use yiiviet\payment\BasePaymentClient;
-use yiiviet\payment\HashDataSignature;
+use nhuluc\payment\BasePaymentClient;
+use nhuluc\payment\HashDataSignature;
 
 /**
  * Lớp PaymentClient hổ trợ tạo và kiểm tra chữ ký dữ liệu và có các thuộc tính kết nối đến cổng thanh toán VnPayment
@@ -21,7 +21,7 @@ use yiiviet\payment\HashDataSignature;
  *
  * @property PaymentGateway $gateway
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class PaymentClient extends BasePaymentClient

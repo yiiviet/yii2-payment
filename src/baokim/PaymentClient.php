@@ -5,13 +5,13 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\baokim;
+namespace nhuluc\payment\baokim;
 
 use Yii;
 
 use yii\base\InvalidConfigException;
 
-use yiiviet\payment\BasePaymentClient;
+use nhuluc\payment\BasePaymentClient;
 
 /**
  * Lớp PaymentClient chứa các thuộc tính dùng để hổ trợ [[PaymentGateway]] kết nối đến Bảo Kim.
@@ -19,7 +19,7 @@ use yiiviet\payment\BasePaymentClient;
  * @method PaymentGateway getGateway()
  * @property PaymentGateway $gateway
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class PaymentClient extends BasePaymentClient
@@ -157,14 +157,14 @@ class PaymentClient extends BasePaymentClient
     {
         if ($type === self::SIGNATURE_RSA) {
             $config = [
-                'class' => 'yiiviet\payment\RsaDataSignature',
+                'class' => 'nhuluc\payment\RsaDataSignature',
                 'publicCertificate' => $this->publicCertificate ?? false,
                 'privateCertificate' => $this->privateCertificate,
                 'openSSLAlgo' => OPENSSL_ALGO_SHA1
             ];
         } elseif ($type === self::SIGNATURE_HMAC) {
             $config = [
-                'class' => 'yiiviet\payment\HmacDataSignature',
+                'class' => 'nhuluc\payment\HmacDataSignature',
                 'key' => $this->securePassword,
                 'hmacAlgo' => 'SHA1',
                 'caseSensitive' => false

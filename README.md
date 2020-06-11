@@ -91,13 +91,13 @@ Cài đặt thông qua `composer` nếu như đó là một khái niệm mới v
 [đây](http://getcomposer.org/download/) để tìm hiểu nó.
 
 ```sh
-composer require "yiiviet/yii2-payment"
+composer require "nhuluc/yii2-payment"
 ```
 
 hoặc thêm
 
 ```json
-"yiiviet/yii2-payment": "*"
+"nhuluc/yii2-payment": "*"
 ```
 
 vào phần `require` trong file composer.json.

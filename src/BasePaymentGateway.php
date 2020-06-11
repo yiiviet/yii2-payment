@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use Yii;
 use ReflectionClass;
@@ -25,7 +25,7 @@ use vxm\gatewayclients\ResponseData;
  * @property BasePaymentClient $client
  * @property BasePaymentClient $defaultClient
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 abstract class BasePaymentGateway extends BaseGateway implements PaymentGatewayInterface

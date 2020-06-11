@@ -7,7 +7,7 @@
  */
 
 return [
-    'class' => 'yiiviet\payment\momo\PaymentClient',
+    'class' => 'nhuluc\payment\momo\PaymentClient',
     'partnerCode' => 'MOMO0HGO20180417',
     'accessKey' => 'E8HZuQRy2RsjVtZp',
     'secretKey' => 'fj00YKnJhmYqahaFWUgkg75saNTzMrbO'

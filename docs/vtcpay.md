@@ -20,7 +20,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```php
 'components' => [
     'VTCGateway' => [
-        'class' => 'yiiviet\payment\vtcpay\PaymentGateway',
+        'class' => 'nhuluc\payment\vtcpay\PaymentGateway',
         'sandbox' => true
     ]
 ]
@@ -32,11 +32,12 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```php
 'components' => [
     'VTCGateway' => [
-        'class' => 'yiiviet\payment\VTCPay\PaymentGateway',
+        'class' => 'nhuluc\payment\VTCPay\PaymentGateway',
         'client' => [
             'business' => 'Account VTCPay bạn vừa đăng ký',
             'merchantId' => 'Website Id bạn vừa đăng ký',
-            'secureCode' => 'Secure Code bạn vừa đăng ký'
+            'secureCode' => 'Secure Code bạn vừa đăng ký',
+            'caseSensitive' => false
         ]
     ]
 ]

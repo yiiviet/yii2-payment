@@ -5,12 +5,12 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\baokim;
+namespace nhuluc\payment\baokim;
 
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 
-use yiiviet\payment\VerifiedData as BaseVerifiedData;
+use nhuluc\payment\VerifiedData as BaseVerifiedData;
 
 /**
  * Lớp VerifiedData cung cấp dữ liệu đã được xác minh từ các truy vấn IPN, success url.
@@ -42,7 +42,7 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
  * @property string $merchant_phone số điên thoại người bán, chỉ tồn tại khi phương thức thanh toán `pro`.
  * @property string $customer_location khu vực khách hàng, chỉ tồn tại khi phương thức thanh toán `pro`.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class VerifiedData extends BaseVerifiedData

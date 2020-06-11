@@ -5,13 +5,13 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\nganluong;
+namespace nhuluc\payment\nganluong;
 
 use GatewayClients\DataInterface;
 
 use yii\base\NotSupportedException;
 
-use yiiviet\payment\BasePaymentGateway;
+use nhuluc\payment\BasePaymentGateway;
 
 use vxm\gatewayclients\RequestEvent;
 
@@ -29,7 +29,7 @@ use vxm\gatewayclients\RequestEvent;
  * @property PaymentClient $defaultClient
  * @property bool $seamless
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class PaymentGateway extends BasePaymentGateway

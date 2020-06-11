@@ -5,11 +5,11 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\vnpayment;
+namespace nhuluc\payment\vnpayment;
 
 use yii\helpers\ArrayHelper;
 
-use yiiviet\payment\VerifiedData as BaseVerifiedData;
+use nhuluc\payment\VerifiedData as BaseVerifiedData;
 
 /**
  * Lớp VerifiedData tổng hợp dữ liệu đã được xác minh từ VnPayment.
@@ -28,7 +28,7 @@ use yiiviet\payment\VerifiedData as BaseVerifiedData;
  * @property string $PayDate thời gian giao dịch, chỉ tồn tại khi `ResponseCode` khác `00`.
  * @property string $ResponseCode mã phản hồi.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class VerifiedData extends BaseVerifiedData

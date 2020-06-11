@@ -5,13 +5,13 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\onepay;
+namespace nhuluc\payment\onepay;
 
 use Yii;
 
 use yii\base\InvalidConfigException;
 
-use yiiviet\payment\BasePaymentClient;
+use nhuluc\payment\BasePaymentClient;
 
 /**
  * Lớp PaymentClient là lớp cung cấp các thông tin cần thiết để kết nối đến cổng thanh toán OnePay.
@@ -20,7 +20,7 @@ use yiiviet\payment\BasePaymentClient;
  *
  * @property PaymentGateway $gateway
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class PaymentClient extends BasePaymentClient
@@ -77,7 +77,7 @@ class PaymentClient extends BasePaymentClient
     protected function initDataSignature(string $data, string $type = null): ?\yiiviet\payment\DataSignature
     {
         return Yii::createObject([
-            'class' => 'yiiviet\payment\HmacDataSignature',
+            'class' => 'nhuluc\payment\HmacDataSignature',
             'key' => pack('H*', $this->secureSecret),
             'hmacAlgo' => 'sha256',
             'caseSensitive' => false

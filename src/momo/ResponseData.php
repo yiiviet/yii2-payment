@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\momo;
+namespace nhuluc\payment\momo;
 
 use vxm\gatewayclients\ResponseData as BaseResponseData;
 
@@ -30,7 +30,7 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  * @property mixed $extraData dữ liệu kèm theo khi tạo request purchase chỉ tồn tại khi tạo request [[PaymentGateway::RC_QUERY_DR]].
  * @property string $payUrl đường dẫn thanh toán chỉ tồn tại khi tạo request [[PaymentGateway::RC_PURCHASE]].
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.3
  */
 class ResponseData extends BaseResponseData

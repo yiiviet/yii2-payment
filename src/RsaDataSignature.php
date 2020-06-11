@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use yii\base\InvalidConfigException;
 
@@ -13,7 +13,7 @@ use yii\base\InvalidConfigException;
 /**
  * Lớp RsaDataSignature dùng cho việc tạo và kiểm tra chữ ký theo chuẩn RSA.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class RsaDataSignature extends DataSignature

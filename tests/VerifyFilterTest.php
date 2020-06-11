@@ -12,12 +12,12 @@ use Yii;
 use yii\base\Action;
 use yii\web\Controller;
 
-use yiiviet\payment\VerifyFilter;
+use nhuluc\payment\VerifyFilter;
 
 /**
  * Lớp VerifyFilterTest
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.2
  */
 class VerifyFilterTest extends TestCase

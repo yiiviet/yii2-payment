@@ -13,7 +13,7 @@ thư mục `config` như sau:
 ```php
     'components' => [
         'paymentGateways' => [
-             'class' => 'yiiviet\payment\PaymentGatewayCollection',
+             'class' => 'nhuluc\payment\PaymentGatewayCollection',
              'gatewayConfig' => [
                  'sandbox' => true
              ],
@@ -34,10 +34,10 @@ thư mục `config` như sau:
 ```php
     'components' => [
         'paymentGateways' => [
-             'class' => 'yiiviet\payment\PaymentGatewayCollection',
+             'class' => 'nhuluc\payment\PaymentGatewayCollection',
              'gateways' => [
                  'BK' => [
-                     'class' => 'yiiviet\payment\baokim\PaymentGateway',
+                     'class' => 'nhuluc\payment\baokim\PaymentGateway',
                      'pro' => true, // Sử dụng phương thức PRO bạn sẽ `redirect` khách trực tiếp đến bank không thông qua Bảo Kim. Ngược lại `FALSE` thì thanh toán thông qua Bảo Kim.        
                      'client' => [
                          'merchantId' => 'Mã merchant bạn vừa đăng ký',
@@ -50,7 +50,7 @@ thư mục `config` như sau:
                      ]
                  ],
                  'NL' => [
-                     'class' => 'yiiviet\payment\nganluong\PaymentGateway',
+                     'class' => 'nhuluc\payment\nganluong\PaymentGateway',
                      'seamless' => FALSE, // Sử dụng phương thức thanh toán redirect về Ngân Lượng (FALSE) hoặc khách thanh toán trực tiếp trên trang của bạn không cần `redirect` (TRUE).
                      'client' => [
                          'email' => 'Email tài khoản ngân lượng của bạn',
@@ -59,7 +59,7 @@ thư mục `config` như sau:
                      ]
                  ],
                  'OP' => [
-                     'class' => 'yiiviet\payment\onepay\PaymentGateway',
+                     'class' => 'nhuluc\payment\onepay\PaymentGateway',
                      'international' => false, //Thiết lập `FALSE` để sử dụng cổng nội địa và ngược lại là cổng quốc tế. Mặc định là `FALSE`.        
                      'client' => [
                          'accessCode' => 'Access code bạn vừa đăng ký',
@@ -68,14 +68,14 @@ thư mục `config` như sau:
                      ]
                  ],
                  'VNP' => [
-                      'class' => 'yiiviet\payment\vnpayment\PaymentGateway',
+                      'class' => 'nhuluc\payment\vnpayment\PaymentGateway',
                       'client' => [
                           'tmnCode' => 'TMN code bạn vừa đăng ký',
                           'hashSecret' => 'Mã hash secret bạn vừa đăng ký'
                       ]
                  ],
                  'VTC' => [
-                    'class' => 'yiiviet\payment\vtcpay\PaymentGateway',
+                    'class' => 'nhuluc\payment\vtcpay\PaymentGateway',
                     'client' => [
                         'business' => 'Tài khoản VTCPay bạn vừa đăng ký',
                         'merchantId' => 'Mã website bạn vừa đăng ký',
@@ -83,7 +83,7 @@ thư mục `config` như sau:
                     ]
                  ],
                  'MM' => [
-                    'class' => 'yiiviet\payment\momo\PaymentGateway',
+                    'class' => 'nhuluc\payment\momo\PaymentGateway',
                     'client' => [
                         'partnerCode' => 'Partner code bạn vừa đăng ký',
                         'accessKey' => 'Access key bạn vừa đăng ký',

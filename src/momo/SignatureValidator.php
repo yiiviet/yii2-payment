@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\momo;
+namespace nhuluc\payment\momo;
 
 use yii\base\InvalidConfigException;
 use yii\validators\Validator;
@@ -13,7 +13,7 @@ use yii\validators\Validator;
 /**
  * Lớp SignatureValidator hổ trợ xác minh chữ ký dữ liệu từ MoMo gửi sang.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.3
  */
 class SignatureValidator extends Validator

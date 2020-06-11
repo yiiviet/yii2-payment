@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use Yii;
 
@@ -20,7 +20,7 @@ use yii\di\Instance;
  * @property PaymentGatewayInterface $gateway
  * @property array $providerClasses có khóa là lớp đối tượng cổng thanh toán và giá trị là lớp đối tượng cung cấp thông tin ngân hàng.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.3
  */
 trait GatewayBankProviderTrait

@@ -5,11 +5,11 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\onepay;
+namespace nhuluc\payment\onepay;
 
 use GatewayClients\DataInterface;
 
-use yiiviet\payment\BasePaymentGateway;
+use nhuluc\payment\BasePaymentGateway;
 
 /**
  * Lớp PaymentGateway thực thi các phương thức trừu tượng dùng hổ trợ kết nối đến OnePay.
@@ -25,7 +25,7 @@ use yiiviet\payment\BasePaymentGateway;
  * @property PaymentClient $client
  * @property PaymentClient $defaultClient
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class PaymentGateway extends BasePaymentGateway

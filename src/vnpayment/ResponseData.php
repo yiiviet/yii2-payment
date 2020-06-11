@@ -5,7 +5,7 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\vnpayment;
+namespace nhuluc\payment\vnpayment;
 
 use vxm\gatewayclients\ResponseData as BaseResponseData;
 
@@ -19,7 +19,7 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  * @property int|null $responseCode mã phản hồi.
  * @property string $redirect_url đường dẫn sẽ redirect khách đến trang thanh toán, chỉ tồn tại khi `isOk` là TRUE.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0
  */
 class ResponseData extends BaseResponseData

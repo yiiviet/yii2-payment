@@ -6,7 +6,7 @@
  */
 
 
-namespace yiiviet\payment\vtcpay;
+namespace nhuluc\payment\vtcpay;
 
 use vxm\gatewayclients\ResponseData as BaseResponseData;
 
@@ -19,7 +19,7 @@ use vxm\gatewayclients\ResponseData as BaseResponseData;
  * @property bool $isOk trạng thái phản hồi từ VTCPay `TRUE` thành công và ngược lại.
  * @property string $redirect_url đường dẫn sẽ redirect khách đến trang thanh toán, chỉ tồn tại khi `isOk` là TRUE.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.2
  */
 class ResponseData extends BaseResponseData

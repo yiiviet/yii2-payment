@@ -6,7 +6,7 @@
  */
 
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use Yii;
 
@@ -22,7 +22,7 @@ use yii\web\ForbiddenHttpException;
  *
  * @property null|DataInterface $verifiedData đối tượng chứa các thuộc tính dữ liệu đã được xác minh tính hợp lệ.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.2
  */
 class VerifyFilter extends ActionFilter

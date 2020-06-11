@@ -6,7 +6,7 @@
  */
 
 
-namespace yiiviet\payment;
+namespace nhuluc\payment;
 
 use yii\base\BaseObject;
 use yii\base\NotSupportedException;
@@ -14,7 +14,7 @@ use yii\base\NotSupportedException;
 /**
  * Mẫu trừu tượng BankProviderInterface cung cấp các phương thức lấy thông tin ngân hàng như tên, logo, id.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.3
  */
 abstract class BankProvider extends BaseObject

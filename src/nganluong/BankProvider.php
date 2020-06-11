@@ -5,14 +5,14 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace yiiviet\payment\nganluong;
+namespace nhuluc\payment\nganluong;
 
-use yiiviet\payment\BankProvider as BaseBankProvider;
+use nhuluc\payment\BankProvider as BaseBankProvider;
 
 /**
  * Lớp BankProvider cung cấp thông tin ngân hàng mà Ngân Lượng hổ trợ.
  *
- * @author Vuong Minh <vuongxuongminh@gmail.com>
+ * @author Nhu Luc <nguyennhuluc1990@gmail.com>
  * @since 1.0.3
  */
 class BankProvider extends BaseBankProvider

@@ -19,7 +19,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```php
 'components' => [
     'VNPGateway' => [
-        'class' => 'yiiviet\payment\vnpayment\PaymentGateway',
+        'class' => 'nhuluc\payment\vnpayment\PaymentGateway',
         'sandbox' => true
     ]
 ]
@@ -31,7 +31,7 @@ Thiết lập vào mảng `components` ở file `web.php` trong thư mục `conf
 ```php
 'components' => [
     'VNPGateway' => [
-        'class' => 'yiiviet\payment\vnpayment\PaymentGateway',
+        'class' => 'nhuluc\payment\vnpayment\PaymentGateway',
         'client' => [
             'tmnCode' => 'TMN code bạn vừa đăng ký',
             'hashSecret' => 'Mã hash secret bạn vừa đăng ký'
