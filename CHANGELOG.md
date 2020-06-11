@@ -1,6 +1,10 @@
 Change Log
 ==========================
 
+1.0.6 fix vtcpay
+--------------------------
+- Thêm config caseSensitive: true/false => phân biết ký tự chữ hoa chữ thường khi validate chữ ký số
+
 1.0.5 đang xây dựng
 --------------------------
 
